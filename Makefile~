@@ -1,0 +1,13 @@
+CFLAGS = -I ./include
+LIB    = ./lib/fmod/libfmodex64.so
+LFLAGS = $(LIB) -lrt -lX11 -lGLU -lGL -pthread -lm #-lXrandr
+
+all: rainforest
+
+rainforest: rainforest.cpp ppm.cpp fmod.c log.c
+	g++ $(CFLAGS) rainforest.cpp ppm.cpp log.c fmod.c libggfonts.a -Wall -Wextra $(LFLAGS) -o rainforest
+
+clean:
+	rm -f rainforest
+	rm -f *.o
+

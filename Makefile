@@ -1,12 +1,13 @@
-# cs335 lab1
-# to compile your project, type make and press enter
+CFLAGS = -I ./include
+##LIB    = ./lib/fmod/libfmodex64.so
+LFLAGS = -lrt -lX11 -lGLU -lGL -pthread -lm #-lXrandr
 
-all: lab1
+all: rainforest
 
-lab1: lab1.cpp
-	g++ dturack.cpp lab1.cpp -Wall -olab1 -lX11 -lGL -lGLU -lm
+rainforest: rainforest.cpp ppm.cpp log.cpp
+	g++ $(CFLAGS) rainforest.cpp ppm.cpp log.cpp libggfonts.a -Wall -Wextra $(LFLAGS) -o rainforest
 
 clean:
-	rm -f lab1
+	rm -f rainforest
 	rm -f *.o
 
