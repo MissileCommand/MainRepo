@@ -5,8 +5,7 @@
 //You will follow along with your instructor.
 //
 
-// commented out by JBC AGAIN!
-// #include "danielt.h"
+
 
 
 //
@@ -69,6 +68,9 @@ int main(void)
 	game.box.height = 10;
 	game.box.center.x = 120 + 5*65;
 	game.box.center.y = 500 - 5*60;
+	
+	//function call to danielt.cpp for creation of enemy missiles
+	createEMissiles(&game);
 
 	//start animation
 	while(!done) {
@@ -276,6 +278,8 @@ void render(Game *game)
 		glEnd();
 		glPopMatrix();
 	}
+	//function call to danielt.cpp to render enemy missiles
+	renderEMissiles(game);
 }
 
 
