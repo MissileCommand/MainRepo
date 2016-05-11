@@ -30,7 +30,7 @@
 //X Position of all buttons
 //Divides WINDOW_WIDTH by the number below
 #define BUTTON_X 4.25
-#define CITYNUM 7
+#define CITYNUM 5
 //#define WINDOW_WIDTH  800
 //#define WINDOW_HEIGHT 600
 #define WINDOW_WIDTH  1024
@@ -95,9 +95,8 @@ struct Game {
     //JR: This will be used to return which button the mouse
     //      is currently on in the menus
     int mouseOnButton[BUTTONS];
-    //JR: Will store value for menu if left click was on Exit button
-    //      if 1 will exit
-    int menuExit;
+    //JR
+    int menuExit, gMenu, inGame;
     Shape mButton[BUTTONS];
     //Constructor 
     Game() {
@@ -107,6 +106,8 @@ struct Game {
     	nmissiles = 0;
 	neexplosions = 0;
         menuExit = 0;
+        gMenu = 1;
+        inGame = 0;
     }
     //Deconstructor
     ~Game() {

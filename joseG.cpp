@@ -51,7 +51,7 @@ void renderStruc(Structures *shape)
                 glColor3ub(87,87,87);
                 c = &shape->city[i];
                 glPushMatrix();
-                glTranslatef(c->center.x - 100, c->center.y, c->center.z);
+                glTranslatef(c->center.x, c->center.y, c->center.z);
                 w2 = c->width;
                 h2 = c->height;
                 glBegin(GL_QUADS);
