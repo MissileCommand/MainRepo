@@ -12,8 +12,19 @@
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <GL/glx.h>
+
+#ifndef MISSILECOMMAND_H
+#define MISSILECOMMAND_H
 #include "missileCommand.h"
+#endif
+
+
+#ifndef JOHNC_H
+#define JOHNC_H
 #include "johnC.h"
+#endif
+
+
 #include "danielT.h"
 #include "joseR.h"
 #include "joseG.h"
@@ -33,6 +44,11 @@ void cleanupXWindows(void);
 void check_mouse(XEvent *e, Game *game);
 int check_keys(XEvent *e, Game *game);
 void movement(Game *game, Structures *sh);
+
+// JBC added 5/13
+void renderDefenseMissile(Game *game);
+void makeDefenseMissile(Game *game, int x, int y);
+
 void render(Game *game);
 
 int main(void)
@@ -81,7 +97,7 @@ void set_title(void)
 {
 	//Set the window title bar.
 	XMapWindow(dpy, win);
-	XStoreName(dpy, win, "335 Lab1   LMB for particle");
+	XStoreName(dpy, win, "335 Lab1   LMB for dMissile");
 }
 
 void cleanupXWindows(void)
@@ -138,19 +154,21 @@ void init_opengl(void)
 	initialize_fonts();
 }
 
-void makeParticle(Game *game, int x, int y)
-{
-	if (game->n >= MAX_PARTICLES)
-		return;
-	//std::cout << "makeParticle()" << x << " " << y << std::endl;
-	//position of particle
-	Particle *p = &game->particle[game->n];
-	p->s.center.x = x;
-	p->s.center.y = y;
-	p->velocity.y = -4.0;
-	p->velocity.x =  1.0;
-	game->n++;
-}
+// JBC note 5/13
+// moved the "particle" stuff out of here
+//void makeParticle(Game *game, int x, int y)
+//{
+//	if (game->n >= MAX_D_MISSILES)
+//		return;
+//	//std::cout << "makeParticle()" << x << " " << y << std::endl;
+//	//position of particle
+//	Particle *p = &game->particle[game->n];
+//	p->s.center.x = x;
+//	p->s.center.y = y;
+//	p->velocity.y = -4.0;
+//	p->velocity.x =  1.0;
+//	game->n++;
+//}
 
 void check_mouse(XEvent *e, Game *game)
 {
@@ -170,8 +188,11 @@ void check_mouse(XEvent *e, Game *game)
 			if (gameState(game) == 1) {
 				menuClick(game);
 			} else {
-				changeTitle();
-				makeParticle(game, e->xbutton.x, y);
+				// changeTitle();
+                                makeDefenseMissile(game, e->xbutton.x, y);
+                                // JBC note 5/13
+                                // moved the "particle" stuff out of here 
+				// makeParticle(game, e->xbutton.x, y);
 			}
 			return;
 		}
@@ -182,7 +203,10 @@ void check_mouse(XEvent *e, Game *game)
 				//Menu functions
 			} else if (gameState(game) == 0) {
 				//Game Functions
-				fireDefenseMissile();
+				// fireDefenseMissile(game);
+                            
+                                // JBC idea to add menu pop up for right-click
+                                game->gMenu ^= 1;
 			}
 			return;
 		}
@@ -198,8 +222,11 @@ void check_mouse(XEvent *e, Game *game)
 			//Menu Functions
 			mouseOver(savex, y, game);
 		} else if (gameState(game) == 0) {
-			//Game Functions
-			makeParticle(game, e->xbutton.x, y);
+			
+                        //Game Functions
+                        // JBC note 5/13
+                        // moved the "particle" stuff out of here 
+			// makeParticle(game, e->xbutton.x, y);
 		}
 	}
 }
@@ -234,58 +261,47 @@ int check_keys(XEvent *e, Game *game)
 	}
 }
 
+// JBC note 5/13
+// moved the "particle" stuff out of here 
 void movement(Game *game, Structures *sh)
 {
+        // JBC temp comment to see ANYTHING
 	eMissilePhysics(game, sh);
 	eExplosionPhysics(game);
 	
-	Particle *p;
-
-	if (game->n <= 0)
-		return;
-
-	for (int i=0; i<game->n; i++) {
-		p = &game->particle[i];
-		p->s.center.x += p->velocity.x;
-		p->s.center.y += p->velocity.y;
-
-		//gravity
-		p->velocity.y -= 0.2;
-
-		//check for off-screen
-		if (p->s.center.y < 0.0) {
-			//std::cout << "off screen" << std::endl;
-            //fireDefenseMissile();
-			game->particle[i] = game->particle[game->n-1];
-			game->n--;
-		}
-	}
+	
 }
 
 void render(Game *game)
 {
-	float w, h;
+//	float w, h;
 	glClear(GL_COLOR_BUFFER_BIT);
 	//Draw shapes...
-	//draw all particles here
+	//draw all dMissiles here
 	glPushMatrix();
 	glColor3ub(150,160,220);
-	for (int i=0; i<game->n; i++) {
-		Vec *c = &game->particle[i].s.center;
-		w = 2;
-		h = 2;
-		glBegin(GL_QUADS);
-			glVertex2i(c->x-w, c->y-h);
-			glVertex2i(c->x-w, c->y+h);
-			glVertex2i(c->x+w, c->y+h);
-			glVertex2i(c->x+w, c->y-h);
-		glEnd();
-		glPopMatrix();
-	}
+        
+//        // JBC temp comment
+//	for (int i=0; i<game->n; i++) {
+//		Vec *c = &game->dMissile[i].s.center;
+//		w = 2;
+//		h = 2;
+//		glBegin(GL_QUADS);
+//			glVertex2i(c->x-w, c->y-h);
+//			glVertex2i(c->x-w, c->y+h);
+//			glVertex2i(c->x+w, c->y+h);
+//			glVertex2i(c->x+w, c->y-h);
+//		glEnd();
+//		glPopMatrix();
+//	}
+        
+        
 	//DT
+	// JBC commented out... please keep for my testing
+//        if (game->nmissiles < 10) {
+//		createEMissiles(game);
+//	}
 	renderEMissiles(game);
-	if (game->nmissiles < 10) {
-		createEMissiles(game);
-	}
 	renderEExplosions(game);
+        renderDefenseMissile(game);
 }
