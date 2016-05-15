@@ -8,5 +8,6 @@ extern void renderMenuObjects(Game *game);
 extern void renderMenuText(Game *game);
 extern void menuClick(Game *game);
 extern int gameState(Game *game);
+extern int init_sound(int gSound);
 
 #endif

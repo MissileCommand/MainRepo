@@ -17,9 +17,12 @@
 //INCLUDES
 #include <iostream>
 #include <cstdlib>
+#include <cstdio>
 #include <ctime>
 #include <cstring>
+#include <string>
 #include <cmath>
+#include <unistd.h>
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <GL/glx.h>

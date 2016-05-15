@@ -6,12 +6,14 @@
 
 #include <iostream>
 #include <cstdlib>
+#include <cstdio>
 #include <ctime>
 #include <cstring>
 #include <cmath>
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <GL/glx.h>
+#include </usr/include/AL/alut.h>
 
 #ifndef MISSILECOMMAND_H
 #define MISSILECOMMAND_H
@@ -178,6 +180,7 @@ void check_mouse(XEvent *e, Game *game)
 
 	if (e->type == ButtonRelease) {
 		return;
+		init_sound(1);
 	}
 	if (e->type == ButtonPress) {
 		//LEFT-CLICK
@@ -187,11 +190,12 @@ void check_mouse(XEvent *e, Game *game)
 			//Check game state when LEFT-clicking
 			if (gameState(game) == 1) {
 				menuClick(game);
+				init_sound(0);
 			} else {
 				// changeTitle();
-                                makeDefenseMissile(game, e->xbutton.x, y);
-                                // JBC note 5/13
-                                // moved the "particle" stuff out of here 
+                makeDefenseMissile(game, e->xbutton.x, y);
+                // JBC note 5/13
+                // moved the "particle" stuff out of here 
 				// makeParticle(game, e->xbutton.x, y);
 			}
 			return;
