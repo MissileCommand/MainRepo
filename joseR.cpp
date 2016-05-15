@@ -15,13 +15,14 @@
 //				This is determined by the function gameState(...)
 //			Added a way of treating the menu as a pseudo pause menu.
 //				This is determined by "int inGame" in "struct Game"
+//		*May 15th, 2016*
+//			OpenAL (sound) functionality has been added
+//			Others may play sounds by simply calling "playSound(game, int);"
+//			Must include joseR.h
 //			
 #include <GL/glx.h>
 #include "missileCommand.h"
 #include "joseR.h"
-#include <AL/al.h>
-#include <AL/alc.h>
-#include <AL/alut.h>
 #include <stdio.h>
 extern "C" {
 	#include "fonts.h"
@@ -33,69 +34,91 @@ using namespace std;
 
 extern void init_opengl();
 
-int init_sound(int gSound)
+void init_openal()
 {
-	const string FILE[] = {"./sounds/button_click.wav", "./sounds/button_release.wav"};
-	//Get started right here.
-	ALCenum error;
+	//Initialize openal
 	alutInit(0, NULL);
 	if (alGetError() != AL_NO_ERROR) {
 		printf("ERROR: alutInit()\n");
-		return 0;
+		return;
 	}
 	//Clear error state.
 	alGetError();
-	ALCdevice *device;
-	device = alcOpenDevice(NULL);
-	if (!device) {
-		printf("DEVICE ERROR\n");
-		return 0;
-	}
+	//Setup default device
+	//ALCdevice *device;
+	//device = alcOpenDevice(NULL);
+	//if (!device) {
+	//	printf("DEVICE ERROR\n");
+	//	return;
+	//}
+	//alGetError();
+	////Setup context
+	//ALCcontext *context;
+	//context = alcCreateContext(device, NULL);
+	//if (!alcMakeContextCurrent(context)) {
+	//	printf("Failed to make context current\n");
+	//	return;
+	//}
+	////Setup the listener.
+	//float vec[6] = {0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f};
+	//alListener3f(AL_POSITION, 0.0f, 0.0f, 0.0f);
+	//alListenerfv(AL_ORIENTATION, vec);
+	//alListenerf(AL_GAIN, 1.0f);
+}
+
+void playSound(Game *game, int n)
+{
+	gameSound *src;
+	src = &game->sound;
+	//Clear error state.
 	alGetError();
-	ALCcontext *context;
-	context = alcCreateContext(device, NULL);
-	if (!alcMakeContextCurrent(context)) {
-		printf("Failed to make context current\n");
-		return 0;
-	}
 	//Setup buffer and source
 	ALuint buffer, source;
 	ALint source_state;
-	//Setup the listener.
-	float vec[6] = {0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f};
-	alListener3f(AL_POSITION, 0.0f, 0.0f, 0.0f);
-	alListenerfv(AL_ORIENTATION, vec);
-	alListenerf(AL_GAIN, 1.0f);
-	
-	int i = gSound;
 	//Buffer holds the sound information.
-	const char *f = FILE[i].c_str();
+	const string FILE[] = {"./sounds/click.wav", "./sounds/digital-click.wav",
+							"./sounds/missile-fire.wav"};
+	const char *f = FILE[n].c_str();
 	buffer = alutCreateBufferFromFile(f);
 	//Source refers to the sound.
 	//Generate a source, and store it in a buffer.
 	alGenSources(1, &source);
 	alSourcei(source, AL_BUFFER, buffer);
 	//Set volume and pitch to normal, no looping of sound.
-	alSourcef(source, AL_GAIN, 1.0f);
-	alSourcef(source, AL_PITCH, 1.0f);
-	alSourcei(source, AL_LOOPING, AL_FALSE);
+	//alSourcef(source, AL_GAIN, 1.0f);
+	//alSourcef(source, AL_PITCH, 1.0f);
+	//alSourcei(source, AL_LOOPING, AL_FALSE);
 	if (alGetError() != AL_NO_ERROR) {
 		printf("ERROR: setting source\n");
-		return 0;
+		return;
 	}
     // Play
 	alSourcePlay(source);
 	alGetSourcei(source, AL_SOURCE_STATE, &source_state);
-	while (source_state == AL_PLAYING) {
-	    alGetSourcei(source, AL_SOURCE_STATE, &source_state);
+	if (game->gMenu == 1) {
+		while (source_state == AL_PLAYING) {
+		    alGetSourcei(source, AL_SOURCE_STATE, &source_state);
+		}
 	}
+	src->source = source;
+	src->buffer = buffer;
+	alGetError();
+	alDeleteBuffers(1, &buffer);
+}
+
+void cleanup_openal(Game *game)
+{
+	gameSound *src;
+	src = &game->sound;
+	ALuint source = src->source;
+	ALuint buffer = src->buffer;
 	//Cleanup.
 	alDeleteSources(1, &source);
 	alDeleteBuffers(1, &buffer);
-	alcMakeContextCurrent(NULL);
-	alcDestroyContext(context);
-	alcCloseDevice(device);
-	return 0;
+	alutExit();
+	//alcMakeContextCurrent(NULL);
+	//alcDestroyContext(&context);
+	//alcCloseDevice(&device);
 }
 
 void drawMenu(Game *game)

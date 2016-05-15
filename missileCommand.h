@@ -26,6 +26,9 @@
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <GL/glx.h>
+#include <AL/al.h>
+#include <AL/alc.h>
+#include <AL/alut.h>
 
 //MACROS
 //Number of buttons to show on menu
@@ -100,6 +103,11 @@ struct EExplosion {
     EExplosion() {}
 };
 
+struct gameSound {
+    int source, buffer;
+    gameSound() {}
+};
+
 struct Game {
     Shape box;    
     // JBC comment out
@@ -123,6 +131,7 @@ struct Game {
     //JR
     int menuExit, gMenu, inGame;
     Shape mButton[BUTTONS];
+    gameSound sound;
     //Constructor 
     Game() {
     	emarr = new EMissile[10];

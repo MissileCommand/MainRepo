@@ -59,6 +59,7 @@ int main(void)
 	srand(time(NULL));
 	initXWindows();
 	init_opengl();
+	init_openal();
 	//declare game object
 	Game game;
 	game.n=0;
@@ -91,6 +92,7 @@ int main(void)
 		renderStruc(&sh);
 		glXSwapBuffers(dpy, win);
 	}
+	cleanup_openal(&game);
 	cleanupXWindows();
 	return 0;
 }
@@ -180,7 +182,6 @@ void check_mouse(XEvent *e, Game *game)
 
 	if (e->type == ButtonRelease) {
 		return;
-		init_sound(1);
 	}
 	if (e->type == ButtonPress) {
 		//LEFT-CLICK
@@ -189,11 +190,12 @@ void check_mouse(XEvent *e, Game *game)
 			int y = WINDOW_HEIGHT - e->xbutton.y;
 			//Check game state when LEFT-clicking
 			if (gameState(game) == 1) {
+				playSound(game, 0);
 				menuClick(game);
-				init_sound(0);
 			} else {
 				// changeTitle();
                 makeDefenseMissile(game, e->xbutton.x, y);
+                playSound(game, 2);
                 // JBC note 5/13
                 // moved the "particle" stuff out of here 
 				// makeParticle(game, e->xbutton.x, y);
@@ -208,9 +210,8 @@ void check_mouse(XEvent *e, Game *game)
 			} else if (gameState(game) == 0) {
 				//Game Functions
 				// fireDefenseMissile(game);
-                            
-                                // JBC idea to add menu pop up for right-click
-                                game->gMenu ^= 1;
+                // JBC idea to add menu pop up for right-click
+                game->gMenu ^= 1;
 			}
 			return;
 		}
