@@ -34,7 +34,7 @@ using namespace std;
 
 extern void init_opengl();
 
-void init_openal()
+void init_openal(Game *game)
 {
 	//Initialize openal
 	alutInit(0, NULL);
@@ -44,6 +44,22 @@ void init_openal()
 	}
 	//Clear error state.
 	alGetError();
+	gameSound *src;
+	src = &game->sound;
+	ALuint source;
+	//Buffer holds the sound information.
+	const string FILE[] = {"./sounds/click.wav", "./sounds/b_release.wav",
+							"./sounds/missile-fire.wav"};
+	for (int n = 0; n < 3; n++) {
+		const char *f = FILE[n].c_str();
+		src->buffer[n] = alutCreateBufferFromFile(f);
+		//Generate a source
+		alGenSources(1, &source);
+		//Store source in a buffer
+		alSourcei(source, AL_BUFFER, src->buffer[n]);
+		//Store value of that source to call later
+		src->source[n] = source;
+	}
 	//Setup default device
 	//ALCdevice *device;
 	//device = alcOpenDevice(NULL);
@@ -73,17 +89,14 @@ void playSound(Game *game, int n)
 	//Clear error state.
 	alGetError();
 	//Setup buffer and source
-	ALuint buffer, source;
+	ALuint source, buffer;
 	ALint source_state;
-	//Buffer holds the sound information.
-	const string FILE[] = {"./sounds/click.wav", "./sounds/digital-click.wav",
-							"./sounds/missile-fire.wav"};
-	const char *f = FILE[n].c_str();
-	buffer = alutCreateBufferFromFile(f);
+	buffer = src->buffer[n];
+	source = src->source[n];
 	//Source refers to the sound.
 	//Generate a source, and store it in a buffer.
-	alGenSources(1, &source);
-	alSourcei(source, AL_BUFFER, buffer);
+	//alGenSources(1, &source);
+	//alSourcei(source, AL_BUFFER, src->buffer[n]);
 	//Set volume and pitch to normal, no looping of sound.
 	//alSourcef(source, AL_GAIN, 1.0f);
 	//alSourcef(source, AL_PITCH, 1.0f);
@@ -93,6 +106,9 @@ void playSound(Game *game, int n)
 		return;
 	}
     // Play
+    //HOW TO POSSIBLY FIX SINGLE SOUND PER BUFFER ISSUE
+    //IF state == playing GENERATE A NEW SOUND
+    //Once we get near the 255 limit, cleanup and recreate sources?
 	alSourcePlay(source);
 	alGetSourcei(source, AL_SOURCE_STATE, &source_state);
 	if (game->gMenu == 1) {
@@ -100,22 +116,19 @@ void playSound(Game *game, int n)
 		    alGetSourcei(source, AL_SOURCE_STATE, &source_state);
 		}
 	}
-	src->source = source;
-	src->buffer = buffer;
+	//src->source = source;
+	//src->buffer = buffer;
 	alGetError();
-	alDeleteBuffers(1, &buffer);
-}
-
-void cleanup_openal(Game *game)
-{
-	gameSound *src;
-	src = &game->sound;
-	ALuint source = src->source;
-	ALuint buffer = src->buffer;
-	//Cleanup.
-	alDeleteSources(1, &source);
-	alDeleteBuffers(1, &buffer);
-	alutExit();
+	//alDeleteBuffers(1, &buffer);
+	//Cleanup Audio
+	if (src->max >= 200) {
+		alDeleteSources(1, &source);
+	}
+	if (game->menuExit == 1) {
+		alDeleteSources(1, &source);
+		alDeleteBuffers(1, &buffer);
+		alutExit();
+	}
 	//alcMakeContextCurrent(NULL);
 	//alcDestroyContext(&context);
 	//alcCloseDevice(&device);

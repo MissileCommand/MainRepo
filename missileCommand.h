@@ -104,7 +104,9 @@ struct EExplosion {
 };
 
 struct gameSound {
-    int source, buffer;
+    int source[4];
+    int buffer[4];
+    int max;
     gameSound() {}
 };
 

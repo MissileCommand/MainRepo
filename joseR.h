@@ -8,8 +8,7 @@ extern void renderMenuObjects(Game *game);
 extern void renderMenuText(Game *game);
 extern void menuClick(Game *game);
 extern int gameState(Game *game);
-extern void init_openal();
+extern void init_openal(Game *game);
 extern void playSound(Game *game, int n);
-extern void cleanup_openal(Game *game);
 
 #endif

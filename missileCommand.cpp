@@ -59,10 +59,10 @@ int main(void)
 	srand(time(NULL));
 	initXWindows();
 	init_opengl();
-	init_openal();
 	//declare game object
 	Game game;
 	game.n=0;
+	init_openal(&game);
 	Structures sh;
 
 	//DT
@@ -92,7 +92,6 @@ int main(void)
 		renderStruc(&sh);
 		glXSwapBuffers(dpy, win);
 	}
-	cleanup_openal(&game);
 	cleanupXWindows();
 	return 0;
 }
