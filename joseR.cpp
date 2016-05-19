@@ -28,110 +28,101 @@ extern "C" {
 	#include "fonts.h"
 }
 
+#define TOTAL_SOUNDS 3
+
 using namespace std;
 
 //#define FILE "./sounds/power-up.wav"
 
 extern void init_opengl();
 
-void init_openal(Game *game)
+//old_code.cpp was from here
+
+Audio::Audio()
 {
-	//Initialize openal
 	alutInit(0, NULL);
 	if (alGetError() != AL_NO_ERROR) {
 		printf("ERROR: alutInit()\n");
 		return;
 	}
-	//Clear error state.
 	alGetError();
-	gameSound *src;
-	src = &game->sound;
-	ALuint source;
-	//Buffer holds the sound information.
-	const string FILE[] = {"./sounds/click.wav", "./sounds/b_release.wav",
-							"./sounds/missile-fire.wav"};
-	for (int n = 0; n < 3; n++) {
-		const char *f = FILE[n].c_str();
-		src->buffer[n] = alutCreateBufferFromFile(f);
-		//Generate a source
-		alGenSources(1, &source);
-		//Store source in a buffer
-		alSourcei(source, AL_BUFFER, src->buffer[n]);
-		//Store value of that source to call later
-		src->source[n] = source;
-	}
-	//Setup default device
-	//ALCdevice *device;
-	//device = alcOpenDevice(NULL);
-	//if (!device) {
-	//	printf("DEVICE ERROR\n");
-	//	return;
-	//}
-	//alGetError();
-	////Setup context
-	//ALCcontext *context;
-	//context = alcCreateContext(device, NULL);
-	//if (!alcMakeContextCurrent(context)) {
-	//	printf("Failed to make context current\n");
-	//	return;
-	//}
-	////Setup the listener.
-	//float vec[6] = {0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f};
-	//alListener3f(AL_POSITION, 0.0f, 0.0f, 0.0f);
-	//alListenerfv(AL_ORIENTATION, vec);
-	//alListenerf(AL_GAIN, 1.0f);
-}
-
-void playSound(Game *game, int n)
-{
-	gameSound *src;
-	src = &game->sound;
-	//Clear error state.
-	alGetError();
-	//Setup buffer and source
-	ALuint source, buffer;
-	ALint source_state;
-	buffer = src->buffer[n];
-	source = src->source[n];
-	//Source refers to the sound.
-	//Generate a source, and store it in a buffer.
-	//alGenSources(1, &source);
-	//alSourcei(source, AL_BUFFER, src->buffer[n]);
-	//Set volume and pitch to normal, no looping of sound.
-	//alSourcef(source, AL_GAIN, 1.0f);
-	//alSourcef(source, AL_PITCH, 1.0f);
-	//alSourcei(source, AL_LOOPING, AL_FALSE);
-	if (alGetError() != AL_NO_ERROR) {
-		printf("ERROR: setting source\n");
+	device = alcOpenDevice(NULL);
+	if (!device) {
+		printf("ERROR: device\n");
 		return;
 	}
-    // Play
-    //HOW TO POSSIBLY FIX SINGLE SOUND PER BUFFER ISSUE
-    //IF state == playing GENERATE A NEW SOUND
-    //Once we get near the 255 limit, cleanup and recreate sources?
-	alSourcePlay(source);
-	alGetSourcei(source, AL_SOURCE_STATE, &source_state);
-	if (game->gMenu == 1) {
-		while (source_state == AL_PLAYING) {
-		    alGetSourcei(source, AL_SOURCE_STATE, &source_state);
+	alGetError();
+	context = alcCreateContext(device, NULL);
+	if (!alcMakeContextCurrent(context)) {
+		printf("ERROR: context\n");
+		return;
+	}
+}
+
+Audio::~Audio()
+{
+	alDeleteSources(1, &alSource);
+	alDeleteBuffers(1, &alBuffer);
+	alcMakeContextCurrent(NULL);
+	alcDestroyContext(context);
+	alcCloseDevice(device);
+	alutExit();
+}
+
+void Audio::loadAudio()
+{
+	std::cout << "Inside Audio Class in initAudio()" << std::endl;
+	//Buffer holds the sound information.
+	const string FILE[] = {
+		"./sounds/storm-sound.wav", "./sounds/click.wav", 
+		"./sounds/missile-fire.wav"};
+	for (int i = 0; i < TOTAL_SOUNDS; i++) {
+		const char *f = FILE[i].c_str();
+		//Explosion Collision - City (0-9)
+		if (i == 0) {
+			buffer[0] = alutCreateBufferFromFile(f);
+			for (int n = 0; n < 10; n++) {
+				//Generate a source
+				alGenSources(1, &alSource);
+				//Store source in a buffer
+				alSourcei(alSource, AL_BUFFER, buffer[0]);
+				//Store value of that source to call later
+				source[n] = alSource;
+			}
+		}
+		//Menu Mouse Clicks - (10-11)
+		if (i == 1) {
+			buffer[1] = alutCreateBufferFromFile(f);
+			for (int n = 10; n < 12; n++) {
+				alGenSources(1, &alSource);
+				alSourcei(alSource, AL_BUFFER, buffer[1]);
+				source[n] = alSource;
+			}
+		}
+		//Game Sounds - Music, Effects, etc..
+		if (i == 2) {
+			//
 		}
 	}
-	//src->source = source;
-	//src->buffer = buffer;
-	alGetError();
-	//alDeleteBuffers(1, &buffer);
-	//Cleanup Audio
-	if (src->max >= 200) {
-		alDeleteSources(1, &source);
+}
+
+void Audio::playAudio(int val)
+{
+	int n = val;
+	alSource = source[n];
+	//alSourcePlay(alSource);
+	alGetSourcei(alSource, AL_SOURCE_STATE, &source_state);
+	while (source_state == AL_PLAYING) {
+		n++;
+		if (n > val + 9) {
+			printf("No more sources!\n");
+			break;
+		}
+		alSource = source[n];
+		alGetSourcei(alSource, AL_SOURCE_STATE, &source_state);
+		printf("Sound already playing!\nPlaying source[%d]\n", n);
 	}
-	if (game->menuExit == 1) {
-		alDeleteSources(1, &source);
-		alDeleteBuffers(1, &buffer);
-		alutExit();
-	}
-	//alcMakeContextCurrent(NULL);
-	//alcDestroyContext(&context);
-	//alcCloseDevice(&device);
+	alSourcePlay(alSource);
 }
 
 void drawMenu(Game *game)

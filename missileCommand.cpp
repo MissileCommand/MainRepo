@@ -13,7 +13,9 @@
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <GL/glx.h>
-#include </usr/include/AL/alut.h>
+#include <AL/al.h>
+#include <AL/alc.h>
+#include <AL/alut.h>
 
 #ifndef MISSILECOMMAND_H
 #define MISSILECOMMAND_H
@@ -43,7 +45,7 @@ GLXContext glc;
 void initXWindows(void);
 void init_opengl(void);
 void cleanupXWindows(void);
-void check_mouse(XEvent *e, Game *game);
+void check_mouse(XEvent *e, Game *game, Audio *sounds);
 int check_keys(XEvent *e, Game *game);
 void movement(Game *game, Structures *sh);
 
@@ -61,8 +63,22 @@ int main(void)
 	init_opengl();
 	//declare game object
 	Game game;
-	game.n=0;
-	init_openal(&game);
+	//JR - Initialize OpenAL
+	//alutInit(0, NULL);
+	//if (alGetError() != AL_NO_ERROR) { printf("alutInit ERROR\n"); }
+	//alGetError();
+	//ALCcontext *context;
+	//ALCdevice *device;
+	//device = NULL, context = NULL;
+	//std::cout << device << " and " << context << std::endl;
+	//initDevice(&device);
+	//
+	//std::cout << device << " and " << context << std::endl;
+	//device = alcOpenDevice(NULL);
+	//context = alcCreateContext(device, NULL);
+	//if (!device || !alcMakeContextCurrent(context)) { printf("openAL ERROR\n"); }
+	//alGetError();
+
 	game.numberDefenseMissiles=0;
 	Structures sh;
 
@@ -70,12 +86,14 @@ int main(void)
 	createEMissiles(&game, 0, 0);
 	//JR - Menu Object Shapes and Locations
 	drawMenu(&game);
+	Audio sounds;
+	sounds.loadAudio();
 	//start animation
 	while(!done) {
 		while(XPending(dpy)) {
 			XEvent e;
 			XNextEvent(dpy, &e);
-			check_mouse(&e, &game);
+			check_mouse(&e, &game, &sounds);
 			done = check_keys(&e, &game);
 		}
 		int state = gameState(&game);
@@ -159,13 +177,16 @@ void init_opengl(void)
 }
 
 
-void check_mouse(XEvent *e, Game *game)
+void check_mouse(XEvent *e, Game *game, Audio *sounds)
 {
 	static int savex = 0;
 	static int savey = 0;
 	static int n = 0;
 
 	if (e->type == ButtonRelease) {
+		if (gameState(game) == 1) {
+			sounds->playAudio(11);
+		}
 		return;
 	}
 	if (e->type == ButtonPress) {
@@ -175,12 +196,12 @@ void check_mouse(XEvent *e, Game *game)
 			int y = WINDOW_HEIGHT - e->xbutton.y;
 			//Check game state when LEFT-clicking
 			if (gameState(game) == 1) {
-				playSound(game, 0);
+				sounds->playAudio(10);
 				menuClick(game);
 			} else {
 				// changeTitle();
                 makeDefenseMissile(game, e->xbutton.x, y);
-                playSound(game, 2);
+                //playSound(game, 2);
                 // JBC note 5/13
                 // moved the "particle" stuff out of here 
 				// makeParticle(game, e->xbutton.x, y);
@@ -192,6 +213,7 @@ void check_mouse(XEvent *e, Game *game)
 			//Check game state when RIGHT-clicking
 			if (gameState(game) == 1) {
 				//Menu functions
+				sounds->playAudio(0);
 			} else if (gameState(game) == 0) {
 				//Game Functions
 				// fireDefenseMissile(game);

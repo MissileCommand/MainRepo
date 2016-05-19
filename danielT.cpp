@@ -93,7 +93,7 @@ void eMissilePhysics(Game *game, Structures *sh)
 		    e->pos.x >= c->center.x-c->width) {
 		//cityChange();
 		eMissileExplode(game, i);
-        playSound(game, 1);
+        //playSound(game, 1);
 		chCount++;
 	    }
 	}
@@ -102,7 +102,7 @@ void eMissilePhysics(Game *game, Structures *sh)
 	c = &sh->floor;
 	if (e->pos.y <= c->center.y+c->height) {
 	    eMissileExplode(game, i);
-        playSound(game, 1);
+        //playSound(game, 1);
 	    offCount++;
 	}
 
