@@ -182,10 +182,16 @@ void makeDefenseMissile(Game *game, int x, int y)
         dMissilePtr->destinationY = y;
         
         
+        
         // set speed of missile
         // 0.5 is a good start, 0.25 seemed a bit to slow & 5.0 
         // seemed insanely fast
-        float missileSpeed = 0.75;
+        
+        // Moved to main game struct
+        // float defMissileSpeed = 40;
+        // game->defMissileSpeed = 40;
+        
+        
         
         // set start position of missile
         // Works now @ 2pm 05/14/16
@@ -208,9 +214,9 @@ void makeDefenseMissile(Game *game, int x, int y)
         float missileVelocityX = 0;
         float missileVelocityY = 0;
 
-//        missileVelocityX = xStart + missileSpeed * dx;
-        missileVelocityX = missileSpeed * dx;
-        missileVelocityY = missileVelocityY + missileSpeed * dy;
+//        missileVelocityX = xStart + defMissileSpeed * dx;
+        missileVelocityX = game->defMissileSpeed * dx;
+        missileVelocityY = missileVelocityY + game->defMissileSpeed * dy;
 
         // Velocity is a vector quantity that refers to 
         // the rate at which an object changes its position.

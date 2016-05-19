@@ -60,6 +60,11 @@ int main(void)
 	//declare game object
 	Game game;
 	game.numberDefenseMissiles=0;
+        
+        // JBC 5/19/16
+        // added globally accesible defMissileSpeed so that we can 
+        // change it dynamically
+        game.defMissileSpeed = 80;
 	Structures sh;
 
 	//Changed call for function prototype 5-17-16 -DT
