@@ -63,6 +63,7 @@ int main(void)
 	Game game;
 	game.n=0;
 	init_openal(&game);
+	game.numberDefenseMissiles=0;
 	Structures sh;
 
 	//DT
@@ -135,7 +136,7 @@ void initXWindows(void)
 			PointerMotionMask |
 			StructureNotifyMask | SubstructureNotifyMask;
 	win = XCreateWindow(dpy, root, 0, 0, w, h, 0, vi->depth,
-					InputOutput, vi->visual, CWColormap | CWEventMask, &swa);
+                InputOutput, vi->visual, CWColormap | CWEventMask, &swa);
 	set_title();
 	glc = glXCreateContext(dpy, vi, NULL, GL_TRUE);
 	glXMakeCurrent(dpy, win, glc);
@@ -157,21 +158,6 @@ void init_opengl(void)
 	initialize_fonts();
 }
 
-// JBC note 5/13
-// moved the "particle" stuff out of here
-//void makeParticle(Game *game, int x, int y)
-//{
-//	if (game->n >= MAX_D_MISSILES)
-//		return;
-//	//std::cout << "makeParticle()" << x << " " << y << std::endl;
-//	//position of particle
-//	Particle *p = &game->particle[game->n];
-//	p->s.center.x = x;
-//	p->s.center.y = y;
-//	p->velocity.y = -4.0;
-//	p->velocity.x =  1.0;
-//	game->n++;
-//}
 
 void check_mouse(XEvent *e, Game *game)
 {
@@ -271,6 +257,8 @@ void movement(Game *game, Structures *sh)
 {
         // JBC temp comment to see ANYTHING
 	eMissilePhysics(game, sh);
+
+	//dMissilePhysics(game, sh);
 	eExplosionPhysics(game);
 	
 	
@@ -278,34 +266,17 @@ void movement(Game *game, Structures *sh)
 
 void render(Game *game)
 {
-//	float w, h;
 	glClear(GL_COLOR_BUFFER_BIT);
-	//Draw shapes...
-	//draw all dMissiles here
 	glPushMatrix();
 	glColor3ub(150,160,220);
-        
-//        // JBC temp comment
-//	for (int i=0; i<game->n; i++) {
-//		Vec *c = &game->dMissile[i].s.center;
-//		w = 2;
-//		h = 2;
-//		glBegin(GL_QUADS);
-//			glVertex2i(c->x-w, c->y-h);
-//			glVertex2i(c->x-w, c->y+h);
-//			glVertex2i(c->x+w, c->y+h);
-//			glVertex2i(c->x+w, c->y-h);
-//		glEnd();
-//		glPopMatrix();
-//	}
-        
-        
-	//DT
+	// JBC removed "particle" stuff that is no longer in use   
+	// DT
 	// JBC commented out... please keep for my testing
-//        if (game->nmissiles < 10) {
-//		createEMissiles(game);
-//	}
-	renderEMissiles(game);
+	//        if (game->nmissiles < 10) {
+	//		createEMissiles(game);
+	//	}
+    renderEMissiles(game);
 	renderEExplosions(game);
-        renderDefenseMissile(game);
+    renderDefenseMissile(game);
+    // renderDefExplosions(game);
 }

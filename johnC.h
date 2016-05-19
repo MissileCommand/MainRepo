@@ -13,10 +13,12 @@
 #define MISSILECOMMAND_H
 #endif
 
-#ifndef JOHNC_H
-#define JOHNC_H
 
- void fireDefenseMissile();
- void changeTitle();
-#endif /* JOHNC_H */
+
+void fireDefenseMissile();
+// void changeTitle();
+
+extern void createDefenseMissileExplosion(Game *game, float x, float y);
+void renderDefExplosions(Game *game);
+
 
