@@ -47,7 +47,7 @@ void init_opengl(void);
 void cleanupXWindows(void);
 void check_mouse(XEvent *e, Game *game, Audio *sounds);
 int check_keys(XEvent *e, Game *game);
-void movement(Game *game, Structures *sh);
+void movement(Game *game, Structures *sh, Audio *sounds);
 
 // JBC added 5/13
 void renderDefenseMissile(Game *game);
@@ -63,21 +63,6 @@ int main(void)
 	init_opengl();
 	//declare game object
 	Game game;
-	//JR - Initialize OpenAL
-	//alutInit(0, NULL);
-	//if (alGetError() != AL_NO_ERROR) { printf("alutInit ERROR\n"); }
-	//alGetError();
-	//ALCcontext *context;
-	//ALCdevice *device;
-	//device = NULL, context = NULL;
-	//std::cout << device << " and " << context << std::endl;
-	//initDevice(&device);
-	//
-	//std::cout << device << " and " << context << std::endl;
-	//device = alcOpenDevice(NULL);
-	//context = alcCreateContext(device, NULL);
-	//if (!device || !alcMakeContextCurrent(context)) { printf("openAL ERROR\n"); }
-	//alGetError();
 
 	game.numberDefenseMissiles=0;
 	Structures sh;
@@ -105,7 +90,7 @@ int main(void)
 			std::cout << "Resetting state to menu(1)\n";
 			game.gMenu = 1;
 		} else {
-			movement(&game, &sh);
+			movement(&game, &sh, &sounds);
 			render(&game);
 		}
 		renderStruc(&sh);
@@ -184,9 +169,6 @@ void check_mouse(XEvent *e, Game *game, Audio *sounds)
 	static int n = 0;
 
 	if (e->type == ButtonRelease) {
-		if (gameState(game) == 1) {
-			sounds->playAudio(11);
-		}
 		return;
 	}
 	if (e->type == ButtonPress) {
@@ -196,12 +178,13 @@ void check_mouse(XEvent *e, Game *game, Audio *sounds)
 			int y = WINDOW_HEIGHT - e->xbutton.y;
 			//Check game state when LEFT-clicking
 			if (gameState(game) == 1) {
-				sounds->playAudio(10);
+				sounds->playAudio(15);
 				menuClick(game);
+				sounds->playAudio(16);
 			} else {
 				// changeTitle();
                 makeDefenseMissile(game, e->xbutton.x, y);
-                //playSound(game, 2);
+                sounds->playAudio(10);
                 // JBC note 5/13
                 // moved the "particle" stuff out of here 
 				// makeParticle(game, e->xbutton.x, y);
@@ -213,7 +196,6 @@ void check_mouse(XEvent *e, Game *game, Audio *sounds)
 			//Check game state when RIGHT-clicking
 			if (gameState(game) == 1) {
 				//Menu functions
-				sounds->playAudio(0);
 			} else if (gameState(game) == 0) {
 				//Game Functions
 				// fireDefenseMissile(game);
@@ -275,10 +257,10 @@ int check_keys(XEvent *e, Game *game)
 
 // JBC note 5/13
 // moved the "particle" stuff out of here 
-void movement(Game *game, Structures *sh)
+void movement(Game *game, Structures *sh, Audio *sounds)
 {
         // JBC temp comment to see ANYTHING
-	eMissilePhysics(game, sh);
+	eMissilePhysics(game, sh, sounds);
 
 	//dMissilePhysics(game, sh);
 	eExplosionPhysics(game);

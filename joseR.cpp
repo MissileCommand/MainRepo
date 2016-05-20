@@ -28,15 +28,11 @@ extern "C" {
 	#include "fonts.h"
 }
 
-#define TOTAL_SOUNDS 3
+#define TOTAL_SOUNDS 5
 
 using namespace std;
 
-//#define FILE "./sounds/power-up.wav"
-
 extern void init_opengl();
-
-//old_code.cpp was from here
 
 Audio::Audio()
 {
@@ -74,34 +70,32 @@ void Audio::loadAudio()
 	std::cout << "Inside Audio Class in initAudio()" << std::endl;
 	//Buffer holds the sound information.
 	const string FILE[] = {
-		"./sounds/storm-sound.wav", "./sounds/click.wav", 
-		"./sounds/missile-fire.wav"};
+		"./sounds/missile_miss.wav", "./sounds/missile_collision.wav",
+		"./sounds/missile_launch.wav", "./sounds/mouse_click.wav",
+		"./sounds/mouse_release.wav"};
+	int val = 0;
+	//Load and assign sounds
 	for (int i = 0; i < TOTAL_SOUNDS; i++) {
+		//Load file into buffer
 		const char *f = FILE[i].c_str();
-		//Explosion Collision - City (0-9)
-		if (i == 0) {
-			buffer[0] = alutCreateBufferFromFile(f);
-			for (int n = 0; n < 10; n++) {
+		buffer[i] = alutCreateBufferFromFile(f);
+		//Sets explosions and missile sounds into sources
+		if (val < 15) {
+			for (int n = 0; n < 5; n++) {
 				//Generate a source
 				alGenSources(1, &alSource);
 				//Store source in a buffer
-				alSourcei(alSource, AL_BUFFER, buffer[0]);
-				//Store value of that source to call later
-				source[n] = alSource;
+				alSourcei(alSource, AL_BUFFER, buffer[i]);
+				//Store value of that source to call later				
+				printf("File: %s stored in buffer[%d].\n", f, val);
+				source[val++] = alSource;
 			}
-		}
-		//Menu Mouse Clicks - (10-11)
-		if (i == 1) {
-			buffer[1] = alutCreateBufferFromFile(f);
-			for (int n = 10; n < 12; n++) {
-				alGenSources(1, &alSource);
-				alSourcei(alSource, AL_BUFFER, buffer[1]);
-				source[n] = alSource;
-			}
-		}
-		//Game Sounds - Music, Effects, etc..
-		if (i == 2) {
-			//
+		//Sets menu click sounds
+		} else if (val >= 15 && val < 17) {
+			alGenSources(1, &alSource);
+			alSourcei(alSource, AL_BUFFER, buffer[i]);
+			printf("File: %s stored in buffer[%d].\n", f, val);
+			source[val++] = alSource;
 		}
 	}
 }
@@ -114,7 +108,7 @@ void Audio::playAudio(int val)
 	alGetSourcei(alSource, AL_SOURCE_STATE, &source_state);
 	while (source_state == AL_PLAYING) {
 		n++;
-		if (n > val + 9) {
+		if (n > val + 4) {
 			printf("No more sources!\n");
 			break;
 		}

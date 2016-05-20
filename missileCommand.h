@@ -109,13 +109,6 @@ struct EExplosion {
     EExplosion() {}
 };
 
-struct gameSound {
-    int source[4];
-    int buffer[4];
-    int max;
-    gameSound() {}
-};
-
 // defense missile explosion
 struct DExplosion {
     Vec pos;
@@ -155,7 +148,6 @@ struct Game {
     //JR
     int menuExit, gMenu, inGame;
     Shape mButton[BUTTONS];
-    gameSound sound;
     //Constructor 
     Game() {
     	//level variable initialized 5-17-16 -DT

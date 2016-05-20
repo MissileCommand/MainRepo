@@ -4,7 +4,10 @@
 #include "missileCommand.h"
 #endif
 
-
+#ifndef JOSER_H
+#define JOSER_H
+#include "joseR.h"
+#endif
 
 #ifndef _DANIELT_H_
 #define _DANIELT_H_
@@ -12,7 +15,7 @@ using namespace std;
 
 
 extern void eExplosionPhysics(Game *game);
-extern void eMissilePhysics(Game *game, Structures *sh);
+extern void eMissilePhysics(Game *game, Structures *sh, Audio *sounds);
 extern void nameInBox(float xpoint, float ypoint);
 extern void createEMissiles(Game *game, float x, float y);
 extern void renderEMissiles(Game *game);
