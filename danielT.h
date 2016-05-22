@@ -15,7 +15,7 @@ using namespace std;
 
 
 extern void eExplosionPhysics(Game *game);
-extern void eMissilePhysics(Game *game, Structures *sh, Audio *sounds);
+extern void eMissilePhysics(Game *game, Structures *sh);
 extern void nameInBox(float xpoint, float ypoint);
 extern void createEMissiles(Game *game, float x, float y);
 extern void renderEMissiles(Game *game);

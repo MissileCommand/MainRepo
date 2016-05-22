@@ -45,9 +45,9 @@ GLXContext glc;
 void initXWindows(void);
 void init_opengl(void);
 void cleanupXWindows(void);
-void check_mouse(XEvent *e, Game *game, Audio *sounds);
+void check_mouse(XEvent *e, Game *game);
 int check_keys(XEvent *e, Game *game);
-void movement(Game *game, Structures *sh, Audio *sounds);
+void movement(Game *game, Structures *sh);
 
 // JBC added 5/13
 void renderDefenseMissile(Game *game);
@@ -66,24 +66,26 @@ int main(void)
 
 	game.numberDefenseMissiles=0;
         
-        // JBC 5/19/16
-        // added globally accesible defMissileSpeed so that we can 
-        // change it dynamically
-        game.defMissileSpeed = 80;
+    // JBC 5/19/16
+    // added globally accesible defMissileSpeed so that we can 
+    // change it dynamically
+    game.defMissileSpeed = 80;
 	Structures sh;
 
 	//Changed call for function prototype 5-17-16 -DT
 	createEMissiles(&game, 0, 0);
 	//JR - Menu Object Shapes and Locations
 	drawMenu(&game);
-	Audio sounds;
-	sounds.loadAudio();
+	drawSettings(&game);
+	//Audio sounds;
+	//sounds.loadAudio();
+	game.sounds.loadAudio();
 	//start animation
 	while(!done) {
 		while(XPending(dpy)) {
 			XEvent e;
 			XNextEvent(dpy, &e);
-			check_mouse(&e, &game, &sounds);
+			check_mouse(&e, &game);
 			done = check_keys(&e, &game);
 		}
 		int state = gameState(&game);
@@ -91,11 +93,9 @@ int main(void)
 			renderMenuObjects(&game);
 			renderMenuText(&game);
 		} else if (state == 2) {
-			std::cout << "Game state was set to settings(2)\n";
-			std::cout << "Resetting state to menu(1)\n";
-			game.gMenu = 1;
+			renderSettings(&game);
 		} else {
-			movement(&game, &sh, &sounds);
+			movement(&game, &sh);
 			render(&game);
 		}
 		renderStruc(&sh);
@@ -167,11 +167,14 @@ void init_opengl(void)
 }
 
 
-void check_mouse(XEvent *e, Game *game, Audio *sounds)
+void check_mouse(XEvent *e, Game *game)
 {
 	static int savex = 0;
 	static int savey = 0;
 	static int n = 0;
+	Audio *a;
+	a = &game->sounds;
+
 
 	if (e->type == ButtonRelease) {
 		return;
@@ -182,14 +185,14 @@ void check_mouse(XEvent *e, Game *game, Audio *sounds)
 			//Left button was pressed
 			int y = WINDOW_HEIGHT - e->xbutton.y;
 			//Check game state when LEFT-clicking
-			if (gameState(game) == 1) {
-				sounds->playAudio(15);
+			if (gameState(game) == 1 || gameState(game) == 2) {
+				a->playAudio(30);
 				menuClick(game);
-				sounds->playAudio(16);
+				a->playAudio(32);
 			} else {
 				// changeTitle();
                 makeDefenseMissile(game, e->xbutton.x, y);
-                sounds->playAudio(10);
+                a->playAudio(20);
                 // JBC note 5/13
                 // moved the "particle" stuff out of here 
 				// makeParticle(game, e->xbutton.x, y);
@@ -221,10 +224,9 @@ void check_mouse(XEvent *e, Game *game, Audio *sounds)
 			//Menu Functions
 			mouseOver(savex, y, game);
 		} else if (gameState(game) == 0) {
-			
-                        //Game Functions
-                        // JBC note 5/13
-                        // moved the "particle" stuff out of here 
+	        //Game Functions
+	        // JBC note 5/13
+	        // moved the "particle" stuff out of here 
 			// makeParticle(game, e->xbutton.x, y);
 		}
 	}
@@ -262,10 +264,10 @@ int check_keys(XEvent *e, Game *game)
 
 // JBC note 5/13
 // moved the "particle" stuff out of here 
-void movement(Game *game, Structures *sh, Audio *sounds)
+void movement(Game *game, Structures *sh)
 {
-        // JBC temp comment to see ANYTHING
-	eMissilePhysics(game, sh, sounds);
+    // JBC temp comment to see ANYTHING
+	eMissilePhysics(game, sh);
 
 	//dMissilePhysics(game, sh);
 	eExplosionPhysics(game);

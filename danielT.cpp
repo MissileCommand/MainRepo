@@ -72,11 +72,13 @@ void eExplosionPhysics(Game *game)
 }
 
 //handles missile movement and collisions
-void eMissilePhysics(Game *game, Structures *sh, Audio *sounds)
+void eMissilePhysics(Game *game, Structures *sh)
 {
     EMissile *e;
     Shape *c;
     EExplosion *d;
+    Audio *a;
+    a = &game->sounds;
 
     //if (game->nmissiles <=0)
     //	return;
@@ -93,7 +95,7 @@ void eMissilePhysics(Game *game, Structures *sh, Audio *sounds)
 		    e->pos.x >= c->center.x-c->width) {
 		//cityChange();
 		eMissileExplode(game, i);
-        sounds->playAudio(5);
+        a->playAudio(10);
 		chCount++;
 	    }
 	}
@@ -102,7 +104,7 @@ void eMissilePhysics(Game *game, Structures *sh, Audio *sounds)
 	c = &sh->floor;
 	if (e->pos.y <= c->center.y+c->height) {
 	    eMissileExplode(game, i);
-        sounds->playAudio(0);
+        a->playAudio(0);
 	    offCount++;
 	}
 

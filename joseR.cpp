@@ -19,6 +19,12 @@
 //			OpenAL (sound) functionality has been added
 //			Others may play sounds by simply calling "playSound(game, int);"
 //			Must include joseR.h
+//		*May 20th, 2016*
+//			Moved OpenAL code into a class
+//			Changed how others may call the function to play a sound buffer.
+//			Requires &game->sounds->playAudio(int);
+//			0 = missile_miss, 10 = missile_hit, 20 = missile_fire
+//			30/32 = mouse clicks
 //			
 #include <GL/glx.h>
 #include "missileCommand.h"
@@ -27,8 +33,6 @@
 extern "C" {
 	#include "fonts.h"
 }
-
-#define TOTAL_SOUNDS 5
 
 using namespace std;
 
@@ -67,7 +71,6 @@ Audio::~Audio()
 
 void Audio::loadAudio()
 {
-	std::cout << "Inside Audio Class in initAudio()" << std::endl;
 	//Buffer holds the sound information.
 	const string FILE[] = {
 		"./sounds/missile_miss.wav", "./sounds/missile_collision.wav",
@@ -79,42 +82,55 @@ void Audio::loadAudio()
 		//Load file into buffer
 		const char *f = FILE[i].c_str();
 		buffer[i] = alutCreateBufferFromFile(f);
-		//Sets explosions and missile sounds into sources
-		if (val < 15) {
-			for (int n = 0; n < 5; n++) {
+		//Check if anything was loaded into the buffer
+		if (!buffer[i]) {
+			printf("ERROR: Audio File Not Found!\n");
+			printf("[%s] - Was not loaded.\n", f);
+			break;
+		}
+		//Sets explosions and missile sounds to 10 sources each
+		if (val < 30) {
+			for (int n = 0; n < 10; n++) {
 				//Generate a source
 				alGenSources(1, &alSource);
 				//Store source in a buffer
 				alSourcei(alSource, AL_BUFFER, buffer[i]);
 				//Store value of that source to call later				
-				printf("File: %s stored in buffer[%d].\n", f, val);
+				//printf("File: %s stored in buffer[%d].\n", f, val);
 				source[val++] = alSource;
 			}
 		//Sets menu click sounds
-		} else if (val >= 15 && val < 17) {
-			alGenSources(1, &alSource);
-			alSourcei(alSource, AL_BUFFER, buffer[i]);
-			printf("File: %s stored in buffer[%d].\n", f, val);
-			source[val++] = alSource;
+		} else if (val >= 30 && val < 34) {
+			for (int n = 0; n < 2; n++) {
+				alGenSources(1, &alSource);
+				alSourcei(alSource, AL_BUFFER, buffer[i]);
+				//printf("File: %s stored in buffer[%d].\n", f, val);
+				source[val++] = alSource;
+			}
+		} else {
+			printf("Something may have gone wrong...\n");
 		}
 	}
 }
 
-void Audio::playAudio(int val)
+void Audio::playAudio(int num)
 {
-	int n = val;
-	alSource = source[n];
-	//alSourcePlay(alSource);
+	int idx = num, max;
+	if (idx < 30) {
+		max = idx + 9;
+	} else {
+		max = idx + 1;
+	}
+	alSource = source[idx];
 	alGetSourcei(alSource, AL_SOURCE_STATE, &source_state);
-	while (source_state == AL_PLAYING) {
-		n++;
-		if (n > val + 4) {
-			printf("No more sources!\n");
+	while (source_state == AL_PLAYING) {		
+		alSource = source[idx++];
+		if (idx > max) {
+			printf("Max sources for this sound was reached!\n");
 			break;
 		}
-		alSource = source[n];
 		alGetSourcei(alSource, AL_SOURCE_STATE, &source_state);
-		printf("Sound already playing!\nPlaying source[%d]\n", n);
+		//printf("Sound already playing!\nPlaying source[%d]\n", idx);
 	}
 	alSourcePlay(alSource);
 }
@@ -128,6 +144,19 @@ void drawMenu(Game *game)
 		game->mButton[j].center.x = WINDOW_WIDTH / BUTTON_X;
 		game->mButton[j].center.y = WINDOW_HEIGHT - game->buttonSpacer[j];
 	}
+}
+
+//Settings buttons draw function goes here
+
+void drawSettings(Game *game)
+{
+	//
+	Shape *s;
+	s = &game->menu1;
+	s->width = WINDOW_WIDTH - 650;
+	s->height = WINDOW_HEIGHT - 450;
+	s->center.x = WINDOW_WIDTH / 2;
+	s->center.y = WINDOW_HEIGHT / 2;
 }
 
 void renderMenuObjects(Game *game)
@@ -161,6 +190,28 @@ void renderMenuObjects(Game *game)
 		glPopMatrix();
 		glFlush();
 	}
+}
+
+void renderSettings(Game *game)
+{
+	Shape *s;
+	glClearColor(0.15, 0.15, 0.15, 0.15);
+	glClear(GL_COLOR_BUFFER_BIT);
+	s = &game->menu1;
+	float w, h;
+	glColor3ub(128,128,128);
+	glPushMatrix();
+	glTranslatef(s->center.x, s->center.y, s->center.z);
+	w = s->width;
+	h = s->height;
+	glBegin(GL_QUADS);
+		glVertex2i(-w,-h);
+		glVertex2i(-w, h);
+		glVertex2i( w, h);
+		glVertex2i( w,-h);
+	glEnd();
+	glPopMatrix();
+	glFlush();
 }
 
 void renderMenuText(Game *game)

@@ -36,6 +36,7 @@
 //X Position of all buttons
 //Divides WINDOW_WIDTH by the number below
 #define BUTTON_X 4.25
+#define TOTAL_SOUNDS 5
 #define CITYNUM 5
 //#define WINDOW_WIDTH  800
 //#define WINDOW_HEIGHT 600
@@ -118,6 +119,26 @@ struct DExplosion {
     DExplosion() {}
 };
 
+// Game sound class for openAL
+class Audio 
+{
+    public:
+        //Variables
+        ALCdevice *device;
+        ALCcontext *context;
+        ALuint alSource;
+        ALuint alBuffer;
+        ALint source_state;
+        int source[100];
+        int buffer[TOTAL_SOUNDS];
+        //Constructor & Deconstructor
+        Audio();
+        ~Audio();
+        //Class Prototypes
+        void loadAudio();
+        void playAudio(int num);
+};
+
 struct Game {
     //global variable for level 5-17-16 -DT
     int level;
@@ -138,20 +159,18 @@ struct Game {
     // JBC 05/08/16 JBC switched from DefenseMissile to dMissile (Defense Missile)
     DefenseMissile dMissile[MAX_D_MISSILES];
 
-    
-    //JR: This will store the values of the x-pos to be used
-    //      for correct font placement on buttons
+    //JR:
     int buttonSpacer[BUTTONS];
-    //JR: This will be used to return which button the mouse
-    //      is currently on in the menus
     int mouseOnButton[BUTTONS];
-    //JR
     int menuExit, gMenu, inGame;
     Shape mButton[BUTTONS];
+    Shape menu1;
+    Audio sounds;
+
     //Constructor 
     Game() {
     	//level variable initialized 5-17-16 -DT
-	level = 0;
+        level = 0;
     	emarr = new EMissile[10];
         eearr = new EExplosion[1000];
     	numberDefenseMissiles = 0;
