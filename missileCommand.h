@@ -123,7 +123,7 @@ struct Game {
     int level;
 
     Shape box;    
-
+    float defMissileSpeed;
     EMissile *emarr;                                  
     int nmissiles;
     EExplosion *eearr;
