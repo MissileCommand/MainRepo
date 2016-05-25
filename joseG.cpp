@@ -72,7 +72,7 @@ void renderStruc(Structures *shape)
         }
 }
 
-renderBackground()
+void renderBackground()
 {
 	glBindTexture(GL_TEXTURE_2D, starsTexture);
         glBegin(GL_QUADS);
