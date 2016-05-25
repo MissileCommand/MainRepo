@@ -106,6 +106,39 @@ int main(void)
 	return 0;
 }
 
+unsigned char *buildAlphaData(Ppmimage *img)
+{
+        //add 4th component to RGB stream...
+        int i;
+        int a,b,c;
+        unsigned char *newdata, *ptr;
+        unsigned char *data = (unsigned char *)img->data;
+        newdata = (unsigned char *)malloc(img->width * img->height * 4);
+        ptr = newdata;
+        for (i=0; i<img->width * img->height * 3; i+=3) {
+                a = *(data+0);
+                b = *(data+1);
+                c = *(data+2);
+                *(ptr+0) = a;
+                *(ptr+1) = b;
+                *(ptr+2) = c;
+                //get largest color component...
+                //*(ptr+3) = (unsigned char)((
+                //              (int)*(ptr+0) +
+                //              (int)*(ptr+1) +
+                //              (int)*(ptr+2)) / 3);
+                //d = a;
+                //if (b >= a && b >= c) d = b;
+                //if (c >= a && c >= b) d = c;
+                //*(ptr+3) = d;
+                *(ptr+3) = (a|b|c);
+                ptr += 4;
+                data += 3;
+        }
+        return newdata;
+}
+
+
 void set_title(void)
 {
 	//Set the window title bar.
@@ -160,11 +193,42 @@ void init_opengl(void)
 	glMatrixMode(GL_MODELVIEW); glLoadIdentity();
 	//Set 2D mode (no perspective)
 	glOrtho(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT, -1, 1);
+	
+	glDisable(GL_LIGHTING);
+        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_FOG);
+        glDisable(GL_CULL_FACE);
 	//Set the screen background color
 	glClearColor(0.1, 0.1, 0.1, 1.0);
 	//Initialize Fonts
 	glEnable(GL_TEXTURE_2D);
 	initialize_fonts();
+	//load images into a ppm structure
+        cityImage = ppm6GetImage("./images/city.ppm");
+        starsImage = ppm6GetImage("./images/stars.ppm");
+        //create opengl texture elements
+        //forest
+        glGenTextures(1, &starsTexture);
+        glBindTexture(GL_TEXTURE_2D, starsTexture);
+        //
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+        glTexImage2D(GL_TEXTURE_2D, 0, 3, starsImage->width, starsImage->height,
+                        0, GL_RGB, GL_UNSIGNED_BYTE, starsImage->data);
+        //
+        glGenTextures(1, &cityTexture);
+        int w = cityImage->width;
+        int h = cityImage->height;
+        //city
+        //
+        glBindTexture(GL_TEXTURE_2D, cityTexture);
+        //
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+        unsigned char *cityData = buildAlphaData(cityImage);
+        glTexImage2D(GL_TEXTURE_2D, 0, 3, w, h, 0,
+        GL_RGB, GL_UNSIGNED_BYTE, cityImage->data);
+        free(cityData);
 }
 
 
@@ -279,15 +343,16 @@ void movement(Game *game, Structures *sh)
 void render(Game *game)
 {
 	glClear(GL_COLOR_BUFFER_BIT);
-	glPushMatrix();
-	glColor3ub(150,160,220);
+	//glPushMatrix();
+	//glColor3ub(150,160,220);
 	// JBC removed "particle" stuff that is no longer in use   
 	// DT
 	// JBC commented out... please keep for my testing
 	//        if (game->nmissiles < 10) {
 	//		createEMissiles(game);
 	//	}
-    renderEMissiles(game);
+    renderBackground();
+	renderEMissiles(game);
 	renderEExplosions(game);
     renderDefenseMissile(game);
     // renderDefExplosions(game);
