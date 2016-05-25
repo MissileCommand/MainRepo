@@ -57,6 +57,7 @@ Audio::Audio()
 		printf("ERROR: context\n");
 		return;
 	}
+	gVolume = 1.0;
 	//Setup the listener.
 	float vec[6] = {0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f};
 	alListener3f(AL_POSITION, 0.0f, 0.0f, 0.0f);
@@ -100,7 +101,11 @@ void Audio::loadAudio()
 				alGenSources(1, &alSource);
 				//Store source in a buffer
 				alSourcei(alSource, AL_BUFFER, buffer[i]);
-				//Store value of that source to call later				
+				//Set volume, pitch, and loop options
+				alSourcef(alSource, AL_GAIN, 1.0f);
+				alSourcef(alSource, AL_PITCH, 1.0f);
+				alSourcei(alSource, AL_LOOPING, AL_FALSE);
+				//Store value of that source to call later
 				//printf("File: %s stored in buffer[%d].\n", f, val);
 				source[val++] = alSource;
 			}
@@ -109,6 +114,9 @@ void Audio::loadAudio()
 			for (int n = 0; n < 2; n++) {
 				alGenSources(1, &alSource);
 				alSourcei(alSource, AL_BUFFER, buffer[i]);
+				alSourcef(alSource, AL_GAIN, 1.0f);
+				alSourcef(alSource, AL_PITCH, 1.0f);
+				alSourcei(alSource, AL_LOOPING, AL_FALSE);
 				//printf("File: %s stored in buffer[%d].\n", f, val);
 				source[val++] = alSource;
 			}
@@ -117,13 +125,6 @@ void Audio::loadAudio()
 		}
 	}
 }
-
-// ODD BUG - AUDIO GETS QUIET OR LOUD WHEN MULTIPLE GO OFF
-// ODD BUG - AUDIO GETS QUIET OR LOUD WHEN MULTIPLE GO OFF
-// ODD BUG - AUDIO GETS QUIET OR LOUD WHEN MULTIPLE GO OFF
-// ODD BUG - AUDIO GETS QUIET OR LOUD WHEN MULTIPLE GO OFF
-// ODD BUG - AUDIO GETS QUIET OR LOUD WHEN MULTIPLE GO OFF
-// ODD BUG - AUDIO GETS QUIET OR LOUD WHEN MULTIPLE GO OFF
 
 void Audio::playAudio(int num)
 {
@@ -144,6 +145,7 @@ void Audio::playAudio(int num)
 		alGetSourcei(alSource, AL_SOURCE_STATE, &source_state);
 		//printf("Sound already playing!\nPlaying source[%d]\n", idx);
 	}
+	alSourcef(alSource, AL_GAIN, gVolume);
 	alSourcePlay(alSource);
 }
 
@@ -164,11 +166,28 @@ void drawSettings(Game *game)
 {
 	//
 	Shape *s;
-	s = &game->menu1;
+	s = &game->menuBG;
 	s->width = WINDOW_WIDTH - 650;
-	s->height = WINDOW_HEIGHT - 450;
+	s->height = WINDOW_HEIGHT - 550;
 	s->center.x = WINDOW_WIDTH / 2;
 	s->center.y = WINDOW_HEIGHT / 2;
+	//Back
+	s = &game->sButton[0];
+	s->width = 125;
+	s->height = 25;
+	s->center.x = WINDOW_WIDTH / 2;
+	s->center.y = WINDOW_HEIGHT - 350;
+	//
+	for (int i = 1; i < BUTTONS_S; i++) {
+		s = &game->sButton[i];
+		s->width = 25;
+		s->height = 25;
+		if (i == 1)
+			s->center.x = WINDOW_WIDTH / 2 + 100;
+		if (i == 2)
+			s->center.x = WINDOW_WIDTH / 2 - 100;
+		s->center.y = WINDOW_HEIGHT - 250;
+	}
 }
 
 void renderMenuObjects(Game *game)
@@ -176,10 +195,8 @@ void renderMenuObjects(Game *game)
 	Shape *s;
 	//Check if game is in progress so menu can act as a pause menu.
 	//Otherwise will clear screen
-	if (game->inGame == 0) {
-		glClearColor(0.15, 0.15, 0.15, 0.15);
-		glClear(GL_COLOR_BUFFER_BIT);
-	}
+	//glClearColor(0.15, 0.15, 0.15, 0.15);
+	glClear(GL_COLOR_BUFFER_BIT);
 	float w, h;
 	for (int i = 0; i < BUTTONS; i++) {
 		s = &game->mButton[i];
@@ -200,30 +217,8 @@ void renderMenuObjects(Game *game)
 			glVertex2i( w,-h);
 		glEnd();
 		glPopMatrix();
-		glFlush();
+		//glFlush();
 	}
-}
-
-void renderSettings(Game *game)
-{
-	Shape *s;
-	glClearColor(0.15, 0.15, 0.15, 0.15);
-	glClear(GL_COLOR_BUFFER_BIT);
-	s = &game->menu1;
-	float w, h;
-	glColor3ub(128,128,128);
-	glPushMatrix();
-	glTranslatef(s->center.x, s->center.y, s->center.z);
-	w = s->width;
-	h = s->height;
-	glBegin(GL_QUADS);
-		glVertex2i(-w,-h);
-		glVertex2i(-w, h);
-		glVertex2i( w, h);
-		glVertex2i( w,-h);
-	glEnd();
-	glPopMatrix();
-	glFlush();
 }
 
 void renderMenuText(Game *game)
@@ -247,37 +242,145 @@ void renderMenuText(Game *game)
 	}
 }
 
+void renderSettingsText(Game *game)
+{
+	Rect rt;
+	int j = 0;
+	rt.bot = WINDOW_HEIGHT - 250 - (j * 100) + 25;
+	rt.left = WINDOW_WIDTH / 2;
+	//std::cout << rt.bot << " " << rt.left << std::endl;
+	rt.center = 1;
+	ggprint16(&rt, 16, 0x00ffffff, "Volume");
+	rt.bot = WINDOW_HEIGHT - 250 - (j * 100) - 10;
+	rt.left = WINDOW_WIDTH / 2 - 100;
+	ggprint16(&rt, 16, 0x00ffffff, " - ");
+	rt.bot = WINDOW_HEIGHT - 250 - (j * 100) - 10;
+	rt.left = WINDOW_WIDTH / 2 + 100;
+	ggprint16(&rt, 16, 0x00ffffff, " + ");
+	rt.bot = WINDOW_HEIGHT - 250 - (j * 100) - 10;
+	rt.left = WINDOW_WIDTH / 2;
+	ggprint16(&rt, 16, 0x00ffffff, "%d", game->vVolume);
+	j++;
+	rt.bot = WINDOW_HEIGHT - 250 - (j * 100) - 10;
+	rt.left = WINDOW_WIDTH / 2;
+	ggprint16(&rt, 16, 0x00ffffff, "Back");
+}
+
+void renderSettings(Game *game)
+{
+	Shape *s;
+	//glClearColor(0.15, 0.15, 0.15, 0.15);
+	glClear(GL_COLOR_BUFFER_BIT);
+	//Render Settings Menu BG
+	s = &game->menuBG;
+	float w, h;
+	glColor3ub(128,128,128);
+	glPushMatrix();
+	glTranslatef(s->center.x, s->center.y, s->center.z);
+	w = s->width;
+	h = s->height;
+	glBegin(GL_QUADS);
+		glVertex2i(-w,-h);
+		glVertex2i(-w, h);
+		glVertex2i( w, h);
+		glVertex2i( w,-h);
+	glEnd();
+	glPopMatrix();
+	//glFlush();
+	//Render Settings Buttons
+	for (int i = 0; i < BUTTONS_S; i++) {
+		s = &game->sButton[i];
+		float w, h;
+		glColor3ub(18,128,128);
+		if (game->mouseOnButton[i] == 1) {
+			//Button selected color
+			glColor3ub(190,190,190);
+		}
+		glPushMatrix();
+		glTranslatef(s->center.x, s->center.y, s->center.z);
+		w = s->width;
+		h = s->height;
+		glBegin(GL_QUADS);
+			glVertex2i(-w,-h);
+			glVertex2i(-w, h);
+			glVertex2i( w, h);
+			glVertex2i( w,-h);
+		glEnd();
+		glPopMatrix();
+		//glFlush();
+	}
+}
+
 void mouseOver(int savex, int savey, Game *game)
 {
 	Shape *s;
-	for (int j = 0; j < BUTTONS; j++) {			
-		s = &game->mButton[j];
-		if (savey >= s->center.y - (s->height) &&
-			savey <= s->center.y + (s->height) &&
-			savex >= s->center.x - (s->width) &&
-			savex <= s->center.x + (s->width)) {
-				game->mouseOnButton[j] = 1;
-		} else {
-			game->mouseOnButton[j] = 0;
+	if (gameState(game) == 1) {
+		for (int j = 0; j < BUTTONS; j++) {			
+			s = &game->mButton[j];
+			if (savey >= s->center.y - (s->height) &&
+				savey <= s->center.y + (s->height) &&
+				savex >= s->center.x - (s->width) &&
+				savex <= s->center.x + (s->width)) {
+					game->mouseOnButton[j] = 1;
+			} else {
+				game->mouseOnButton[j] = 0;
+			}
+		}
+	} else if (gameState(game) == 2) {
+		for (int j = 0; j < BUTTONS_S; j++) {			
+			s = &game->sButton[j];
+			if (savey >= s->center.y - (s->height) &&
+				savey <= s->center.y + (s->height) &&
+				savex >= s->center.x - (s->width) &&
+				savex <= s->center.x + (s->width)) {
+					game->mouseOnButton[j] = 1;
+			} else {
+				game->mouseOnButton[j] = 0;
+			}
 		}
 	}
 }
 
 void menuClick(Game *game)
 {
-	//Play Button (2)
-	if (game->mouseOnButton[2] == 1) {
-		game->gMenu = 0;
-		game->inGame = 1;
-	}
-	//Settings Button (1)
-	if (game->mouseOnButton[1] == 1) {
-		game->gMenu = 2;
-	}
-	//Exit Button (0)
-	if (game->mouseOnButton[0] == 1) {
-		//std::cout << "Quitting..." << std::endl;
-		game->menuExit = 1;
+	if (gameState(game) == 1) {
+		//Play Button (2)
+		if (game->mouseOnButton[2] == 1) {
+			game->gMenu = 0;
+			game->inGame = 1;
+		}
+		//Settings Button (1)
+		if (game->mouseOnButton[1] == 1) {
+			game->gMenu = 2;
+		}
+		//Exit Button (0)
+		if (game->mouseOnButton[0] == 1) {
+			//std::cout << "Quitting..." << std::endl;
+			game->menuExit = 1;
+		}
+	} else if (gameState(game) == 2) {
+		float adjust = 0.1;
+		int iadjust = 10;
+		//Volume -
+		if (game->mouseOnButton[2] == 1) {
+			if (game->sounds.gVolume > 0.0 && game->sounds.gVolume <= 1.0) {
+				game->sounds.gVolume -= adjust;
+				game->vVolume -= iadjust;
+			}
+				printf("%f\n", game->sounds.gVolume);
+		}
+		//Volume +
+		if (game->mouseOnButton[1] == 1) {
+			if (game->sounds.gVolume > -1.0 && game->sounds.gVolume < 1.0) {
+				game->sounds.gVolume += adjust;
+				game->vVolume += iadjust;
+			}
+				printf("%f\n", game->sounds.gVolume);
+		}
+		//Back
+		if (game->mouseOnButton[0] == 1) {
+			game->gMenu = 1;
+		}
 	}
 }
 
@@ -294,4 +397,9 @@ int gameState(Game *game)
 		state = 0;
 	}
 	return state;
+}
+
+float gameVolume(Game *game)
+{
+	return game->sounds.gVolume;
 }

@@ -33,6 +33,8 @@
 //MACROS
 //Number of buttons to show on menu
 #define BUTTONS 3
+#define BUTTONS_S 3
+#define T_BUTTONS BUTTONS + BUTTONS_S
 //X Position of all buttons
 //Divides WINDOW_WIDTH by the number below
 #define BUTTON_X 4.25
@@ -49,8 +51,6 @@
 extern Display *dpy;
 extern Window win;
 extern GLXContext glc;
-
-
 
 struct Vec {
     float x, y, z;
@@ -131,6 +131,7 @@ class Audio
         ALint source_state;
         int source[100];
         int buffer[TOTAL_SOUNDS];
+        float gVolume;
         //Constructor & Deconstructor
         Audio();
         ~Audio();
@@ -161,10 +162,14 @@ struct Game {
 
     //JR:
     int buttonSpacer[BUTTONS];
-    int mouseOnButton[BUTTONS];
-    int menuExit, gMenu, inGame;
+    int mouseOnButton[T_BUTTONS];
+    int menuExit;
+    int gMenu;
+    int inGame;
+    int vVolume;
     Shape mButton[BUTTONS];
-    Shape menu1;
+    Shape sButton[BUTTONS_S];
+    Shape menuBG;
     Audio sounds;
 
     //Constructor 
@@ -179,7 +184,8 @@ struct Game {
         menuExit = 0;
         gMenu = 1;
         inGame = 0;
-        for (int i=0;i<BUTTONS;i++) {
+        vVolume = 100;
+        for (int i=0;i<T_BUTTONS;i++) {
             mouseOnButton[i] = 0;
         }
     }

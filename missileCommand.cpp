@@ -94,6 +94,7 @@ int main(void)
 			renderMenuText(&game);
 		} else if (state == 2) {
 			renderSettings(&game);
+			renderSettingsText(&game);
 		} else {
 			movement(&game, &sh);
 			render(&game);
@@ -220,7 +221,7 @@ void check_mouse(XEvent *e, Game *game)
 		int y = WINDOW_HEIGHT - e->xbutton.y;
 		if (++n < 10)
 			return;
-		if (gameState(game) == 1) {
+		if (gameState(game) == 1 || gameState(game) == 2) {
 			//Menu Functions
 			mouseOver(savex, y, game);
 		} else if (gameState(game) == 0) {
