@@ -47,7 +47,7 @@ void init_opengl(void);
 void cleanupXWindows(void);
 void check_mouse(XEvent *e, Game *game);
 int check_keys(XEvent *e, Game *game);
-void movement(Game *game, Structures *sh);
+void movement(Game *game);
 
 // JBC added 5/13
 void renderDefenseMissile(Game *game);
@@ -74,10 +74,13 @@ int main(void)
     // added globally accesible defMissileSpeed so that we can 
     // change it dynamically
     game.defMissileSpeed = 80;
-	Structures sh;
+	
+    initStruc(&game);
+    //Structures sh;
 
 	//Changed call for function prototype 5-17-16 -DT
 	createEMissiles(&game, 0, 0);
+	initRadar(&game);
 	//JR - Menu Object Shapes and Locations
 	drawMenu(&game);
 	drawSettings(&game);
@@ -100,9 +103,10 @@ int main(void)
 			renderSettings(&game);
 			renderSettingsText(&game);
 		} else {
-			movement(&game, &sh);
+			movement(&game);
 			render(&game);
-			renderStruc(&sh);
+			//moved to render func 5-25 -DT
+			//renderStruc(&sh);
 		}
 		glXSwapBuffers(dpy, win);
 	}
@@ -319,6 +323,11 @@ int check_keys(XEvent *e, Game *game)
 			game->gMenu ^= 1;
 		}
 
+		//DT special feature - radar
+		if (key == XK_r) {
+		    game->radarOn ^= 1;
+		}
+
 		//You may check other keys here.
 	}
 	//JR: Check if exit button was clicked
@@ -333,12 +342,11 @@ int check_keys(XEvent *e, Game *game)
 
 // JBC note 5/13
 // moved the "particle" stuff out of here 
-void movement(Game *game, Structures *sh)
-{
-    // JBC temp comment to see ANYTHING
-	eMissilePhysics(game, sh);
-
-	//dMissilePhysics(game, sh);
+void movement(Game *game)
+{    
+    radarPhysics(game);
+    eMissilePhysics(game);
+	//dMissilePhysics(game);
 	eExplosionPhysics(game);
 	
 	
@@ -356,8 +364,10 @@ void render(Game *game)
 	//		createEMissiles(game);
 	//	}
     renderBackground(starsTexture);
+    renderRadar(game);
 	renderEMissiles(game);
 	renderEExplosions(game);
     renderDefenseMissile(game);
+    renderStruc(game);
     // renderDefExplosions(game);
 }
