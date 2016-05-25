@@ -12,6 +12,11 @@
 #define _JOSEG_H_
 using namespace std;
 
-extern void renderStruc(Structures *shape);
+extern GLuint cityTexture;
+
+extern void initStruc(Game *game);
+extern void renderStruc(Game *game);
+extern void destroyCity(Game *game, int citynum);
+extern void renderBackground(GLuint starsTexture);
 
 #endif

@@ -29,6 +29,7 @@
 #include <AL/al.h>
 #include <AL/alc.h>
 #include <AL/alut.h>
+#include "ppm.h"
 
 //MACROS
 //Number of buttons to show on menu
@@ -110,6 +111,15 @@ struct EExplosion {
     EExplosion() {}
 };
 
+struct Radar {
+    Vec pos;
+    float radius;
+    float radius2;
+    float radiusInc;
+    float color[4];
+    Radar() {}
+};
+
 // defense missile explosion
 struct DExplosion {
     Vec pos;
@@ -146,10 +156,14 @@ struct Game {
 
     Shape box;    
     float defMissileSpeed;
+    
+    //DT
     EMissile *emarr;                                  
     int nmissiles;
     EExplosion *eearr;
     int neexplosions;
+    Radar radar;
+    int radarOn;
 
     // DefenseMissile section
     int numberDefenseMissiles;
@@ -172,15 +186,19 @@ struct Game {
     Shape menuBG;
     Audio sounds;
 
+    Structures structures;
+
     //Constructor 
     Game() {
-    	//level variable initialized 5-17-16 -DT
+    	//DT
         level = 0;
     	emarr = new EMissile[10];
         eearr = new EExplosion[1000];
     	numberDefenseMissiles = 0;
     	nmissiles = 0;
         neexplosions = 0;
+	radarOn = 0;
+	
         menuExit = 0;
         gMenu = 1;
         inGame = 0;
