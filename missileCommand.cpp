@@ -355,7 +355,7 @@ void render(Game *game)
 	//        if (game->nmissiles < 10) {
 	//		createEMissiles(game);
 	//	}
-    renderBackground();
+    renderBackground(starsTexture);
 	renderEMissiles(game);
 	renderEExplosions(game);
     renderDefenseMissile(game);
