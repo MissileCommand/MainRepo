@@ -17,7 +17,6 @@
 //				This is determined by "int inGame" in "struct Game"
 //		*May 15th, 2016*
 //			OpenAL (sound) functionality has been added
-//			Others may play sounds by simply calling "playSound(game, int);"
 //			Must include joseR.h
 //		*May 20th, 2016*
 //			Moved OpenAL code into a class
@@ -28,6 +27,7 @@
 //		*May 24th, 2016*
 //			Finalized audio code (still need in-line comments)
 //			Added settings menu (adjust volume for now)
+//			Can call sounds via game->sounds.playAudio(int);
 //			
 #include <GL/glx.h>
 #include "missileCommand.h"
