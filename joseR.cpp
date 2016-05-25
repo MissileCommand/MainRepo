@@ -57,6 +57,11 @@ Audio::Audio()
 		printf("ERROR: context\n");
 		return;
 	}
+	//Setup the listener.
+	float vec[6] = {0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f};
+	alListener3f(AL_POSITION, 0.0f, 0.0f, 0.0f);
+	alListenerfv(AL_ORIENTATION, vec);
+	alListenerf(AL_GAIN, 1.0f);
 }
 
 Audio::~Audio()
@@ -73,8 +78,8 @@ void Audio::loadAudio()
 {
 	//Buffer holds the sound information.
 	const string FILE[] = {
-		"./sounds/missile_miss.wav", "./sounds/missile_collision.wav",
-		"./sounds/missile_launch.wav", "./sounds/mouse_click.wav",
+		"./sounds/missile_explosion.wav", "./sounds/missile_collision.wav",
+		"./sounds/missile_launch2.wav", "./sounds/mouse_click.wav",
 		"./sounds/mouse_release.wav"};
 	int val = 0;
 	//Load and assign sounds
@@ -112,6 +117,13 @@ void Audio::loadAudio()
 		}
 	}
 }
+
+// ODD BUG - AUDIO GETS QUIET OR LOUD WHEN MULTIPLE GO OFF
+// ODD BUG - AUDIO GETS QUIET OR LOUD WHEN MULTIPLE GO OFF
+// ODD BUG - AUDIO GETS QUIET OR LOUD WHEN MULTIPLE GO OFF
+// ODD BUG - AUDIO GETS QUIET OR LOUD WHEN MULTIPLE GO OFF
+// ODD BUG - AUDIO GETS QUIET OR LOUD WHEN MULTIPLE GO OFF
+// ODD BUG - AUDIO GETS QUIET OR LOUD WHEN MULTIPLE GO OFF
 
 void Audio::playAudio(int num)
 {
