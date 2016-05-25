@@ -98,8 +98,8 @@ int main(void)
 		} else {
 			movement(&game, &sh);
 			render(&game);
+			renderStruc(&sh);
 		}
-		renderStruc(&sh);
 		glXSwapBuffers(dpy, win);
 	}
 	cleanupXWindows();

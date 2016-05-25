@@ -25,6 +25,9 @@
 //			Requires &game->sounds->playAudio(int);
 //			0 = missile_miss, 10 = missile_hit, 20 = missile_fire
 //			30/32 = mouse clicks
+//		*May 24th, 2016*
+//			Finalized audio code (still need in-line comments)
+//			Added settings menu (adjust volume for now)
 //			
 #include <GL/glx.h>
 #include "missileCommand.h"
@@ -195,7 +198,7 @@ void renderMenuObjects(Game *game)
 	Shape *s;
 	//Check if game is in progress so menu can act as a pause menu.
 	//Otherwise will clear screen
-	//glClearColor(0.15, 0.15, 0.15, 0.15);
+	glClearColor(0.15, 0.15, 0.15, 0.15);
 	glClear(GL_COLOR_BUFFER_BIT);
 	float w, h;
 	for (int i = 0; i < BUTTONS; i++) {
@@ -367,7 +370,7 @@ void menuClick(Game *game)
 				game->sounds.gVolume -= adjust;
 				game->vVolume -= iadjust;
 			}
-				printf("%f\n", game->sounds.gVolume);
+			//printf("%f\n", game->sounds.gVolume);
 		}
 		//Volume +
 		if (game->mouseOnButton[1] == 1) {
@@ -375,7 +378,7 @@ void menuClick(Game *game)
 				game->sounds.gVolume += adjust;
 				game->vVolume += iadjust;
 			}
-				printf("%f\n", game->sounds.gVolume);
+			//printf("%f\n", game->sounds.gVolume);
 		}
 		//Back
 		if (game->mouseOnButton[0] == 1) {
