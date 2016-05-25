@@ -15,5 +15,6 @@ using namespace std;
 extern GLuint cityTexture;
 
 extern void renderStruc(Structures *shape);
+extern void renderBackground();
 
 #endif
