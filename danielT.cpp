@@ -38,6 +38,7 @@ const int MAX_EMISSILES = 10;
 int mCount=0;
 int chCount=0;
 int offCount=0;
+int prevLevel=1;
 //int level=0;
 int redirects=0;
 
@@ -57,9 +58,21 @@ void eExplosionPhysics(Game *game)
     for (int m=0; m<game->neexplosions; m++) {
 	e = &game->eearr[m];
 	e->radius += e->radiusInc;
-	e->color[0] *= -1.0;
-	e->color[1] = 0.1;
-	e->color[2] = 0.1;
+	if (rand()%2==0) {
+	    e->color[0] = 1.0f;
+    	    e->color[1] = 0.1f;
+    	    e->color[2] = 0.1f;
+	}
+	else if (rand()%3==0) {
+	    e->color[0] = 1.0f;
+	    e->color[1] = 1.0f;
+	    e->color[2] = 0.1f;
+	}
+	else {
+	    e->color[0] = 1.0f;
+	    e->color[1] = 0.549f;
+	    e->color[2] = 0.0f;
+	}
 
 	if (e->radius >= 40.0) {
 	    e->radiusInc *= -1.25;
@@ -137,7 +150,7 @@ void eMissilePhysics(Game *game, Structures *sh)
 	if (rand()%100==0 && 
 		game->nmissiles<10-game->level && 
 		mCount>10-game->level &&
-		e->pos.y>WINDOW_HEIGHT/2) {
+		e->pos.y>(WINDOW_HEIGHT/3)*2) {
 	    for(int q=0; q<(rand()%game->level); q++) {
 		createEMissiles(game, e->pos.x, e->pos.y);
 	    }
@@ -145,7 +158,7 @@ void eMissilePhysics(Game *game, Structures *sh)
     }
     //puts in a random delay between missile creation
     if (game->nmissiles < 10) {
-	if (rand()%50==0)
+	if (rand()%(60/game->level)==0)
     	    createEMissiles(game, 0, 0);
     }
     return;
@@ -163,17 +176,56 @@ void eMissileExplode(Game *game, int misnum)
     game->nmissiles--;
 }
 
+void displayScore(Game *g) {
+    /*float w = 50.0;
+    float h = 10.0;
+    float xpoint = 100.0;
+    float ypoint = 100.0;
+    glColor3ub(100, 140, 100);
+    glPushMatrix();
+    glTranslatef(0.0, 0.0, -1.0);
+    glBegin(GL_QUADS);
+    glVertex2i(xpoint-w, ypoint-h);
+    glVertex2i(xpoint-w, ypoint+h);
+    glVertex2i(xpoint+w, ypoint+h);
+    glVertex2i(xpoint+w, ypoint-h);
+    glEnd();
+    glPopMatrix();
+    Rect r;    
+    //glClear(GL_COLOR_BUFFER_BIT);
+    r.bot = ypoint-10;
+    r.left = xpoint;
+    r.center = 0;
+    ggprint8b(&r, 16, 0x00005599, "LEVEL:      %i", g->level);
+    ggprint8b(&r, 16, 0x00005599, "SCORE: 100");
+    //ggprint8b(&r, 16, 0x00005599, "City Hit Count: %i", chCount);
+    //ggprint8b(&r, 16, 0x00005599, "Missile Miss Count: %i", offCount);
+    //ggprint8b(&r, 16, 0x00005599, "City Hit Count: %i", chCount);*/
+    sleep(10);
+    //ggprint8b(&r, 16, 0x00005599, "Missile Miss Count: %i", offCount);
+}
+
 //initialize enemy missles from top of screen
 void createEMissiles(Game *g, float x, float y)
 {
     //counts down missiles in each level
     if (mCount<=0) {
 	//waits at the end of each level
-	if (g->nmissiles>0)
+	if (g->nmissiles>0 || g->neexplosions>0)
 	    return;
 	g->level++;
 	mCount=20*(g->level*0.50);
+	//after level has increased return from function 
+	//level/score screen will then be displayed
+	return;
     }
+    //code will eventually be in main
+    //////////////////
+    if (prevLevel< g->level) {
+	displayScore(g);
+	prevLevel++;
+    }
+    /////////////////
     float mRatio;
     EMissile *e = &g->emarr[g->nmissiles];
     if (x==0 && y==0){
@@ -291,7 +343,10 @@ void renderEExplosions(Game *g)
     for (int i=0; i<g->neexplosions; i++) {
 	EExplosion *e = &g->eearr[i];
 	glPushMatrix();
-	glColor3f(e->color[0], e->color[1], e->color[2]);
+	glTranslatef(0.0, 0.0, -1.0);
+	glEnable (GL_BLEND);
+	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	glColor4f(e->color[0], e->color[1], e->color[2], 0.75);
 	glBegin(GL_TRIANGLE_FAN);
 	glVertex2f(e->pos.x, e->pos.y);
 	for (int i=0; i<=tris; i++) {
