@@ -71,3 +71,15 @@ void renderStruc(Structures *shape)
 		glDisable(GL_ALPHA_TEST);
         }
 }
+
+renderBackground()
+{
+	glBindTexture(GL_TEXTURE_2D, starsTexture);
+        glBegin(GL_QUADS);
+                        glTexCoord2f(0.0f, 1.0f); glVertex2i(0, 0);
+                        glTexCoord2f(0.0f, 0.0f); glVertex2i(0, WINDOW_HEIGHT);
+                        glTexCoord2f(1.0f, 0.0f); glVertex2i(WINDOW_WIDTH, WINDOW_HEIGHT);
+                        glTexCoord2f(1.0f, 1.0f); glVertex2i(WINDOW_WIDTH, 0);
+        glEnd();
+        glBindTexture(GL_TEXTURE_2D, 0);
+}
