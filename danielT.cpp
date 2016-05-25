@@ -17,6 +17,7 @@
 #include <GL/glx.h>
 #include "danielT.h"
 #include "joseR.h"
+#include "joseG.h"
 extern "C" {
 #include "fonts.h"
 }
@@ -60,8 +61,8 @@ void eExplosionPhysics(Game *game)
 	e->radius += e->radiusInc;
 	if (rand()%2==0) {
 	    e->color[0] = 1.0f;
-    	    e->color[1] = 0.1f;
-    	    e->color[2] = 0.1f;
+	    e->color[1] = 0.1f;
+	    e->color[2] = 0.1f;
 	}
 	else if (rand()%3==0) {
 	    e->color[0] = 1.0f;
@@ -85,8 +86,9 @@ void eExplosionPhysics(Game *game)
 }
 
 //handles missile movement and collisions
-void eMissilePhysics(Game *game, Structures *sh)
+void eMissilePhysics(Game *game)
 {
+    Structures *sh = &game->structures;
     EMissile *e;
     Shape *c;
     EExplosion *d;
@@ -97,60 +99,74 @@ void eMissilePhysics(Game *game, Structures *sh)
     //	return;
     for (int i=0; i<game->nmissiles; i++) {
 	e = &game->emarr[i];
+
+	//update missile position
 	e->pos.x += e->vel.x;
 	e->pos.y += e->vel.y;
-
-	//check for collision with cities 
-	for (int k=0; k<CITYNUM; k++) {
-	    c = &sh->city[k];
-	    if (e->pos.y <= c->center.y+c->height && 
-		    e->pos.x <= c->center.x+c->width && 
-		    e->pos.x >= c->center.x-c->width) {
-		//cityChange();
-		eMissileExplode(game, i);
-        a->playAudio(10);
-		chCount++;
-	    }
-	}
-
-	//check for collision with floor
-	c = &sh->floor;
-	if (e->pos.y <= c->center.y+c->height) {
-	    eMissileExplode(game, i);
-        a->playAudio(0);
-	    offCount++;
-	}
 
 	//update missile trail
 	e->trail.end.x = e->pos.x;
 	e->trail.end.y = e->pos.y;
-
-	//check for DMissile collision
-	/*for (int p=0; p<game->neexplosions; p++) {
-	    d = &game->eearr[p];
-	    float xd = abs(e->pos.x-d->pos.x);
-	    float yd = abs(e->pos.y-d->pos.y);
-	    float dist = sqrt(xd*xd+yd*yd);
-	    if (dist<=d->radius) {
-		eMissileExplode(game,i);
-        sounds->playAudio(0);
-	    }
-	}*/
 
 	//check for off screen
 	if (e->pos.y < 0.0 || e->pos.x <= 0.0 || e->pos.x >= WINDOW_WIDTH) {
 	    eMissileExplode(game, i);
 	    std::cout << "misoff" << std::endl;
 	    offCount++;
+	    continue;
 	}
-	
+
+	int k;
+
+	//check for collision with cities 
+	for (k=0; k<CITYNUM; k++) {
+	    c = &sh->city[k];
+	    if (e->pos.y <= c->center.y+c->height && 
+		    e->pos.x <= c->center.x+c->width && 
+		    e->pos.x >= c->center.x-c->width) {
+		destroyCity(game, k);
+		eMissileExplode(game, i);
+		a->playAudio(10);
+		chCount++;
+		break;
+	    }
+	}
+
+	if (k<CITYNUM)
+	    continue;
+
+	//check for collision with floor
+	c = &sh->floor;
+	if (e->pos.y <= c->center.y+c->height) {
+	    eMissileExplode(game, i);
+	    a->playAudio(0);
+	    offCount++;
+	    continue;
+	}
+
+	int p;
+	//check for DMissile collision
+	for (p=0; p<game->neexplosions; p++) {
+  	    d = &game->eearr[p];
+  	    float xd = abs(e->pos.x-d->pos.x);
+  	    float yd = abs(e->pos.y-d->pos.y);
+  	    float dist = sqrt(xd*xd+yd*yd);
+  	    if (dist<=d->radius) {
+      		eMissileExplode(game,i);
+      		a->playAudio(0);
+      		break;
+  	    }
+	}
+	if (p<game->neexplosions)
+	    continue;
+
 	//randomly generate new missile branch
 	//as long as more missiles are available
 	//only generate branches above middle of screen
 	if (rand()%100==0 && 
 		game->nmissiles<10-game->level && 
 		mCount>10-game->level &&
-		e->pos.y>(WINDOW_HEIGHT/3)*2) {
+		e->pos.y>WINDOW_HEIGHT/2) {
 	    for(int q=0; q<(rand()%game->level); q++) {
 		createEMissiles(game, e->pos.x, e->pos.y);
 	    }
@@ -159,7 +175,7 @@ void eMissilePhysics(Game *game, Structures *sh)
     //puts in a random delay between missile creation
     if (game->nmissiles < 10) {
 	if (rand()%(60/game->level)==0)
-    	    createEMissiles(game, 0, 0);
+	    createEMissiles(game, 0, 0);
     }
     return;
 }
@@ -177,32 +193,8 @@ void eMissileExplode(Game *game, int misnum)
 }
 
 void displayScore(Game *g) {
-    /*float w = 50.0;
-    float h = 10.0;
-    float xpoint = 100.0;
-    float ypoint = 100.0;
-    glColor3ub(100, 140, 100);
-    glPushMatrix();
-    glTranslatef(0.0, 0.0, -1.0);
-    glBegin(GL_QUADS);
-    glVertex2i(xpoint-w, ypoint-h);
-    glVertex2i(xpoint-w, ypoint+h);
-    glVertex2i(xpoint+w, ypoint+h);
-    glVertex2i(xpoint+w, ypoint-h);
-    glEnd();
-    glPopMatrix();
-    Rect r;    
-    //glClear(GL_COLOR_BUFFER_BIT);
-    r.bot = ypoint-10;
-    r.left = xpoint;
-    r.center = 0;
-    ggprint8b(&r, 16, 0x00005599, "LEVEL:      %i", g->level);
-    ggprint8b(&r, 16, 0x00005599, "SCORE: 100");
-    //ggprint8b(&r, 16, 0x00005599, "City Hit Count: %i", chCount);
-    //ggprint8b(&r, 16, 0x00005599, "Missile Miss Count: %i", offCount);
-    //ggprint8b(&r, 16, 0x00005599, "City Hit Count: %i", chCount);*/
-    sleep(10);
-    //ggprint8b(&r, 16, 0x00005599, "Missile Miss Count: %i", offCount);
+    //sleep(10);
+    return;
 }
 
 //initialize enemy missles from top of screen
@@ -229,9 +221,9 @@ void createEMissiles(Game *g, float x, float y)
     float mRatio;
     EMissile *e = &g->emarr[g->nmissiles];
     if (x==0 && y==0){
-    	e->pos.y = WINDOW_HEIGHT-1;    
+	e->pos.y = WINDOW_HEIGHT-1;    
 	e->pos.x = (rand()%WINDOW_WIDTH-1.0) +1.0;
-    	e->pos.z = 0;
+	e->pos.z = 0;
     }
     else {
 	e->pos.y = y;
@@ -244,20 +236,6 @@ void createEMissiles(Game *g, float x, float y)
     //calculate angle using start and end points
     mRatio = (e->pos.x-tempX)/WINDOW_HEIGHT;
     e->vel.x = e->vel.y*mRatio;
-    //e->vel.x = ((rand()%900)-450)*0.001*e->vel.y;
-    //e->angle = asin(e->vel.x/(sqrt(e->vel.y*e->vel.y+e->vel.x*e->vel.x)));
-    //if so, reverse direction e->vel.x = e->vel.x*-1.0;
-    /*mRatio = e->vel.x/(e->vel.y*-1.0);
-      endPt = e->pos.x + (mRatio*WINDOW_HEIGHT);
-      endPt2 = e->pos.x - (mRatio*WINDOW_HEIGHT);
-      while (endPt>=WINDOW_WIDTH-5.0 || endPt<=5.0 || endPt2>=WINDOW_WIDTH-5.0 || endPt2<=5.0) {
-      mRatio = e->vel.x/(e->vel.y*-1.0);
-      endPt = e->pos.x + (mRatio*WINDOW_HEIGHT);
-      endPt2 = e->pos.x - (mRatio*WINDOW_HEIGHT);
-      e->vel.x = ((rand()%900)-450)*0.001*e->vel.y;
-      redirects++;
-      }
-      */
     e->vel.z = 0;
     e->color[0] = 0.0f;
     e->color[1] = 0.5f;
@@ -298,31 +276,54 @@ void createEExplosion(Game *g, float x, float y)
 
 void renderEMissiles(Game *g)
 {
-    for (int i=0; i<g->nmissiles; i++) {
-	EMissile *e = &g->emarr[i];
+    if (g->radarOn==0) {
+	for (int i=0; i<g->nmissiles; i++) {
+	    EMissile *e = &g->emarr[i];
 
-	float w = e->trail.width;
-	//render missile trails
-	glPushMatrix();
-	glColor3f(e->trail.color[0], e->trail.color[1], e->trail.color[2]);
-	glBegin(GL_QUADS);
-	glVertex2i(e->trail.start.x, e->trail.start.y);
-	glVertex2i(e->trail.start.x+w, e->trail.start.y+(w*0.5));
-	glVertex2i(e->trail.end.x, e->trail.end.y);
-	glVertex2i(e->trail.end.x+w, e->trail.end.y+(w*0.5));
-	glEnd();
-	glPopMatrix();
+	    float w = e->trail.width;
+	    //render missile trails
+	    glPushMatrix();
+	    glColor3f(e->trail.color[0], e->trail.color[1], e->trail.color[2]);
+	    glBegin(GL_QUADS);
+	    glVertex2i(e->trail.start.x, e->trail.start.y);
+	    glVertex2i(e->trail.start.x+w, e->trail.start.y+(w*0.5));
+	    glVertex2i(e->trail.end.x, e->trail.end.y);
+	    glVertex2i(e->trail.end.x+w, e->trail.end.y+(w*0.5));
+	    glEnd();
+	    glPopMatrix();
 
-	//render Missiles
-	glPushMatrix();
-	glColor3f(e->color[0], e->color[1], e->color[2]);
-	glBegin(GL_QUADS);
-	glVertex2i(e->pos.x-1, e->pos.y-6);
-	glVertex2i(e->pos.x-3, e->pos.y+6);
-	glVertex2i(e->pos.x+3, e->pos.y+6);
-	glVertex2i(e->pos.x+1, e->pos.y-6);
-	glEnd();
-	glPopMatrix();
+	    //render Missiles
+	    glPushMatrix();
+	    glColor3f(e->color[0], e->color[1], e->color[2]);
+	    glBegin(GL_QUADS);
+	    glVertex2i(e->pos.x-1, e->pos.y-6);
+	    glVertex2i(e->pos.x-3, e->pos.y+6);
+	    glVertex2i(e->pos.x+3, e->pos.y+6);
+	    glVertex2i(e->pos.x+1, e->pos.y-6);
+	    glEnd();
+	    glPopMatrix();
+	}
+    }
+    else {
+	for (int i=0; i<g->nmissiles; i++) {
+            EMissile *e = &g->emarr[i];
+
+            //render Missiles with radar
+	    float xd = abs(e->pos.x-g->radar.pos.x);
+	    float yd = abs(e->pos.y-g->radar.pos.y);
+	    float dist = sqrt(xd*xd+yd*yd);
+	    if (dist<=g->radar.radius2 || e->pos.y <=100.0) {
+		glPushMatrix();
+		glColor3f(e->color[0], e->color[1], e->color[2]);
+		glBegin(GL_QUADS);
+		glVertex2i(e->pos.x-1, e->pos.y-6);
+		glVertex2i(e->pos.x-3, e->pos.y+6);
+		glVertex2i(e->pos.x+3, e->pos.y+6);
+		glVertex2i(e->pos.x+1, e->pos.y-6);
+		glEnd();
+		glPopMatrix();
+	    }
+        }
     }
     Rect r;
     //glClear(GL_COLOR_BUFFER_BIT);
@@ -358,6 +359,62 @@ void renderEExplosions(Game *g)
 	glEnd();
 	glPopMatrix();
     }
+}
+
+//DT special feature - radar
+
+void renderRadar(Game *g) {
+    if (g->radarOn == 0)
+	return;
+    Radar *r = &g->radar;
+    int tris = 100;
+    float twicePi = 2.0f * 3.14159265359;
+    glPushMatrix();
+    glEnable (GL_BLEND);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glColor4f(r->color[0], r->color[1], r->color[2], r->color[3]);
+    glBegin(GL_TRIANGLE_FAN);
+    glVertex2f(r->pos.x, r->pos.y);
+    for (int i=0; i<=tris; i++) {
+	glVertex2f(
+		r->pos.x + (r->radius * cos(i * twicePi/tris)),
+		r->pos.y + (r->radius * sin(i * twicePi/tris))
+		);
+    }
+    glEnd();
+    glPopMatrix();
+}
+
+void radarPhysics(Game *g) {
+    if (g->radarOn == 0)
+	return;
+    Radar *r = &g->radar;
+    if (r->radius2 >= 900.0) {
+	initRadar(g);
+	return;
+    }
+    r->radius += r->radiusInc;
+    r->radius2 += r->radiusInc;
+    //change transparency level
+    if ((int)r->radius%10==0)
+	r->color[3] = 0.1;
+    else
+	r->color[3] = 0.3;
+
+}
+
+void initRadar(Game *g) {
+    Radar *r = &g->radar;
+    r->pos.x = WINDOW_WIDTH/2.0;
+    r->pos.y = 50.0;
+    r->pos.z = 0.0;
+    r->radius = 20.0;
+    r->radius2 = 30.0;
+    r->radiusInc = 5.0;
+    r->color[0] = 0.091;
+    r->color[1] = 0.973;
+    r->color[2] = 0.016;
+    r->color[3] = 0.0;
 }
 
 void nameInBox(float xpoint, float ypoint)
