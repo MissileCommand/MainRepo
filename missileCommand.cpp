@@ -6,12 +6,16 @@
 
 #include <iostream>
 #include <cstdlib>
+#include <cstdio>
 #include <ctime>
 #include <cstring>
 #include <cmath>
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <GL/glx.h>
+#include <AL/al.h>
+#include <AL/alc.h>
+#include <AL/alut.h>
 
 #ifndef MISSILECOMMAND_H
 #define MISSILECOMMAND_H
@@ -59,18 +63,23 @@ int main(void)
 	init_opengl();
 	//declare game object
 	Game game;
+
 	game.numberDefenseMissiles=0;
         
-        // JBC 5/19/16
-        // added globally accesible defMissileSpeed so that we can 
-        // change it dynamically
-        game.defMissileSpeed = 80;
+    // JBC 5/19/16
+    // added globally accesible defMissileSpeed so that we can 
+    // change it dynamically
+    game.defMissileSpeed = 80;
 	Structures sh;
 
 	//Changed call for function prototype 5-17-16 -DT
 	createEMissiles(&game, 0, 0);
 	//JR - Menu Object Shapes and Locations
 	drawMenu(&game);
+	drawSettings(&game);
+	//Audio sounds;
+	//sounds.loadAudio();
+	game.sounds.loadAudio();
 	//start animation
 	while(!done) {
 		while(XPending(dpy)) {
@@ -84,14 +93,13 @@ int main(void)
 			renderMenuObjects(&game);
 			renderMenuText(&game);
 		} else if (state == 2) {
-			std::cout << "Game state was set to settings(2)\n";
-			std::cout << "Resetting state to menu(1)\n";
-			game.gMenu = 1;
+			renderSettings(&game);
+			renderSettingsText(&game);
 		} else {
 			movement(&game, &sh);
 			render(&game);
+			renderStruc(&sh);
 		}
-		renderStruc(&sh);
 		glXSwapBuffers(dpy, win);
 	}
 	cleanupXWindows();
@@ -165,6 +173,9 @@ void check_mouse(XEvent *e, Game *game)
 	static int savex = 0;
 	static int savey = 0;
 	static int n = 0;
+	Audio *a;
+	a = &game->sounds;
+
 
 	if (e->type == ButtonRelease) {
 		return;
@@ -175,13 +186,16 @@ void check_mouse(XEvent *e, Game *game)
 			//Left button was pressed
 			int y = WINDOW_HEIGHT - e->xbutton.y;
 			//Check game state when LEFT-clicking
-			if (gameState(game) == 1) {
+			if (gameState(game) == 1 || gameState(game) == 2) {
+				a->playAudio(30);
 				menuClick(game);
+				a->playAudio(32);
 			} else {
 				// changeTitle();
-                                makeDefenseMissile(game, e->xbutton.x, y);
-                                // JBC note 5/13
-                                // moved the "particle" stuff out of here 
+                makeDefenseMissile(game, e->xbutton.x, y);
+                a->playAudio(20);
+                // JBC note 5/13
+                // moved the "particle" stuff out of here 
 				// makeParticle(game, e->xbutton.x, y);
 			}
 			return;
@@ -194,9 +208,8 @@ void check_mouse(XEvent *e, Game *game)
 			} else if (gameState(game) == 0) {
 				//Game Functions
 				// fireDefenseMissile(game);
-                            
-                                // JBC idea to add menu pop up for right-click
-                                game->gMenu ^= 1;
+                // JBC idea to add menu pop up for right-click
+                game->gMenu ^= 1;
 			}
 			return;
 		}
@@ -208,14 +221,13 @@ void check_mouse(XEvent *e, Game *game)
 		int y = WINDOW_HEIGHT - e->xbutton.y;
 		if (++n < 10)
 			return;
-		if (gameState(game) == 1) {
+		if (gameState(game) == 1 || gameState(game) == 2) {
 			//Menu Functions
 			mouseOver(savex, y, game);
 		} else if (gameState(game) == 0) {
-			
-                        //Game Functions
-                        // JBC note 5/13
-                        // moved the "particle" stuff out of here 
+	        //Game Functions
+	        // JBC note 5/13
+	        // moved the "particle" stuff out of here 
 			// makeParticle(game, e->xbutton.x, y);
 		}
 	}
@@ -255,7 +267,7 @@ int check_keys(XEvent *e, Game *game)
 // moved the "particle" stuff out of here 
 void movement(Game *game, Structures *sh)
 {
-        // JBC temp comment to see ANYTHING
+    // JBC temp comment to see ANYTHING
 	eMissilePhysics(game, sh);
 
 	//dMissilePhysics(game, sh);
@@ -269,17 +281,14 @@ void render(Game *game)
 	glClear(GL_COLOR_BUFFER_BIT);
 	glPushMatrix();
 	glColor3ub(150,160,220);
-        
-//  // JBC removed "particle" stuff that is no longer in use
-        
-	//DT
+	// JBC removed "particle" stuff that is no longer in use   
+	// DT
 	// JBC commented out... please keep for my testing
-//        if (game->nmissiles < 10) {
-//		createEMissiles(game);
-//	}
-	
-        renderEMissiles(game);
+	//        if (game->nmissiles < 10) {
+	//		createEMissiles(game);
+	//	}
+    renderEMissiles(game);
 	renderEExplosions(game);
-        renderDefenseMissile(game);
-        // renderDefExplosions(game);
+    renderDefenseMissile(game);
+    // renderDefExplosions(game);
 }

@@ -4,7 +4,10 @@
 #include "missileCommand.h"
 #endif
 
-
+#ifndef JOSER_H
+#define JOSER_H
+#include "joseR.h"
+#endif
 
 #ifndef _DANIELT_H_
 #define _DANIELT_H_
