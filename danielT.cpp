@@ -90,6 +90,8 @@ void eMissilePhysics(Game *game, Structures *sh)
     EMissile *e;
     Shape *c;
     EExplosion *d;
+    Audio *a;
+    a = &game->sounds;
 
     //if (game->nmissiles <=0)
     //	return;
@@ -106,6 +108,7 @@ void eMissilePhysics(Game *game, Structures *sh)
 		    e->pos.x >= c->center.x-c->width) {
 		//cityChange();
 		eMissileExplode(game, i);
+        a->playAudio(10);
 		chCount++;
 	    }
 	}
@@ -114,6 +117,7 @@ void eMissilePhysics(Game *game, Structures *sh)
 	c = &sh->floor;
 	if (e->pos.y <= c->center.y+c->height) {
 	    eMissileExplode(game, i);
+        a->playAudio(0);
 	    offCount++;
 	}
 
@@ -129,6 +133,7 @@ void eMissilePhysics(Game *game, Structures *sh)
 	    float dist = sqrt(xd*xd+yd*yd);
 	    if (dist<=d->radius) {
 		eMissileExplode(game,i);
+        sounds->playAudio(0);
 	    }
 	}*/
 

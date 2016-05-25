@@ -17,19 +17,29 @@
 //INCLUDES
 #include <iostream>
 #include <cstdlib>
+#include <cstdio>
 #include <ctime>
 #include <cstring>
+#include <string>
 #include <cmath>
+#include <unistd.h>
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <GL/glx.h>
+#include <AL/al.h>
+#include <AL/alc.h>
+#include <AL/alut.h>
+#include "ppm.h"
 
 //MACROS
 //Number of buttons to show on menu
 #define BUTTONS 3
+#define BUTTONS_S 3
+#define T_BUTTONS BUTTONS + BUTTONS_S
 //X Position of all buttons
 //Divides WINDOW_WIDTH by the number below
 #define BUTTON_X 4.25
+#define TOTAL_SOUNDS 5
 #define CITYNUM 5
 //#define WINDOW_WIDTH  800
 //#define WINDOW_HEIGHT 600
@@ -42,8 +52,6 @@
 extern Display *dpy;
 extern Window win;
 extern GLXContext glc;
-
-
 
 struct Vec {
     float x, y, z;
@@ -112,6 +120,26 @@ struct DExplosion {
     DExplosion() {}
 };
 
+// Game sound class for openAL
+class Audio 
+{
+    public:
+        //Variables
+        ALCdevice *device;
+        ALCcontext *context;
+        ALuint alSource;
+        ALuint alBuffer;
+        ALint source_state;
+        int source[100];
+        int buffer[TOTAL_SOUNDS];
+        float gVolume;
+        //Constructor & Deconstructor
+        Audio();
+        ~Audio();
+        //Class Prototypes
+        void loadAudio();
+        void playAudio(int num);
+};
 
 struct Game {
     //global variable for level 5-17-16 -DT
@@ -133,20 +161,22 @@ struct Game {
     // JBC 05/08/16 JBC switched from DefenseMissile to dMissile (Defense Missile)
     DefenseMissile dMissile[MAX_D_MISSILES];
 
-    
-    //JR: This will store the values of the x-pos to be used
-    //      for correct font placement on buttons
+    //JR:
     int buttonSpacer[BUTTONS];
-    //JR: This will be used to return which button the mouse
-    //      is currently on in the menus
-    int mouseOnButton[BUTTONS];
-    //JR
-    int menuExit, gMenu, inGame;
+    int mouseOnButton[T_BUTTONS];
+    int menuExit;
+    int gMenu;
+    int inGame;
+    int vVolume;
     Shape mButton[BUTTONS];
+    Shape sButton[BUTTONS_S];
+    Shape menuBG;
+    Audio sounds;
+
     //Constructor 
     Game() {
     	//level variable initialized 5-17-16 -DT
-	level = 0;
+        level = 0;
     	emarr = new EMissile[10];
         eearr = new EExplosion[1000];
     	numberDefenseMissiles = 0;
@@ -155,7 +185,8 @@ struct Game {
         menuExit = 0;
         gMenu = 1;
         inGame = 0;
-        for (int i=0;i<BUTTONS;i++) {
+        vVolume = 100;
+        for (int i=0;i<T_BUTTONS;i++) {
             mouseOnButton[i] = 0;
         }
     }
