@@ -55,6 +55,10 @@ void makeDefenseMissile(Game *game, int x, int y);
 
 void render(Game *game);
 
+Ppmimage *cityImage=NULL;
+Ppmimage *starsImage=NULL;
+GLuint starsTexture;
+
 int main(void)
 {
 	int done=0;
