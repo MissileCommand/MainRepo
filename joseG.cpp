@@ -8,7 +8,7 @@
 #include "joseG.h"
 #include <GL/glx.h>
 
-extern void init_opengl();
+//extern void init_opengl();
 
 GLuint cityTexture;
 
@@ -72,7 +72,7 @@ void renderStruc(Structures *shape)
         }
 }
 
-void renderBackground()
+void renderBackground(GLuint starsTexture)
 {
 	glBindTexture(GL_TEXTURE_2D, starsTexture);
         glBegin(GL_QUADS);

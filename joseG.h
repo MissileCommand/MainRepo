@@ -15,6 +15,6 @@ using namespace std;
 extern GLuint cityTexture;
 
 extern void renderStruc(Structures *shape);
-extern void renderBackground();
+extern void renderBackground(GLuint starsTexture);
 
 #endif
