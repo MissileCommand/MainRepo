@@ -62,7 +62,7 @@ Audio::Audio()
 	}
 	gVolume = 1.0;
 	//Setup the listener.
-	float vec[6] = {0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f};
+	float vec[6] = { 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
 	alListener3f(AL_POSITION, 0.0f, 0.0f, 0.0f);
 	alListenerfv(AL_ORIENTATION, vec);
 	alListenerf(AL_GAIN, 1.0f);
@@ -84,7 +84,7 @@ void Audio::loadAudio()
 	const string FILE[] = {
 		"./sounds/missile_explosion.wav", "./sounds/missile_collision.wav",
 		"./sounds/missile_launch2.wav", "./sounds/mouse_click.wav",
-		"./sounds/mouse_release.wav"};
+		"./sounds/mouse_release.wav" };
 	int val = 0;
 	//Load and assign sounds
 	for (int i = 0; i < TOTAL_SOUNDS; i++) {
@@ -97,8 +97,8 @@ void Audio::loadAudio()
 			printf("[%s] - Was not loaded.\n", f);
 			break;
 		}
-		//Sets explosions and missile sounds to 10 sources each
 		if (val < 30) {
+			//Sets explosions and missile sounds to 10 sources each
 			for (int n = 0; n < 10; n++) {
 				//Generate a source
 				alGenSources(1, &alSource);
@@ -112,8 +112,8 @@ void Audio::loadAudio()
 				//printf("File: %s stored in buffer[%d].\n", f, val);
 				source[val++] = alSource;
 			}
-		//Sets menu click sounds
 		} else if (val >= 30 && val < 34) {
+			//Sets menu click sounds
 			for (int n = 0; n < 2; n++) {
 				alGenSources(1, &alSource);
 				alSourcei(alSource, AL_BUFFER, buffer[i]);
@@ -198,11 +198,12 @@ void renderMenuObjects(Game *game)
 	Shape *s;
 	//Check if game is in progress so menu can act as a pause menu.
 	//Otherwise will clear screen
-	glClearColor(0.15, 0.15, 0.15, 0.15);
-	glClear(GL_COLOR_BUFFER_BIT);
+	//glClearColor(0.15, 0.15, 0.15, 0.15);
+	//glClear(GL_COLOR_BUFFER_BIT);
 	float w, h;
 	for (int i = 0; i < BUTTONS; i++) {
 		s = &game->mButton[i];
+		glBindTexture(GL_TEXTURE_2D, 0);
 		glColor3ub(128,128,128);
 		//Button colors based on mouse position
 		if (game->mouseOnButton[i] == 1) {
@@ -272,8 +273,8 @@ void renderSettingsText(Game *game)
 void renderSettings(Game *game)
 {
 	Shape *s;
-	//glClearColor(0.15, 0.15, 0.15, 0.15);
-	glClear(GL_COLOR_BUFFER_BIT);
+	glClearColor(0.15, 0.15, 0.15, 0.15);
+	//glClear(GL_COLOR_BUFFER_BIT);
 	//Render Settings Menu BG
 	s = &game->menuBG;
 	float w, h;
@@ -294,7 +295,7 @@ void renderSettings(Game *game)
 	for (int i = 0; i < BUTTONS_S; i++) {
 		s = &game->sButton[i];
 		float w, h;
-		glColor3ub(18,128,128);
+		glColor3ub(205,92,92);
 		if (game->mouseOnButton[i] == 1) {
 			//Button selected color
 			glColor3ub(190,190,190);
