@@ -153,9 +153,9 @@ void makeDefenseMissile(Game *game, int x, int y)
 
     if (game->numberDefenseMissiles >= MAX_D_MISSILES)
         return;
-    //std::cout << "makeDefenseMissile()" << x << " " << y << std::endl;
+        //std::cout << "makeDefenseMissile()" << x << " " << y << std::endl;
     
-    DefenseMissile *dMissilePtr = 
+        DefenseMissile *dMissilePtr = 
                 &game->dMissile[game->numberDefenseMissiles];
         dMissilePtr->shape.width = 10;
         dMissilePtr->shape.height = 10;
