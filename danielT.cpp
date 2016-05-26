@@ -167,7 +167,7 @@ void eMissilePhysics(Game *game)
 				game->nmissiles<10-game->level && 
 				mCount>10-game->level &&
 				e->pos.y>WINDOW_HEIGHT/2) {
-			for(int q=0; q<(rand()%game->level); q++) {
+			for (int q=0; q<(rand()%game->level); q++) {
 				createEMissiles(game, e->pos.x, e->pos.y);
 			}
 		}
@@ -221,7 +221,7 @@ void createEMissiles(Game *g, float x, float y)
 	/////////////////
 	float mRatio;
 	EMissile *e = &g->emarr[g->nmissiles];
-	if (x==0 && y==0){
+	if (x==0 && y==0) {
 		e->pos.y = WINDOW_HEIGHT-1;    
 		e->pos.x = (rand()%WINDOW_WIDTH-1.0) +1.0;
 		e->pos.z = 0;
@@ -357,6 +357,7 @@ void renderEExplosions(Game *g)
 					e->pos.y + (e->radius * sin(i * twicePi/tris))
 					);
 		}
+		glDisable(GL_BLEND);
 		glEnd();
 		glPopMatrix();
 	}
@@ -371,7 +372,7 @@ void renderRadar(Game *g)
 	Radar *r = &g->radar;
 	int tris = 100;
 	float twicePi = 2.0f * 3.14159265359;
-	glPushMatrix();
+	//glPushMatrix();
 	glEnable (GL_BLEND);
 	glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 	glColor4f(r->color[0], r->color[1], r->color[2], r->color[3]);
@@ -383,8 +384,9 @@ void renderRadar(Game *g)
 				r->pos.y + (r->radius * sin(i * twicePi/tris))
 				);
 	}
+	glDisable(GL_BLEND);
 	glEnd();
-	glPopMatrix();
+	//glPopMatrix();
 }
 
 void radarPhysics(Game *g) 
