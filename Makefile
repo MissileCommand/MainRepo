@@ -5,9 +5,9 @@
 all: missileCommand
 
 missileCommand:  missileCommand.cpp johnC.cpp danielT.cpp joseR.cpp joseG.cpp ppm.cpp
-	g++ -g missileCommand.cpp johnC.cpp danielT.cpp joseR.cpp joseG.cpp \
-	ppm.cpp libggfonts.a -Wall -lX11 -lGL -lGLU -lalut -lm \
-	/usr/lib/x86_64-linux-gnu/libopenal.so /usr/lib/libalut.so \
+	g++ -g missileCommand.cpp johnC.cpp danielT.cpp joseR.cpp joseG.cpp ppm.cpp \
+	libggfonts.a -Wall -lX11 -lGL -lGLU -lalut -lm \
+	/usr/lib/x86_64-linux-gnu/libopenal.so \
 	-o missileCommandMain
 
 clean:
