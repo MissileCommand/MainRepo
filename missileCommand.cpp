@@ -33,7 +33,7 @@
 #include "joseR.h"
 #include "joseG.h"
 extern "C" {
-	#include "fonts.h"
+#include "fonts.h"
 }
 
 //X Windows variables
@@ -69,14 +69,14 @@ int main(void)
 	Game game;
 
 	game.numberDefenseMissiles=0;
-        
-    // JBC 5/19/16
-    // added globally accesible defMissileSpeed so that we can 
-    // change it dynamically
-    game.defMissileSpeed = 80;
-	
-    initStruc(&game);
-    //Structures sh;
+
+	// JBC 5/19/16
+	// added globally accesible defMissileSpeed so that we can 
+	// change it dynamically
+	game.defMissileSpeed = 80;
+
+	initStruc(&game);
+	//Structures sh;
 
 	//Changed call for function prototype 5-17-16 -DT
 	createEMissiles(&game, 0, 0);
@@ -89,8 +89,8 @@ int main(void)
 	game.sounds.loadAudio();
 	renderBackground(starsTexture);
 	//start animation
-	while(!done) {
-		while(XPending(dpy)) {
+	while (!done) {
+		while (XPending(dpy)) {
 			XEvent e;
 			XNextEvent(dpy, &e);
 			check_mouse(&e, &game);
@@ -118,34 +118,34 @@ int main(void)
 
 unsigned char *buildAlphaData(Ppmimage *img)
 {
-    //add 4th component to RGB stream...
-    int i;
-    int a,b,c;
-    unsigned char *newdata, *ptr;
-    unsigned char *data = (unsigned char *)img->data;
-    newdata = (unsigned char *)malloc(img->width * img->height * 4);
-    ptr = newdata;
-    for (i=0; i<img->width * img->height * 3; i+=3) {
-        a = *(data+0);
-        b = *(data+1);
-        c = *(data+2);
-        *(ptr+0) = a;
-        *(ptr+1) = b;
-        *(ptr+2) = c;
-        //get largest color component...
-        //*(ptr+3) = (unsigned char)((
-        //              (int)*(ptr+0) +
-        //              (int)*(ptr+1) +
-        //              (int)*(ptr+2)) / 3);
-        //d = a;
-        //if (b >= a && b >= c) d = b;
-        //if (c >= a && c >= b) d = c;
-        //*(ptr+3) = d;
-        *(ptr+3) = (a|b|c);
-        ptr += 4;
-        data += 3;
-    }
-    return newdata;
+	//add 4th component to RGB stream...
+	int i;
+	int a,b,c;
+	unsigned char *newdata, *ptr;
+	unsigned char *data = (unsigned char *)img->data;
+	newdata = (unsigned char *)malloc(img->width * img->height * 4);
+	ptr = newdata;
+	for (i=0; i<img->width * img->height * 3; i+=3) {
+		a = *(data+0);
+		b = *(data+1);
+		c = *(data+2);
+		*(ptr+0) = a;
+		*(ptr+1) = b;
+		*(ptr+2) = c;
+		//get largest color component...
+		//*(ptr+3) = (unsigned char)((
+		//              (int)*(ptr+0) +
+		//              (int)*(ptr+1) +
+		//              (int)*(ptr+2)) / 3);
+		//d = a;
+		//if (b >= a && b >= c) d = b;
+		//if (c >= a && c >= b) d = c;
+		//*(ptr+3) = d;
+		*(ptr+3) = (a|b|c);
+		ptr += 4;
+		data += 3;
+	}
+	return newdata;
 }
 
 
@@ -182,13 +182,13 @@ void initXWindows(void)
 	Colormap cmap = XCreateColormap(dpy, root, vi->visual, AllocNone);
 	XSetWindowAttributes swa;
 	swa.colormap = cmap;
-        // JBC just moved code over <- to stay with the "80 lines" requirement
+	// JBC just moved code over <- to stay with the "80 lines" requirement
 	swa.event_mask = ExposureMask | KeyPressMask | KeyReleaseMask |
-			ButtonPress | ButtonReleaseMask |
-			PointerMotionMask |
-			StructureNotifyMask | SubstructureNotifyMask;
+		ButtonPress | ButtonReleaseMask |
+		PointerMotionMask |
+		StructureNotifyMask | SubstructureNotifyMask;
 	win = XCreateWindow(dpy, root, 0, 0, w, h, 0, vi->depth,
-                InputOutput, vi->visual, CWColormap | CWEventMask, &swa);
+			InputOutput, vi->visual, CWColormap | CWEventMask, &swa);
 	set_title();
 	glc = glXCreateContext(dpy, vi, NULL, GL_TRUE);
 	glXMakeCurrent(dpy, win, glc);
@@ -203,42 +203,42 @@ void init_opengl(void)
 	glMatrixMode(GL_MODELVIEW); glLoadIdentity();
 	//Set 2D mode (no perspective)
 	glOrtho(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT, -1, 1);
-	
+
 	glDisable(GL_LIGHTING);
-    glDisable(GL_DEPTH_TEST);
-    glDisable(GL_FOG);
-    glDisable(GL_CULL_FACE);
+	glDisable(GL_DEPTH_TEST);
+	glDisable(GL_FOG);
+	glDisable(GL_CULL_FACE);
 	//Set the screen background color
 	glClearColor(0.1, 0.1, 0.1, 1.0);
 	//Initialize Fonts
 	glEnable(GL_TEXTURE_2D);
 	initialize_fonts();
 	//load images into a ppm structure
-    cityImage = ppm6GetImage("./images/city.ppm");
-    starsImage = ppm6GetImage("./images/stars.ppm");
-    //create opengl texture elements
-    //forest
-    glGenTextures(1, &starsTexture);
-    glBindTexture(GL_TEXTURE_2D, starsTexture);
-    //
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, 3, starsImage->width, starsImage->height,
-                    0, GL_RGB, GL_UNSIGNED_BYTE, starsImage->data);
-    //
-    glGenTextures(1, &cityTexture);
-    int w = cityImage->width;
-    int h = cityImage->height;
-    //city
-    //
-    glBindTexture(GL_TEXTURE_2D, cityTexture);
-    //
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-    unsigned char *cityData = buildAlphaData(cityImage);
-    glTexImage2D(GL_TEXTURE_2D, 0, 3, w, h, 0,
-    GL_RGB, GL_UNSIGNED_BYTE, cityImage->data);
-    free(cityData);
+	cityImage = ppm6GetImage("./images/city.ppm");
+	starsImage = ppm6GetImage("./images/stars.ppm");
+	//create opengl texture elements
+	//forest
+	glGenTextures(1, &starsTexture);
+	glBindTexture(GL_TEXTURE_2D, starsTexture);
+	//
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, starsImage->width, starsImage->height,
+			0, GL_RGB, GL_UNSIGNED_BYTE, starsImage->data);
+	//
+	glGenTextures(1, &cityTexture);
+	int w = cityImage->width;
+	int h = cityImage->height;
+	//city
+	//
+	glBindTexture(GL_TEXTURE_2D, cityTexture);
+	//
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+	unsigned char *cityData = buildAlphaData(cityImage);
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, w, h, 0,
+			GL_RGB, GL_UNSIGNED_BYTE, cityImage->data);
+	free(cityData);
 }
 
 
@@ -266,10 +266,10 @@ void check_mouse(XEvent *e, Game *game)
 				a->playAudio(32);
 			} else {
 				// changeTitle();
-                makeDefenseMissile(game, e->xbutton.x, y);
-                a->playAudio(20);
-                // JBC note 5/13
-                // moved the "particle" stuff out of here 
+				makeDefenseMissile(game, e->xbutton.x, y);
+				a->playAudio(20);
+				// JBC note 5/13
+				// moved the "particle" stuff out of here 
 				// makeParticle(game, e->xbutton.x, y);
 			}
 			return;
@@ -282,8 +282,8 @@ void check_mouse(XEvent *e, Game *game)
 			} else if (gameState(game) == 0) {
 				//Game Functions
 				// fireDefenseMissile(game);
-                // JBC idea to add menu pop up for right-click
-                game->gMenu ^= 1;
+				// JBC idea to add menu pop up for right-click
+				game->gMenu ^= 1;
 			}
 			return;
 		}
@@ -299,9 +299,9 @@ void check_mouse(XEvent *e, Game *game)
 			//Menu Functions
 			mouseOver(savex, y, game);
 		} else if (gameState(game) == 0) {
-	        //Game Functions
-	        // JBC note 5/13
-	        // moved the "particle" stuff out of here 
+			//Game Functions
+			// JBC note 5/13
+			// moved the "particle" stuff out of here 
 			// makeParticle(game, e->xbutton.x, y);
 		}
 	}
@@ -315,8 +315,8 @@ int check_keys(XEvent *e, Game *game)
 		if (key == XK_Escape) {
 			return 1;
 		}
-                
-        // Added line for checking "z" key (just closes for now)
+
+		// Added line for checking "z" key (just closes for now)
 		if (key == XK_z) {
 			return 1;
 		}
@@ -327,7 +327,7 @@ int check_keys(XEvent *e, Game *game)
 
 		//DT special feature - radar
 		if (key == XK_r) {
-		    game->radarOn ^= 1;
+			game->radarOn ^= 1;
 		}
 
 		//You may check other keys here.
@@ -335,7 +335,7 @@ int check_keys(XEvent *e, Game *game)
 	//JR: Check if exit button was clicked
 	// This is a temp work around for my exit code and should
 	// NOT interfere with anyone elses code or main functions
-	if (game->menuExit == 1){
+	if (game->menuExit == 1) {
 		return 1;
 	} else {
 		return 0;
@@ -346,12 +346,12 @@ int check_keys(XEvent *e, Game *game)
 // moved the "particle" stuff out of here 
 void movement(Game *game)
 {    
-    radarPhysics(game);
-    eMissilePhysics(game);
+	radarPhysics(game);
+	eMissilePhysics(game);
 	//dMissilePhysics(game);
 	eExplosionPhysics(game);
-	
-	
+
+
 }
 
 void render(Game *game)
@@ -365,11 +365,11 @@ void render(Game *game)
 	//        if (game->nmissiles < 10) {
 	//		createEMissiles(game);
 	//	}
-    renderBackground(starsTexture);
-    renderRadar(game);
+	renderBackground(starsTexture);
+	renderRadar(game);
 	renderEMissiles(game);
 	renderEExplosions(game);
-    renderDefenseMissile(game);
-    renderStruc(game);
-    // renderDefExplosions(game);
+	renderDefenseMissile(game);
+	renderStruc(game);
+	// renderDefExplosions(game);
 }
