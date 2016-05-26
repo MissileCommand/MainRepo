@@ -181,7 +181,8 @@ void ppm1ClearImage(Ppmimage *image, unsigned char color)
 }
 
 void ppm1Setpixel(Ppmimage *image, int x, int y, unsigned char val) {
-	unsigned char *data = (unsigned char *)image->data + (y * image->width + x);
+	unsigned char *data = (unsigned char *)image->data + 
+		(y * image->width + x);
 	*data = val;
 }
 
