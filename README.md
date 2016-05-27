@@ -2,8 +2,8 @@
 
 Starting with the last meeting in class (05-26-2016)  
 JBC ToDo's: 
-- [ ] Make missiles stop at mouse coords (currently temp fixed with work-around)
-- [ ] Nuke 'em  
+- [x] Make missiles stop at mouse coords (currently temp fixed with work-around)
+- [x] Nuke 'em  
 - [ ] Missiles start higher 
 - [ ] Pics of missiles in Silos  
 - [ ] Detection of Silo destruction  
@@ -12,6 +12,7 @@ JBC ToDo's:
 --------------------------------------------
 DT ToDo's: 
 - [ ] Help the rest of us since he codes too damn fast :-)
+- [ ] City count after destruction (maybe via JG's code)
 
 --------------------------------------------
 JR ToDo's: 
