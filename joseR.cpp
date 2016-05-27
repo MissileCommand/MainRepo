@@ -33,6 +33,7 @@
 #include "missileCommand.h"
 #include "joseR.h"
 #include <stdio.h>
+#include <time.h>
 extern "C" {
 	#include "fonts.h"
 }
@@ -62,7 +63,7 @@ Audio::Audio()
 	}
 	gVolume = 1.0;
 	//Setup the listener.
-	float vec[6] = {0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f};
+	float vec[6] = { 0.0f, 0.0f, 1.0f, 0.0f, 1.0f, 0.0f };
 	alListener3f(AL_POSITION, 0.0f, 0.0f, 0.0f);
 	alListenerfv(AL_ORIENTATION, vec);
 	alListenerf(AL_GAIN, 1.0f);
@@ -84,7 +85,8 @@ void Audio::loadAudio()
 	const string FILE[] = {
 		"./sounds/missile_explosion.wav", "./sounds/missile_collision.wav",
 		"./sounds/missile_launch2.wav", "./sounds/mouse_click.wav",
-		"./sounds/mouse_release.wav"};
+		"./sounds/mouse_release.wav", "./sounds/classic_tick.wav",
+		"./sounds/classic_lvl_start.wav" };
 	int val = 0;
 	//Load and assign sounds
 	for (int i = 0; i < TOTAL_SOUNDS; i++) {
@@ -97,8 +99,8 @@ void Audio::loadAudio()
 			printf("[%s] - Was not loaded.\n", f);
 			break;
 		}
-		//Sets explosions and missile sounds to 10 sources each
 		if (val < 30) {
+			//Sets explosions and missile sounds to 10 sources each
 			for (int n = 0; n < 10; n++) {
 				//Generate a source
 				alGenSources(1, &alSource);
@@ -112,8 +114,8 @@ void Audio::loadAudio()
 				//printf("File: %s stored in buffer[%d].\n", f, val);
 				source[val++] = alSource;
 			}
-		//Sets menu click sounds
 		} else if (val >= 30 && val < 34) {
+			//Sets menu click sounds
 			for (int n = 0; n < 2; n++) {
 				alGenSources(1, &alSource);
 				alSourcei(alSource, AL_BUFFER, buffer[i]);
@@ -121,6 +123,27 @@ void Audio::loadAudio()
 				alSourcef(alSource, AL_PITCH, 1.0f);
 				alSourcei(alSource, AL_LOOPING, AL_FALSE);
 				//printf("File: %s stored in buffer[%d].\n", f, val);
+				source[val++] = alSource;
+			}
+		} else if (val >= 34 && val < 40) {
+			//Sets score counter and new level sound
+			if (val < 39) {
+				for (int n = 0; n < 5; n++) {
+					alGenSources(1, &alSource);
+					alSourcei(alSource, AL_BUFFER, buffer[i]);
+					alSourcef(alSource, AL_GAIN, 1.0f);
+					alSourcef(alSource, AL_PITCH, 1.0f);
+					alSourcei(alSource, AL_LOOPING, AL_FALSE);
+					printf("File: %s stored in buffer[%d].\n", f, val);
+					source[val++] = alSource;
+				}
+			} else {
+				alGenSources(1, &alSource);
+				alSourcei(alSource, AL_BUFFER, buffer[i]);
+				alSourcef(alSource, AL_GAIN, 1.0f);
+				alSourcef(alSource, AL_PITCH, 1.0f);
+				alSourcei(alSource, AL_LOOPING, AL_FALSE);
+				printf("File: %s stored in buffer[%d].\n", f, val);
 				source[val++] = alSource;
 			}
 		} else {
@@ -134,8 +157,12 @@ void Audio::playAudio(int num)
 	int idx = num, max;
 	if (idx < 30) {
 		max = idx + 9;
+	} else if (idx >= 30 && idx < 34) {
+		max = idx +1;
+	} else if (idx >= 34 && idx < 49) {
+		max = idx + 4;
 	} else {
-		max = idx + 1;
+		max = idx;
 	}
 	alSource = source[idx];
 	alGetSourcei(alSource, AL_SOURCE_STATE, &source_state);
@@ -198,11 +225,12 @@ void renderMenuObjects(Game *game)
 	Shape *s;
 	//Check if game is in progress so menu can act as a pause menu.
 	//Otherwise will clear screen
-	glClearColor(0.15, 0.15, 0.15, 0.15);
-	glClear(GL_COLOR_BUFFER_BIT);
+	//glClearColor(0.15, 0.15, 0.15, 0.15);
+	//glClear(GL_COLOR_BUFFER_BIT);
 	float w, h;
 	for (int i = 0; i < BUTTONS; i++) {
 		s = &game->mButton[i];
+		glBindTexture(GL_TEXTURE_2D, 0);
 		glColor3ub(128,128,128);
 		//Button colors based on mouse position
 		if (game->mouseOnButton[i] == 1) {
@@ -245,6 +273,51 @@ void renderMenuText(Game *game)
 	}
 }
 
+void renderSettings(Game *game)
+{
+	Shape *s;
+	//glClearColor(0.15, 0.15, 0.15, 0.15);
+	//glClear(GL_COLOR_BUFFER_BIT);
+	//Render Settings Menu BG
+	s = &game->menuBG;
+	float w, h;
+	glColor3ub(128,128,128);
+	glPushMatrix();
+	glTranslatef(s->center.x, s->center.y, s->center.z);
+	w = s->width;
+	h = s->height;
+	glBegin(GL_QUADS);
+		glVertex2i(-w,-h);
+		glVertex2i(-w, h);
+		glVertex2i( w, h);
+		glVertex2i( w,-h);
+	glEnd();
+	glPopMatrix();
+	//glFlush();
+	//Render Settings Buttons
+	for (int i = 0; i < BUTTONS_S; i++) {
+		s = &game->sButton[i];
+		float w, h;
+		glColor3ub(205,92,92);
+		if (game->mouseOnButton[i] == 1) {
+			//Button selected color
+			glColor3ub(190,190,190);
+		}
+		glPushMatrix();
+		glTranslatef(s->center.x, s->center.y, s->center.z);
+		w = s->width;
+		h = s->height;
+		glBegin(GL_QUADS);
+			glVertex2i(-w,-h);
+			glVertex2i(-w, h);
+			glVertex2i( w, h);
+			glVertex2i( w,-h);
+		glEnd();
+		glPopMatrix();
+		//glFlush();
+	}
+}
+
 void renderSettingsText(Game *game)
 {
 	Rect rt;
@@ -269,49 +342,65 @@ void renderSettingsText(Game *game)
 	ggprint16(&rt, 16, 0x00ffffff, "Back");
 }
 
-void renderSettings(Game *game)
+void endLevel(Game *game)
 {
-	Shape *s;
-	//glClearColor(0.15, 0.15, 0.15, 0.15);
-	glClear(GL_COLOR_BUFFER_BIT);
-	//Render Settings Menu BG
-	s = &game->menuBG;
-	float w, h;
-	glColor3ub(128,128,128);
-	glPushMatrix();
-	glTranslatef(s->center.x, s->center.y, s->center.z);
-	w = s->width;
-	h = s->height;
-	glBegin(GL_QUADS);
-		glVertex2i(-w,-h);
-		glVertex2i(-w, h);
-		glVertex2i( w, h);
-		glVertex2i( w,-h);
-	glEnd();
-	glPopMatrix();
-	//glFlush();
-	//Render Settings Buttons
-	for (int i = 0; i < BUTTONS_S; i++) {
-		s = &game->sButton[i];
-		float w, h;
-		glColor3ub(18,128,128);
-		if (game->mouseOnButton[i] == 1) {
-			//Button selected color
-			glColor3ub(190,190,190);
+	if (gameState(game) != 5)
+		return;
+	time_t start, end;
+	clock_t t;
+	//Time to stay in function by seconds
+	double delay = 7.5;
+	//How fast missiles and cities are tallied
+	double m_delay = 0.115;
+	double c_delay = 0.30;
+	double diff;
+	int rMissiles = 10, rCount = 0;
+	int rCities = 5, cCount = 0;
+	int alertPlayed = 0;
+	Audio *a;
+	a = &game->sounds;
+	time(&start);
+	//Calculate Score
+	do {
+		t = clock();
+		while (rCount != rMissiles) {
+			diff = clock() - t;
+			diff /= CLOCKS_PER_SEC;
+			if (diff > m_delay) {	
+				a->playAudio(34);
+				//Draw Text/Missile Images
+				//Increment Score
+				rCount++;
+				t = clock();
+			}
 		}
-		glPushMatrix();
-		glTranslatef(s->center.x, s->center.y, s->center.z);
-		w = s->width;
-		h = s->height;
-		glBegin(GL_QUADS);
-			glVertex2i(-w,-h);
-			glVertex2i(-w, h);
-			glVertex2i( w, h);
-			glVertex2i( w,-h);
-		glEnd();
-		glPopMatrix();
-		//glFlush();
+		t = clock();
+		usleep(500000);
+		while (cCount != rCities) {
+			diff = clock() - t;
+			diff /= CLOCKS_PER_SEC;
+			if (diff > c_delay) {	
+				a->playAudio(34);
+				//Draw Text/Cities
+				//Increment Score
+				cCount++;
+				t = clock();
+			}
+		}
+		sleep(1);
+		if (!alertPlayed) {
+			a->playAudio(39);
+			alertPlayed = 1;
+		}
+		time(&end);
+	} while (difftime(end, start) < delay);
+	//Check for Game Over
+	if (rCities == 0) {
+		//Set state to some unused value
+		game->gState = 10;
+		//gameOver(game);
 	}
+	game->gState = 0;
 }
 
 void mouseOver(int savex, int savey, Game *game)
@@ -349,12 +438,12 @@ void menuClick(Game *game)
 	if (gameState(game) == 1) {
 		//Play Button (2)
 		if (game->mouseOnButton[2] == 1) {
-			game->gMenu = 0;
+			game->gState = 0;
 			game->inGame = 1;
 		}
 		//Settings Button (1)
 		if (game->mouseOnButton[1] == 1) {
-			game->gMenu = 2;
+			game->gState = 2;
 		}
 		//Exit Button (0)
 		if (game->mouseOnButton[0] == 1) {
@@ -382,7 +471,7 @@ void menuClick(Game *game)
 		}
 		//Back
 		if (game->mouseOnButton[0] == 1) {
-			game->gMenu = 1;
+			game->gState = 1;
 		}
 	}
 }
@@ -391,13 +480,9 @@ int gameState(Game *game)
 {
 	int state = 0;
 	int g;
-	g = game->gMenu;
-	if (g == 1) {
-		state = 1;
-	} else if (g == 2) {
-		state = 2;
-	} else {
-		state = 0;
+	g = game->gState;
+	if (g > state) {
+		return g;
 	}
 	return state;
 }
@@ -406,3 +491,4 @@ float gameVolume(Game *game)
 {
 	return game->sounds.gVolume;
 }
+
