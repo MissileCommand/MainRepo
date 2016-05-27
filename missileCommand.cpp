@@ -52,6 +52,7 @@ void movement(Game *game);
 // JBC added 5/13
 void renderDefenseMissile(Game *game);
 void makeDefenseMissile(Game *game, int x, int y);
+void nukeEmAll (Game *game);
 
 void render(Game *game);
 
@@ -320,6 +321,14 @@ int check_keys(XEvent *e, Game *game)
 		if (key == XK_z) {
 			return 1;
 		}
+
+		// Added line for checking "n" key (nukeEm/ Kill 'em all)
+		if (key == XK_n) {
+			nukeEmAll(game);
+		}
+                
+                
+                
 		//JR: Allows pause menu if play has been clicked
 		if (key == XK_m && game->inGame == 1) {
 			game->gMenu ^= 1;
