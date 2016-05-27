@@ -346,16 +346,23 @@ void endLevel(Game *game)
 {
 	if (gameState(game) != 5)
 		return;
+	int rCount = 0, rMissiles = 10;
+	int cCount = 0, rCities = 5;
+	//Check for Game Over
+	if (rCities == 0 && rMissiles == 0) {
+		//Set state to some unused value
+		game->gState = 10;
+		//gameOver(game);
+		return;
+	}
 	time_t start, end;
 	clock_t t;
 	//Time to stay in function by seconds
-	double delay = 7.5;
+	double delay = 7.0;
 	//How fast missiles and cities are tallied
 	double m_delay = 0.115;
 	double c_delay = 0.30;
 	double diff;
-	int rMissiles = 10, rCount = 0;
-	int rCities = 5, cCount = 0;
 	int alertPlayed = 0;
 	Audio *a;
 	a = &game->sounds;
@@ -394,12 +401,6 @@ void endLevel(Game *game)
 		}
 		time(&end);
 	} while (difftime(end, start) < delay);
-	//Check for Game Over
-	if (rCities == 0) {
-		//Set state to some unused value
-		game->gState = 10;
-		//gameOver(game);
-	}
 	game->gState = 0;
 }
 
