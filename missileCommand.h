@@ -39,8 +39,8 @@
 //X Position of all buttons
 //Divides WINDOW_WIDTH by the number below
 #define BUTTON_X 4.25
-#define TOTAL_SOUNDS 5
 #define CITYNUM 5
+#define TOTAL_SOUNDS 7
 //#define WINDOW_WIDTH  800
 //#define WINDOW_HEIGHT 600
 #define WINDOW_WIDTH  1024
@@ -179,7 +179,7 @@ struct Game {
     int buttonSpacer[BUTTONS];
     int mouseOnButton[T_BUTTONS];
     int menuExit;
-    int gMenu;
+    int gState;
     int inGame;
     int vVolume;
     Shape mButton[BUTTONS];
@@ -201,7 +201,7 @@ struct Game {
 	radarOn = 0;
 	
         menuExit = 0;
-        gMenu = 1;
+        gState = 1;
         inGame = 0;
         vVolume = 100;
         for (int i=0;i<T_BUTTONS;i++) {

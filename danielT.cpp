@@ -195,6 +195,7 @@ void eMissileExplode(Game *game, int misnum)
 void displayScore(Game *g) 
 {
 	//sleep(10);
+	g->gState = 5;
 	return;
 }
 
