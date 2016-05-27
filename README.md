@@ -15,8 +15,8 @@ sudo apt-get install gdb
 Starting with the last meeting in class (05-26-2016)
 
 JBC ToDo's: 
-[]Nuke 'em  
-[]Missiles start higher 
-[]Pics of missiles in Silos  
-[]Detection of Silo destruction  
-[]Maybe Flashing "X" (crosshairs)  
+- [ ] Nuke 'em  
+- [ ] Missiles start higher 
+- [ ] Pics of missiles in Silos  
+- [ ] Detection of Silo destruction  
+- [ ] Maybe Flashing "X" (crosshairs)  
