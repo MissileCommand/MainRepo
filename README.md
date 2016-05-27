@@ -16,6 +16,7 @@ DT ToDo's:
 - [ ] Missile spawn from UFOs
 - [ ] Smart Missile
 - [ ] Possible texture on missiles
+- [ ] make count componets global in game struct
 
 --------------------------------------------
 JR ToDo's: 
