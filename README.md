@@ -4,7 +4,7 @@ Starting with the last meeting in class (05-26-2016)
 JBC ToDo's: 
 - [x] Make missiles stop at mouse coords (currently temp fixed with work-around)
 - [x] Nuke 'em  
-- [ ] Missiles start higher 
+- [x] Missiles start higher 
 - [ ] Pics of missiles in Silos  
 - [ ] Detection of Silo destruction  
 - [ ] Maybe Flashing "X" (crosshairs)  
