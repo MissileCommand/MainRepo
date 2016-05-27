@@ -1,7 +1,6 @@
 ### MainRepo / MissileCommand
 
-Starting with the last meeting in class (05-26-2016)
-
+Starting with the last meeting in class (05-26-2016)  
 JBC ToDo's: 
 - [ ] Make missiles stop at mouse coords (currently temp fixed with work-around)
 - [ ] Nuke 'em  
@@ -14,7 +13,6 @@ JBC ToDo's:
 DT ToDo's: 
 - [ ] Help the rest of us since he codes too damn fast :-)
 
-
 --------------------------------------------
 JR ToDo's: 
 - [ ] Level Endings
@@ -24,11 +22,9 @@ JR ToDo's:
 JG ToDo's: 
 - [ ] Cities and Silos (PPM/BMP issues)
 
-
 --------------------------------------------
-
-
-
+--------------------------------------------
+--------------------------------------------
 
 apt-get lines for OpenGL and Git  
 UBUNTU 15.10 & 16.04 OpenGL projects:
