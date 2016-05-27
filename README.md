@@ -11,6 +11,21 @@ JBC ToDo's:
 - [ ] Maybe Flashing "X" (crosshairs)  
 
 --------------------------------------------
+DT ToDo's: 
+- [ ] Help the rest of us since he codes too damn fast :-)
+
+
+--------------------------------------------
+JR ToDo's: 
+- [ ] Level Endings
+- [ ] Game Over screen
+
+--------------------------------------------
+JG ToDo's: 
+- [ ] Cities and Silos (PPM/BMP issues)
+
+
+--------------------------------------------
 
 
 
