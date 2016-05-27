@@ -134,7 +134,7 @@ void Audio::loadAudio()
 					alSourcef(alSource, AL_GAIN, 1.0f);
 					alSourcef(alSource, AL_PITCH, 1.0f);
 					alSourcei(alSource, AL_LOOPING, AL_FALSE);
-					printf("File: %s stored in buffer[%d].\n", f, val);
+					//printf("File: %s stored in buffer[%d].\n", f, val);
 					source[val++] = alSource;
 				}
 			} else {
@@ -143,7 +143,7 @@ void Audio::loadAudio()
 				alSourcef(alSource, AL_GAIN, 1.0f);
 				alSourcef(alSource, AL_PITCH, 1.0f);
 				alSourcei(alSource, AL_LOOPING, AL_FALSE);
-				printf("File: %s stored in buffer[%d].\n", f, val);
+				//printf("File: %s stored in buffer[%d].\n", f, val);
 				source[val++] = alSource;
 			}
 		} else {
