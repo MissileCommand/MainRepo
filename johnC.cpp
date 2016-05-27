@@ -98,19 +98,13 @@ void renderDefenseMissile(Game *game)
         dMissilePtr = &game->dMissile[i];
         
             
-        // TODO #1: missile goes too far past mouse coords before exploding
-        // temp workaround is to set explosion coords to mouse coords 
-        // directly instead of using missile coords to place explosion
         if (dMissilePtr->destinationY >= dMissilePtr->shape.center.y ) {
-//        if (dMissilePtr->destinationY >= dMissilePtr->shape.center.y || 
-//                dMissilePtr->destinationX >= dMissilePtr->shape.center.x) {
 
 //            // test location of Missile vs mouse pick coords
 //            cout << "X,Y Missile coords just before the next move (velocity):" << 
 //                    dMissilePtr->shape.center.x << 
 //                "," << dMissilePtr->shape.center.y << endl; 
 
-            
             // shape.center refers to the Shape center position
             // IE the position of the center of that particular Shape
             dMissilePtr->shape.center.x += dMissilePtr->velocity.x;
@@ -189,6 +183,7 @@ void nukeEmAll (Game *game)
 // seems OK now... :-)
 void makeDefenseMissile(Game *game, int x, int y)
 {
+    
 
     if (game->numberDefenseMissiles >= MAX_D_MISSILES)
         return;
@@ -206,11 +201,21 @@ void makeDefenseMissile(Game *game, int x, int y)
 
         // set target of missile from mouse coords
         dMissilePtr->destinationX = x;
-        dMissilePtr->destinationY = y;
+        // do not allow shooting below a certain point 
+        dMissilePtr->minimumY = 200;
+        if ( y <  dMissilePtr->minimumY ) {
+            dMissilePtr->destinationY = dMissilePtr->minimumY;
+        } else {
+            dMissilePtr->destinationY = y;
+            
+        }
         
-//        // test location of explosion vs mouse pick coords
-//        cout << "X,Y Mouse coords:" << dMissilePtr->destinationX << 
-//                "," << dMissilePtr->destinationY << endl;
+        
+        
+        
+        // test location of explosion vs mouse pick coords
+        cout << "X,Y Mouse coords:" << dMissilePtr->destinationX << 
+                "," << dMissilePtr->destinationY << endl;
         
         
         

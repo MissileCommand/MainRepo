@@ -78,6 +78,7 @@ struct DefenseMissile {
 	Vec velocity;
         int destinationX;
         int destinationY;
+        int minimumY;
         
 };
 
