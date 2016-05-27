@@ -85,10 +85,7 @@ int main(void)
 	//JR - Menu Object Shapes and Locations
 	drawMenu(&game);
 	drawSettings(&game);
-	//Audio sounds;
-	//sounds.loadAudio();
 	game.sounds.loadAudio();
-	renderBackground(starsTexture);
 	//start animation
 	while (!done) {
 		while (XPending(dpy)) {
@@ -99,6 +96,7 @@ int main(void)
 		}
 		int state = gameState(&game);
 		if (state == 1) {
+			renderBackground(starsTexture);
 			renderMenuObjects(&game);
 			renderMenuText(&game);
 		} else if (state == 2) {
@@ -284,7 +282,7 @@ void check_mouse(XEvent *e, Game *game)
 				//Game Functions
 				// fireDefenseMissile(game);
 				// JBC idea to add menu pop up for right-click
-				game->gMenu ^= 1;
+				game->gState ^= 1;
 			}
 			return;
 		}
@@ -331,7 +329,7 @@ int check_keys(XEvent *e, Game *game)
                 
 		//JR: Allows pause menu if play has been clicked
 		if (key == XK_m && game->inGame == 1) {
-			game->gMenu ^= 1;
+			game->gState ^= 1;
 		}
 
 		//DT special feature - radar
@@ -375,6 +373,7 @@ void render(Game *game)
 	//		createEMissiles(game);
 	//	}
 	renderBackground(starsTexture);
+	endLevel(game);
 	renderRadar(game);
 	renderEMissiles(game);
 	renderEExplosions(game);

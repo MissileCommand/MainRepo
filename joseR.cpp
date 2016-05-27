@@ -33,6 +33,7 @@
 #include "missileCommand.h"
 #include "joseR.h"
 #include <stdio.h>
+#include <time.h>
 extern "C" {
 	#include "fonts.h"
 }
@@ -84,7 +85,8 @@ void Audio::loadAudio()
 	const string FILE[] = {
 		"./sounds/missile_explosion.wav", "./sounds/missile_collision.wav",
 		"./sounds/missile_launch2.wav", "./sounds/mouse_click.wav",
-		"./sounds/mouse_release.wav" };
+		"./sounds/mouse_release.wav", "./sounds/classic_tick.wav",
+		"./sounds/classic_lvl_start.wav" };
 	int val = 0;
 	//Load and assign sounds
 	for (int i = 0; i < TOTAL_SOUNDS; i++) {
@@ -123,6 +125,27 @@ void Audio::loadAudio()
 				//printf("File: %s stored in buffer[%d].\n", f, val);
 				source[val++] = alSource;
 			}
+		} else if (val >= 34 && val < 40) {
+			//Sets score counter and new level sound
+			if (val < 39) {
+				for (int n = 0; n < 5; n++) {
+					alGenSources(1, &alSource);
+					alSourcei(alSource, AL_BUFFER, buffer[i]);
+					alSourcef(alSource, AL_GAIN, 1.0f);
+					alSourcef(alSource, AL_PITCH, 1.0f);
+					alSourcei(alSource, AL_LOOPING, AL_FALSE);
+					printf("File: %s stored in buffer[%d].\n", f, val);
+					source[val++] = alSource;
+				}
+			} else {
+				alGenSources(1, &alSource);
+				alSourcei(alSource, AL_BUFFER, buffer[i]);
+				alSourcef(alSource, AL_GAIN, 1.0f);
+				alSourcef(alSource, AL_PITCH, 1.0f);
+				alSourcei(alSource, AL_LOOPING, AL_FALSE);
+				printf("File: %s stored in buffer[%d].\n", f, val);
+				source[val++] = alSource;
+			}
 		} else {
 			printf("Something may have gone wrong...\n");
 		}
@@ -134,8 +157,12 @@ void Audio::playAudio(int num)
 	int idx = num, max;
 	if (idx < 30) {
 		max = idx + 9;
+	} else if (idx >= 30 && idx < 34) {
+		max = idx +1;
+	} else if (idx >= 34 && idx < 49) {
+		max = idx + 4;
 	} else {
-		max = idx + 1;
+		max = idx;
 	}
 	alSource = source[idx];
 	alGetSourcei(alSource, AL_SOURCE_STATE, &source_state);
@@ -246,34 +273,10 @@ void renderMenuText(Game *game)
 	}
 }
 
-void renderSettingsText(Game *game)
-{
-	Rect rt;
-	int j = 0;
-	rt.bot = WINDOW_HEIGHT - 250 - (j * 100) + 25;
-	rt.left = WINDOW_WIDTH / 2;
-	//std::cout << rt.bot << " " << rt.left << std::endl;
-	rt.center = 1;
-	ggprint16(&rt, 16, 0x00ffffff, "Volume");
-	rt.bot = WINDOW_HEIGHT - 250 - (j * 100) - 10;
-	rt.left = WINDOW_WIDTH / 2 - 100;
-	ggprint16(&rt, 16, 0x00ffffff, " - ");
-	rt.bot = WINDOW_HEIGHT - 250 - (j * 100) - 10;
-	rt.left = WINDOW_WIDTH / 2 + 100;
-	ggprint16(&rt, 16, 0x00ffffff, " + ");
-	rt.bot = WINDOW_HEIGHT - 250 - (j * 100) - 10;
-	rt.left = WINDOW_WIDTH / 2;
-	ggprint16(&rt, 16, 0x00ffffff, "%d", game->vVolume);
-	j++;
-	rt.bot = WINDOW_HEIGHT - 250 - (j * 100) - 10;
-	rt.left = WINDOW_WIDTH / 2;
-	ggprint16(&rt, 16, 0x00ffffff, "Back");
-}
-
 void renderSettings(Game *game)
 {
 	Shape *s;
-	glClearColor(0.15, 0.15, 0.15, 0.15);
+	//glClearColor(0.15, 0.15, 0.15, 0.15);
 	//glClear(GL_COLOR_BUFFER_BIT);
 	//Render Settings Menu BG
 	s = &game->menuBG;
@@ -315,6 +318,91 @@ void renderSettings(Game *game)
 	}
 }
 
+void renderSettingsText(Game *game)
+{
+	Rect rt;
+	int j = 0;
+	rt.bot = WINDOW_HEIGHT - 250 - (j * 100) + 25;
+	rt.left = WINDOW_WIDTH / 2;
+	//std::cout << rt.bot << " " << rt.left << std::endl;
+	rt.center = 1;
+	ggprint16(&rt, 16, 0x00ffffff, "Volume");
+	rt.bot = WINDOW_HEIGHT - 250 - (j * 100) - 10;
+	rt.left = WINDOW_WIDTH / 2 - 100;
+	ggprint16(&rt, 16, 0x00ffffff, " - ");
+	rt.bot = WINDOW_HEIGHT - 250 - (j * 100) - 10;
+	rt.left = WINDOW_WIDTH / 2 + 100;
+	ggprint16(&rt, 16, 0x00ffffff, " + ");
+	rt.bot = WINDOW_HEIGHT - 250 - (j * 100) - 10;
+	rt.left = WINDOW_WIDTH / 2;
+	ggprint16(&rt, 16, 0x00ffffff, "%d", game->vVolume);
+	j++;
+	rt.bot = WINDOW_HEIGHT - 250 - (j * 100) - 10;
+	rt.left = WINDOW_WIDTH / 2;
+	ggprint16(&rt, 16, 0x00ffffff, "Back");
+}
+
+void endLevel(Game *game)
+{
+	if (gameState(game) != 5)
+		return;
+	time_t start, end;
+	clock_t t;
+	//Time to stay in function by seconds
+	double delay = 7.5;
+	//How fast missiles and cities are tallied
+	double m_delay = 0.115;
+	double c_delay = 0.30;
+	double diff;
+	int rMissiles = 10, rCount = 0;
+	int rCities = 5, cCount = 0;
+	int alertPlayed = 0;
+	Audio *a;
+	a = &game->sounds;
+	time(&start);
+	//Calculate Score
+	do {
+		t = clock();
+		while (rCount != rMissiles) {
+			diff = clock() - t;
+			diff /= CLOCKS_PER_SEC;
+			if (diff > m_delay) {	
+				a->playAudio(34);
+				//Draw Text/Missile Images
+				//Increment Score
+				rCount++;
+				t = clock();
+			}
+		}
+		t = clock();
+		usleep(500000);
+		while (cCount != rCities) {
+			diff = clock() - t;
+			diff /= CLOCKS_PER_SEC;
+			if (diff > c_delay) {	
+				a->playAudio(34);
+				//Draw Text/Cities
+				//Increment Score
+				cCount++;
+				t = clock();
+			}
+		}
+		sleep(1);
+		if (!alertPlayed) {
+			a->playAudio(39);
+			alertPlayed = 1;
+		}
+		time(&end);
+	} while (difftime(end, start) < delay);
+	//Check for Game Over
+	if (rCities == 0) {
+		//Set state to some unused value
+		game->gState = 10;
+		//gameOver(game);
+	}
+	game->gState = 0;
+}
+
 void mouseOver(int savex, int savey, Game *game)
 {
 	Shape *s;
@@ -350,12 +438,12 @@ void menuClick(Game *game)
 	if (gameState(game) == 1) {
 		//Play Button (2)
 		if (game->mouseOnButton[2] == 1) {
-			game->gMenu = 0;
+			game->gState = 0;
 			game->inGame = 1;
 		}
 		//Settings Button (1)
 		if (game->mouseOnButton[1] == 1) {
-			game->gMenu = 2;
+			game->gState = 2;
 		}
 		//Exit Button (0)
 		if (game->mouseOnButton[0] == 1) {
@@ -383,7 +471,7 @@ void menuClick(Game *game)
 		}
 		//Back
 		if (game->mouseOnButton[0] == 1) {
-			game->gMenu = 1;
+			game->gState = 1;
 		}
 	}
 }
@@ -392,13 +480,9 @@ int gameState(Game *game)
 {
 	int state = 0;
 	int g;
-	g = game->gMenu;
-	if (g == 1) {
-		state = 1;
-	} else if (g == 2) {
-		state = 2;
-	} else {
-		state = 0;
+	g = game->gState;
+	if (g > state) {
+		return g;
 	}
 	return state;
 }
@@ -407,3 +491,4 @@ float gameVolume(Game *game)
 {
 	return game->sounds.gVolume;
 }
+
