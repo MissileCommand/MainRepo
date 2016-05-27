@@ -15,8 +15,9 @@ JBC ToDo's:
 
 
 
-apt-get lines for OpenGL and Git...  
+apt-get lines for OpenGL and Git
 UBUNTU 15.10 & 16.04 OpenGL projects:
+
 --------------------------------------------  
 sudo apt-get update  
 sudo apt-get install git  
