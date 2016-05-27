@@ -25,6 +25,10 @@
  *          added code to make defense missiles lime green and bigger
  *          also made them stop at mouse click location
  * 
+ *          5/25/16
+ *          Changed explosion coords to mouse location instead of missile 
+ *          location to be more accurate. (SEE TODO #1)
+ * 
  */
 #include <iostream>
 #include <cstdlib>
@@ -52,17 +56,13 @@
 
 using namespace std;
 extern void dMissileRemove(Game *game, int dMissilenumber);
-//extern void createEExplosion(Game *g, float x, float y,
-//        float color0, float color1, float color2);
 extern void createEExplosion(Game *game, float x, float y);
 
 
-// extern void createEExplosion(Game *g, float x, float y);
-
-void changeTitle() 
-{
-    XStoreName(dpy, win, "335 Lab1 JBC Changed Title to prove a point");
-}
+//void changeTitle() 
+//{
+//    XStoreName(dpy, win, "335 Lab1 JBC Changed Title to prove a point");
+//}
 
 void renderDefenseMissile(Game *game)
 {
@@ -91,25 +91,49 @@ void renderDefenseMissile(Game *game)
     if (game->numberDefenseMissiles <= 0)
         return;
 
+    
+    
+    
     for (int i=0; i<game->numberDefenseMissiles; i++) {
         dMissilePtr = &game->dMissile[i];
-
-
-//        // shape.center refers to the Shape's "s" center's position
-//        // IE the position of the center of that particular Shape
-//        dMissilePtr->shape.center.x += dMissilePtr->velocity.x;
-//        dMissilePtr->shape.center.y += dMissilePtr->velocity.y;
-            
-
         
+            
+        // TODO #1: missile goes too far past mouse coords before exploding
+        // temp workaround is to set explosion coords to mouse coords 
+        // directly instead of using missile coords to place explosion
         if (dMissilePtr->destinationY >= dMissilePtr->shape.center.y ) {
-        // shape.center refers to the Shape's "s" center's position
-        // IE the position of the center of that particular Shape
-        dMissilePtr->shape.center.x += dMissilePtr->velocity.x;
-        dMissilePtr->shape.center.y += dMissilePtr->velocity.y;
+//        if (dMissilePtr->destinationY >= dMissilePtr->shape.center.y || 
+//                dMissilePtr->destinationX >= dMissilePtr->shape.center.x) {
+
+//            // test location of Missile vs mouse pick coords
+//            cout << "X,Y Missile coords just before the next move (velocity):" << 
+//                    dMissilePtr->shape.center.x << 
+//                "," << dMissilePtr->shape.center.y << endl; 
+
+            
+            // shape.center refers to the Shape center position
+            // IE the position of the center of that particular Shape
+            dMissilePtr->shape.center.x += dMissilePtr->velocity.x;
+            dMissilePtr->shape.center.y += dMissilePtr->velocity.y;
+            
+            // Fix to make missiles stop at mouse coords
+            // because without this the missile goes 100+ pixels too far
+            // I think it has to do with game refresh rate or "render rate"
+            if (dMissilePtr->shape.center.y >= dMissilePtr->destinationY) {
+                dMissilePtr->shape.center.x = dMissilePtr->destinationX + .01;
+                dMissilePtr->shape.center.y = dMissilePtr->destinationY + .01;
+                // Added "+ 1" otherwise the missile never explodes 
+                        
+            }
+            
             
         } else {
-            // game->numberDefenseMissiles--;
+            
+//            // test location of explosion vs mouse pick coords
+//            cout << "X,Y Missile coords:" << 
+//                    dMissilePtr->shape.center.x << 
+//                "," << dMissilePtr->shape.center.y << endl; 
+            
             dMissileRemove(game, i);
             
         }
@@ -117,46 +141,48 @@ void renderDefenseMissile(Game *game)
     }
 }
 
-//
-//void createDefenseMissileExplosion(Game *game, float x, float y)
-//{
-//    DExplosion * defExplosion = 
-//        &game->defExplArray[game->numDefExplosions];
-////    EExplosion *e = &g->eearr[g->neexplosions];
-//    
-//    defExplosion->pos.y = y;
-//    defExplosion->pos.x = x;
-//    defExplosion->pos.z = 0;
-//    defExplosion->radius = 4.0;
-//    defExplosion->radiusInc = 0.5;
-//    defExplosion->color[0] = 0.0f;
-//    defExplosion->color[1] = 255.0f;
-//    defExplosion->color[2] = 0.0f;
-//    
-//    // game->neexplosions++;
-//}
-
 
 void dMissileRemove(Game *game, int dMissilenumber)
 {
     DefenseMissile *dMissilePtr = &game->dMissile[dMissilenumber];
-    
-    
-    // cant seem to make them a different color???
-    createEExplosion(game,  dMissilePtr->shape.center.x,
-                            dMissilePtr->shape.center.y);
+    createEExplosion(game,  dMissilePtr->destinationX,
+                            dMissilePtr->destinationY);
 
-    
     //delete defense missile
     game->dMissile[dMissilenumber] = 
         game->dMissile[game->numberDefenseMissiles - 1];
-
-//    createDefenseMissileExplosion (game, dMissilePtr->shape.center.x, 
-//        dMissilePtr->shape.center.y);
-
     game->numberDefenseMissiles--;
 }
 
+void nukeEmAll (Game *game)
+{
+    EMissile *enemyMissile;
+    
+    for (int i=0; i<game->nmissiles; i++) {
+        enemyMissile = &game->emarr[i];
+
+	//Use Enemy missile position to create explosion just below it
+        if (enemyMissile->vel.x>0) {
+            // dowmn and to the right enemy missile
+            createEExplosion(game,  
+                enemyMissile->pos.x + enemyMissile->vel.x, 
+                enemyMissile->pos.y + enemyMissile->vel.y);
+                // down to left... vel.y = -0.5 & vel.x -=-0.46
+                // down to right. vel.y = -0.5 & vel.x = +0.3
+            
+        } else { 
+            // dowmn and to the left enemy missile
+            createEExplosion(game,  
+                enemyMissile->pos.x - fabs(enemyMissile->vel.x), 
+                enemyMissile->pos.y + enemyMissile->vel.y);
+                // down to left... vel.y = -0.5 & vel.x -=-0.46
+                // down to right. vel.y = -0.5 & vel.x = +0.3
+            
+        }
+    }
+    
+    
+}
 
 
 // 5/14 changes to make missile firing work
@@ -166,9 +192,9 @@ void makeDefenseMissile(Game *game, int x, int y)
 
     if (game->numberDefenseMissiles >= MAX_D_MISSILES)
         return;
-	//std::cout << "makeDefenseMissile()" << x << " " << y << std::endl;
-	
-	DefenseMissile *dMissilePtr = 
+        //std::cout << "makeDefenseMissile()" << x << " " << y << std::endl;
+    
+        DefenseMissile *dMissilePtr = 
                 &game->dMissile[game->numberDefenseMissiles];
         dMissilePtr->shape.width = 10;
         dMissilePtr->shape.height = 10;
@@ -178,14 +204,20 @@ void makeDefenseMissile(Game *game, int x, int y)
         dMissilePtr->color[1] = 255;
         dMissilePtr->color[2] = 0;
 
+        // set target of missile from mouse coords
         dMissilePtr->destinationX = x;
         dMissilePtr->destinationY = y;
+        
+//        // test location of explosion vs mouse pick coords
+//        cout << "X,Y Mouse coords:" << dMissilePtr->destinationX << 
+//                "," << dMissilePtr->destinationY << endl;
         
         
         
         // set speed of missile
         // 0.5 is a good start, 0.25 seemed a bit to slow & 5.0 
-        // seemed insanely fast
+        // seemed insanely fast (BEFORE setting my NVidia card to 
+        // "Sync to VBlank")
         
         // Moved to main game struct
         // float defMissileSpeed = 40;
@@ -200,21 +232,16 @@ void makeDefenseMissile(Game *game, int x, int y)
         dMissilePtr->shape.center.x = xStart;
         dMissilePtr->shape.center.y = yStart;
         
-//        // set target of missile from mouse coords
-//        float xMissileTarget = x;
-//        float yMissileTarget = y;
-
-        // do the math to find X,Y coords of mouse to pass to 
-        // missile as target
-        float dx = dMissilePtr->destinationX - xStart;
-        float dy = dMissilePtr->destinationY - yStart;
+        // do the math to find Velocity values to show missile at next
+        // location upon screen refresh
+        float dx = dMissilePtr->destinationX - xStart; // delta "x" (dx)
+        float dy = dMissilePtr->destinationY - yStart; // delta "y" (dy)
         float dist = sqrt(dx*dx + dy*dy);
         dx /= dist;
         dy /= dist;
         float missileVelocityX = 0;
         float missileVelocityY = 0;
 
-//        missileVelocityX = xStart + defMissileSpeed * dx;
         missileVelocityX = game->defMissileSpeed * dx;
         missileVelocityY = missileVelocityY + game->defMissileSpeed * dy;
 
@@ -226,4 +253,3 @@ void makeDefenseMissile(Game *game, int x, int y)
 
         game->numberDefenseMissiles++;
 }
-
