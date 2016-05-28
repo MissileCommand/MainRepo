@@ -95,9 +95,17 @@ struct EMTrail {
     EMTrail() {}
 };
 
+struct SMissile {
+    Vec pos;
+    Vec vel;
+    float color[3];
+    SMissile() { }
+};
+
 struct EMissile {
     Vec pos;
     Vec vel;
+    double active;
     float angle;
     float color[3];        
     EMTrail trail;
@@ -117,6 +125,7 @@ struct Radar {
     float radius;
     float radius2;
     float radiusInc;
+    Vec tri[3];
     float color[4];
     Radar() {}
 };
@@ -166,6 +175,8 @@ struct Game {
     int nmissiles;
     EExplosion *eearr;
     int neexplosions;
+    SMissile *smarr;
+    int nsmissiles;
     Radar radar;
     int radarOn;
 
@@ -196,11 +207,13 @@ struct Game {
     Game() {
     	//DT
         level = 0;
-    	emarr = new EMissile[10];
+    	emarr = new EMissile[15];
+	smarr = new SMissile[10];
         eearr = new EExplosion[1000];
     	numberDefenseMissiles = 0;
     	nmissiles = 0;
         neexplosions = 0;
+	nsmissiles = 0;
 	radarOn = 0;
 	
         menuExit = 0;
@@ -215,6 +228,7 @@ struct Game {
     ~Game() {
 	   delete [] emarr;
 	   delete [] eearr;
+	   delete [] smarr;
     }    
 };
 

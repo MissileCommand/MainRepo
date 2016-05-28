@@ -380,5 +380,6 @@ void render(Game *game)
 	renderDefenseMissile(game);
 	renderStruc(game);
 	renderScores(game);
+	renderSMissile(game);
 	// renderDefExplosions(game);
 }
