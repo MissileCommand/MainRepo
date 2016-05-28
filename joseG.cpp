@@ -7,6 +7,9 @@
 
 #include "joseG.h"
 #include <GL/glx.h>
+extern "C" {
+#include "fonts.h"
+}
 
 //extern void init_opengl();
 
@@ -97,4 +100,14 @@ void renderBackground(GLuint starsTexture)
 	glTexCoord2f(1.0f, 1.0f); glVertex2i(WINDOW_WIDTH, 0);
 	glEnd();
 	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void renderScores(Game *game)
+{
+    Rect r;
+    //glClear(GL_COLOR_BUFFER_BIT);
+    r.bot = 30;
+    r.left = 50.0;
+    r.center = 0;
+    ggprint16(&r, 16, 0x00005599, "Score: %i", game->score);
 }

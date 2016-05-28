@@ -128,6 +128,7 @@ void eMissilePhysics(Game *game)
 				eMissileExplode(game, i);
 				a->playAudio(10);
 				chCount++;
+				game->score -= 10;
 				break;
 			}
 		}
@@ -154,6 +155,7 @@ void eMissilePhysics(Game *game)
 			if (dist<=d->radius) {
 				eMissileExplode(game,i);
 				a->playAudio(0);
+				game->score += 100;
 				break;
 			}
 		}
