@@ -18,5 +18,6 @@ extern void initStruc(Game *game);
 extern void renderStruc(Game *game);
 extern void destroyCity(Game *game, int citynum);
 extern void renderBackground(GLuint starsTexture);
+extern void renderScores(Game *game);
 
 #endif
