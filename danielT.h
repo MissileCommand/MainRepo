@@ -25,5 +25,8 @@ extern void createEExplosion(Game *game, float x, float y);
 extern void renderRadar(Game *game);
 extern void radarPhysics(Game *game);
 extern void initRadar(Game *game);
+extern void createSMissile(Game *game);
+extern void sMissilePhysics(Game *game);
+extern void renderSMissile(Game *game);
 
 #endif 
