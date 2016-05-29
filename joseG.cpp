@@ -107,7 +107,6 @@ void renderBackground(GLuint starsTexture)
 void renderScores(Game *game)
 {
     Rect r;
-    //glClear(GL_COLOR_BUFFER_BIT);
     r.bot = 30;
     r.left = 50.0;
     r.center = 0;
