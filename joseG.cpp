@@ -38,7 +38,8 @@ void initStruc(Game *game)
 
 void destroyCity(Game *game, int citynum)
 {
-	//Shape *dcity = &game->structures.city[citynum];
+	Shape *dcity = &game->structures.city[citynum];
+	dcity->alive = 0;
 	return;
 }
 
