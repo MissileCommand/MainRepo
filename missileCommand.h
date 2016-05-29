@@ -58,6 +58,7 @@ struct Vec {
 };
 
 struct Shape {
+	int alive;
 	float width, height;
 	float radius;
 	Vec center;
