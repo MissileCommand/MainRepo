@@ -28,6 +28,7 @@ void initStruc(Game *game)
 
 	//city shape
 	for (int i=0; i < CITYNUM; i++) {
+		shape->city[i].alive = 1;
 		shape->city[i].width = 30;
 		shape->city[i].height = 50;
 		shape->city[i].center.x = 225 + i*130;
@@ -37,7 +38,8 @@ void initStruc(Game *game)
 
 void destroyCity(Game *game, int citynum)
 {
-	//Shape *dcity = &game->structures.city[citynum];
+	Shape *dcity = &game->structures.city[citynum];
+	dcity->alive = 0;
 	return;
 }
 
@@ -67,9 +69,8 @@ void renderStruc(Game *game)
 	//draw cities
 	Shape *c;
 	for (int i = 0; i < CITYNUM; i++) {
-		//glColor3ub(87,87,87);
 		c = &shape->city[i];
-		//float wid = 40.0f;
+		if (c[i].alive) {
 		glPushMatrix();
 		glTranslatef(c->center.x, c->center.y, c->center.z);
 		w2 = c->width;
@@ -87,6 +88,7 @@ void renderStruc(Game *game)
 		glBindTexture(GL_TEXTURE_2D, 0);
 		glPopMatrix();
 		glDisable(GL_ALPHA_TEST);
+		}
 	}
 }
 
