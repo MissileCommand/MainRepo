@@ -8,6 +8,7 @@ JBC ToDo's:
 - [ ] Pics of missiles in Silos  
 - [ ] Detection of Silo destruction  
 - [ ] Maybe Flashing "X" (crosshairs)  
+- [ ] make count components global in game struct
 
 --------------------------------------------
 DT ToDo's: 
