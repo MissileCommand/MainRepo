@@ -131,7 +131,7 @@ void eMissilePhysics(Game *game)
 				chCount++;
 				game->score -= 10;
 				break;
-					}
+			}
 			}
 		}
 
