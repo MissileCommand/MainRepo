@@ -121,6 +121,7 @@ void eMissilePhysics(Game *game)
 		//check for collision with cities 
 		for (k=0; k<CITYNUM; k++) {
 			c = &sh->city[k];
+			if (c[i].alive) {
 			if (e->pos.y <= c->center.y+c->height && 
 					e->pos.x <= c->center.x+c->width && 
 					e->pos.x >= c->center.x-c->width) {
@@ -130,6 +131,7 @@ void eMissilePhysics(Game *game)
 				chCount++;
 				game->score -= 10;
 				break;
+					}
 			}
 		}
 
