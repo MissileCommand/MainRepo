@@ -73,6 +73,8 @@ Audio::~Audio()
 {
 	alDeleteSources(1, &alSource);
 	alDeleteBuffers(1, &alBuffer);
+	ALCcontext *context = alcGetCurrentContext();
+	ALCdevice *device = alcGetContextsDevice(context);
 	alcMakeContextCurrent(NULL);
 	alcDestroyContext(context);
 	alcCloseDevice(device);
@@ -190,36 +192,6 @@ void drawMenu(Game *game)
 	}
 }
 
-//Settings buttons draw function goes here
-
-void drawSettings(Game *game)
-{
-	//
-	Shape *s;
-	s = &game->menuBG;
-	s->width = WINDOW_WIDTH - 650;
-	s->height = WINDOW_HEIGHT - 550;
-	s->center.x = WINDOW_WIDTH / 2;
-	s->center.y = WINDOW_HEIGHT / 2;
-	//Back
-	s = &game->sButton[0];
-	s->width = 125;
-	s->height = 25;
-	s->center.x = WINDOW_WIDTH / 2;
-	s->center.y = WINDOW_HEIGHT - 350;
-	//
-	for (int i = 1; i < BUTTONS_S; i++) {
-		s = &game->sButton[i];
-		s->width = 25;
-		s->height = 25;
-		if (i == 1)
-			s->center.x = WINDOW_WIDTH / 2 + 100;
-		if (i == 2)
-			s->center.x = WINDOW_WIDTH / 2 - 100;
-		s->center.y = WINDOW_HEIGHT - 250;
-	}
-}
-
 void renderMenuObjects(Game *game)
 {
 	Shape *s;
@@ -228,19 +200,20 @@ void renderMenuObjects(Game *game)
 	//glClearColor(0.15, 0.15, 0.15, 0.15);
 	//glClear(GL_COLOR_BUFFER_BIT);
 	float w, h;
+	//glBindTexture(GL_TEXTURE_2D, 0);
 	for (int i = 0; i < BUTTONS; i++) {
 		s = &game->mButton[i];
-		glBindTexture(GL_TEXTURE_2D, 0);
-		glColor3ub(128,128,128);
+		glColor3f(0.5, 0.75, 0.90);
 		//Button colors based on mouse position
 		if (game->mouseOnButton[i] == 1) {
 			//Button selected color
-			glColor3ub(190,190,190);
+			glColor3f(1.0, 0.0, 1.0);
 		}
 		glPushMatrix();
-		glTranslatef(s->center.x, s->center.y, s->center.z);
+		glTranslatef(s->center.x, s->center.y, 0);
 		w = s->width;
 		h = s->height;
+		glEnd();
 		glBegin(GL_QUADS);
 			glVertex2i(-w,-h);
 			glVertex2i(-w, h);
@@ -273,6 +246,36 @@ void renderMenuText(Game *game)
 	}
 }
 
+//Settings buttons draw function goes here
+
+void drawSettings(Game *game)
+{
+	//
+	Shape *s;
+	s = &game->menuBG;
+	s->width = WINDOW_WIDTH - 650;
+	s->height = WINDOW_HEIGHT - 550;
+	s->center.x = WINDOW_WIDTH / 2;
+	s->center.y = WINDOW_HEIGHT / 2;
+	//Back
+	s = &game->sButton[0];
+	s->width = 125;
+	s->height = 25;
+	s->center.x = WINDOW_WIDTH / 2;
+	s->center.y = WINDOW_HEIGHT - 350;
+	//Plus and Minus
+	for (int i = 1; i < BUTTONS_S; i++) {
+		s = &game->sButton[i];
+		s->width = 25;
+		s->height = 25;
+		if (i == 1)
+			s->center.x = WINDOW_WIDTH / 2 + 100;
+		if (i == 2)
+			s->center.x = WINDOW_WIDTH / 2 - 100;
+		s->center.y = WINDOW_HEIGHT - 250;
+	}
+}
+
 void renderSettings(Game *game)
 {
 	Shape *s;
@@ -281,9 +284,10 @@ void renderSettings(Game *game)
 	//Render Settings Menu BG
 	s = &game->menuBG;
 	float w, h;
+	//glBindTexture(GL_TEXTURE_2D, 0);
 	glColor3ub(128,128,128);
 	glPushMatrix();
-	glTranslatef(s->center.x, s->center.y, s->center.z);
+	glTranslatef(s->center.x, s->center.y, 0);
 	w = s->width;
 	h = s->height;
 	glBegin(GL_QUADS);
@@ -304,7 +308,7 @@ void renderSettings(Game *game)
 			glColor3ub(190,190,190);
 		}
 		glPushMatrix();
-		glTranslatef(s->center.x, s->center.y, s->center.z);
+		glTranslatef(s->center.x, s->center.y, 0);
 		w = s->width;
 		h = s->height;
 		glBegin(GL_QUADS);
@@ -492,4 +496,3 @@ float gameVolume(Game *game)
 {
 	return game->sounds.gVolume;
 }
-

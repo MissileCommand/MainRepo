@@ -55,7 +55,7 @@ void renderStruc(Game *game)
 	Shape *s;
 	s = &shape->floor;
 	glPushMatrix();
-	glTranslatef(s->center.x, s->center.y, s->center.z);
+	glTranslatef(s->center.x, s->center.y, 0);
 	w = s->width;
 	h = s->height;
 	glBegin(GL_QUADS);
@@ -71,30 +71,34 @@ void renderStruc(Game *game)
 	for (int i = 0; i < CITYNUM; i++) {
 		c = &shape->city[i];
 		if (c[i].alive) {
+		glColor3f(1.0, 1.0, 1.0);
 		glPushMatrix();
-		glTranslatef(c->center.x, c->center.y, c->center.z);
+		glTranslatef(c->center.x, c->center.y, 0);
 		w2 = c->width;
 		h2 = c->height;
 		glBindTexture(GL_TEXTURE_2D, cityTexture);
-		glEnable(GL_ALPHA_TEST);
-		glAlphaFunc(GL_GREATER, 0.0f);
-		glColor4ub(255,255,255,255);
+		//For transparency
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+		//glColor4ub(255,255,255,255);
 		glBegin(GL_QUADS);
-		glTexCoord2f(1.0f, 1.0f); glVertex2i(-w2,-h2);
-		glTexCoord2f(1.0f, 0.0f); glVertex2i(-w2, h2);
-		glTexCoord2f(0.0f, 0.0f); glVertex2i( w2, h2);
-		glTexCoord2f(0.0f, 1.0f); glVertex2i( w2,-h2);
+			glTexCoord2f(1.0f, 1.0f); glVertex2i(-w2,-h2);
+			glTexCoord2f(1.0f, 0.0f); glVertex2i(-w2, h2);
+			glTexCoord2f(0.0f, 0.0f); glVertex2i( w2, h2);
+			glTexCoord2f(0.0f, 1.0f); glVertex2i( w2,-h2);
 		glEnd();
-		glBindTexture(GL_TEXTURE_2D, 0);
+		glDisable(GL_BLEND);
 		glPopMatrix();
-		glDisable(GL_ALPHA_TEST);
+		glBindTexture(GL_TEXTURE_2D, 0);
 		}
 	}
 }
 
 void renderBackground(GLuint starsTexture)
 {
+	//glColor3f(1.0, 1.0, 1.0);
 	glBindTexture(GL_TEXTURE_2D, starsTexture);
+	//glEnd();
 	glBegin(GL_QUADS);
 	glTexCoord2f(0.0f, 1.0f); glVertex2i(0, 0);
 	glTexCoord2f(0.0f, 0.0f); glVertex2i(0, WINDOW_HEIGHT);

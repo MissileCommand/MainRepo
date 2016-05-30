@@ -54,6 +54,11 @@ void renderDefenseMissile(Game *game);
 void makeDefenseMissile(Game *game, int x, int y);
 void nukeEmAll (Game *game);
 
+// JR Prototypes
+void render_menu(Game *game);
+void render_settings(Game *game);
+void render_lvlbreak(Game *game); 
+
 void render(Game *game);
 
 Ppmimage *cityImage=NULL;
@@ -96,13 +101,15 @@ int main(void)
 		}
 		int state = gameState(&game);
 		if (state == 1) {
-			renderBackground(starsTexture);
-			renderMenuObjects(&game);
-			renderMenuText(&game);
+			render_menu(&game);
+			//renderBackground(starsTexture);
+			//renderMenuObjects(&game);
+			//renderMenuText(&game);
 		} else if (state == 2) {
-			renderBackground(starsTexture);
-			renderSettings(&game);
-			renderSettingsText(&game);
+			render_settings(&game);
+			//renderBackground(starsTexture);
+			//renderSettings(&game);
+			//renderSettingsText(&game);
 		} else {
 			movement(&game);
 			render(&game);
@@ -225,19 +232,26 @@ void init_opengl(void)
 	glTexImage2D(GL_TEXTURE_2D, 0, 3, starsImage->width, starsImage->height,
 			0, GL_RGB, GL_UNSIGNED_BYTE, starsImage->data);
 	//
+	//FOR TEXTURES WITH TRANSPARENT BACKGROUNDS
+	//=========================================
 	glGenTextures(1, &cityTexture);
 	int w = cityImage->width;
 	int h = cityImage->height;
-	//city
-	//
 	glBindTexture(GL_TEXTURE_2D, cityTexture);
-	//
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	unsigned char *cityData = buildAlphaData(cityImage);
 	glTexImage2D(GL_TEXTURE_2D, 0, 3, w, h, 0,
 			GL_RGB, GL_UNSIGNED_BYTE, cityImage->data);
-	free(cityData);
+	//Create Transparent Background
+	GLuint silhouetteTexture;
+	glGenTextures(1, &silhouetteTexture);
+	glBindTexture(GL_TEXTURE_2D, silhouetteTexture);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+	unsigned char *silhouetteData = buildAlphaData(cityImage);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0,
+			GL_RGBA, GL_UNSIGNED_BYTE, silhouetteData);
+	//Set data to original texture
+	cityTexture = silhouetteTexture;
+	delete [] silhouetteData;
 }
 
 
@@ -357,8 +371,25 @@ void movement(Game *game)
 	eMissilePhysics(game);
 	//dMissilePhysics(game);
 	eExplosionPhysics(game);
+}
 
+void render_menu(Game *game)
+{
+	renderBackground(starsTexture);
+	renderMenuObjects(game);
+	renderMenuText(game);
+}
 
+void render_settings(Game *game)
+{
+	renderBackground(starsTexture);
+	renderSettings(game);
+	renderSettingsText(game);
+}
+
+void render_lvlbreak(Game *game)
+{
+	//
 }
 
 void render(Game *game)
