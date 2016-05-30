@@ -216,7 +216,7 @@ void init_opengl(void)
 	cityImage = ppm6GetImage("./images/city.ppm");
 	starsImage = ppm6GetImage("./images/stars.ppm");
 	//create opengl texture elements
-	//forest
+	//FOR TEXTURES WITHOUT TRANSPARENT BACKGROUNDS
 	glGenTextures(1, &starsTexture);
 	glBindTexture(GL_TEXTURE_2D, starsTexture);
 	//
@@ -224,20 +224,31 @@ void init_opengl(void)
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
 	glTexImage2D(GL_TEXTURE_2D, 0, 3, starsImage->width, starsImage->height,
 			0, GL_RGB, GL_UNSIGNED_BYTE, starsImage->data);
+	//return nameTexture;
 	//
+	//FOR TEXTURES WITH TRANSPARENT BACKGROUNDS
+	//=========================================
 	glGenTextures(1, &cityTexture);
 	int w = cityImage->width;
 	int h = cityImage->height;
-	//city
-	//
 	glBindTexture(GL_TEXTURE_2D, cityTexture);
-	//
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	unsigned char *cityData = buildAlphaData(cityImage);
 	glTexImage2D(GL_TEXTURE_2D, 0, 3, w, h, 0,
 			GL_RGB, GL_UNSIGNED_BYTE, cityImage->data);
-	free(cityData);
+	//Create Transparent Background
+	GLuint silhouetteTexture;
+	glGenTextures(1, &silhouetteTexture);
+	glBindTexture(GL_TEXTURE_2D, silhouetteTexture);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+	unsigned char *silhouetteData = buildAlphaData(cityImage);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0,
+			GL_RGBA, GL_UNSIGNED_BYTE, silhouetteData);
+	//Set data to original texture
+	cityTexture = silhouetteTexture;
+	delete [] silhouetteData;
+	//Use return if calling as function
+	//return silhouetteTexture;
+	//free(cityData);
 }
 
 
