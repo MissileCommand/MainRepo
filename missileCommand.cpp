@@ -264,9 +264,14 @@ void check_mouse(XEvent *e, Game *game)
 				menuClick(game);
 				a->playAudio(32);
 			} else {
-				// changeTitle();
-				makeDefenseMissile(game, e->xbutton.x, y);
-				a->playAudio(20);
+                            
+                                // JBC Added 5/30 to only make defense 
+                                // missiles and play sound when enemy 
+                                // missiles are present
+				if (game->nmissiles > 0) {
+                                    makeDefenseMissile(game, e->xbutton.x, y);
+                                    a->playAudio(20);
+                                }
 				// JBC note 5/13
 				// moved the "particle" stuff out of here 
 				// makeParticle(game, e->xbutton.x, y);
