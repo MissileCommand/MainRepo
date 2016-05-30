@@ -96,25 +96,24 @@ int main(void)
 		while (XPending(dpy)) {
 			XEvent e;
 			XNextEvent(dpy, &e);
-			check_mouse(&e, &game);
-			done = check_keys(&e, &game);
+			if (lvlState(&game) < 0) {
+				check_mouse(&e, &game);
+				done = check_keys(&e, &game);
+			}
 		}
 		int state = gameState(&game);
 		if (state == 1) {
 			render_menu(&game);
-			//renderBackground(starsTexture);
-			//renderMenuObjects(&game);
-			//renderMenuText(&game);
 		} else if (state == 2) {
 			render_settings(&game);
-			//renderBackground(starsTexture);
-			//renderSettings(&game);
-			//renderSettingsText(&game);
 		} else {
-			movement(&game);
-			render(&game);
-			//moved to render func 5-25 -DT
-			//renderStruc(&sh);
+			if (lvlState(&game) < 0) {
+				movement(&game);
+				render(&game);
+			} else {
+				//level-to-level code
+				levelEnd(&game);
+			}
 		}
 		glXSwapBuffers(dpy, win);
 	}
@@ -267,7 +266,7 @@ void check_mouse(XEvent *e, Game *game)
 	if (e->type == ButtonRelease) {
 		return;
 	}
-	if (e->type == ButtonPress) {
+	if (e->type == ButtonPress && lvlState(game) < 0) {
 		//LEFT-CLICK
 		if (e->xbutton.button==1) {
 			//Left button was pressed
@@ -277,7 +276,7 @@ void check_mouse(XEvent *e, Game *game)
 				a->playAudio(30);
 				menuClick(game);
 				a->playAudio(32);
-			} else {
+			} else if (gameState(game) == 0) {
 				// changeTitle();
 				makeDefenseMissile(game, e->xbutton.x, y);
 				a->playAudio(20);
@@ -389,7 +388,10 @@ void render_settings(Game *game)
 
 void render_lvlbreak(Game *game)
 {
-	//
+	if (lvlState(game) < 0)
+		return;
+	printf("Greater than 0\n");
+
 }
 
 void render(Game *game)
@@ -404,7 +406,7 @@ void render(Game *game)
 	//		createEMissiles(game);
 	//	}
 	renderBackground(starsTexture);
-	endLevel(game);
+	//endLevel(game);
 	renderRadar(game);
 	renderEMissiles(game);
 	renderEExplosions(game);

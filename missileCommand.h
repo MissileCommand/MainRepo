@@ -22,6 +22,7 @@
 #include <cstring>
 #include <string>
 #include <cmath>
+#include <time.h>
 #include <unistd.h>
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
@@ -161,6 +162,34 @@ class Audio
         void playAudio(int num);
 };
 
+struct levelInfo {    
+    time_t start, end;
+    clock_t gtime;
+    float timer;
+    int rCount, cCount, mDone, alertPlayed;
+    double diff;
+    bool cReset;
+    //Time to stay in function by seconds
+    double delay;
+    //How fast missiles and cities are tallied
+    double m_delay;
+    double c_delay;
+    levelInfo() {
+        delay = 5.0;
+        m_delay = 0.7;
+        c_delay = 2.0;
+        diff = 0;
+        cReset = true;
+        gtime = 0.0;
+        rCount = 0.0;
+        cCount = 0.0;
+        start = 0, end = 0;
+        timer = 0.0;
+        mDone = 1;
+        alertPlayed = 0;
+    }
+};
+
 struct Game {
     //global variable for level 5-17-16 -DT
     int level;
@@ -193,14 +222,12 @@ struct Game {
     //JR:
     int buttonSpacer[BUTTONS];
     int mouseOnButton[T_BUTTONS];
-    int menuExit;
-    int gState;
-    int inGame;
-    int vVolume;
+    int menuExit, gState, inGame, vVolume;
     Shape mButton[BUTTONS];
     Shape sButton[BUTTONS_S];
     Shape menuBG;
     Audio sounds;
+    levelInfo lvl;
 
     Structures structures;
 

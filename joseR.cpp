@@ -346,66 +346,91 @@ void renderSettingsText(Game *game)
 	ggprint16(&rt, 16, 0x00ffffff, "Back");
 }
 
-void endLevel(Game *game)
+int lvlState(Game *game)
 {
+	//printf("lvlState()\n");
 	if (gameState(game) != 5)
-		return;
-	int rCount = 0, rMissiles = 10;
-	int cCount = 0, rCities = 5;
+		return -1;
+	//TODO: Attach to correct struct variables
+	int rMissiles = 10;
+	int rCities = 5;
 	//Check for Game Over
 	if (rCities == 0 && rMissiles == 0) {
 		//Set state to some unused value
 		game->gState = 10;
 		//gameOver(game);
-		return;
+		return 5;
 	}
-	time_t start, end;
-	clock_t t;
-	//Time to stay in function by seconds
-	double delay = 7.0;
-	//How fast missiles and cities are tallied
-	double m_delay = 0.115;
-	double c_delay = 0.30;
-	double diff;
-	int alertPlayed = 0;
+	return 1;
+}
+
+void levelEnd(Game *game)
+{
+	//Variables stored in struct levelInfo
+	time_t start = game->lvl.start;
+	time_t end   = game->lvl.end;
+	float timer = game->lvl.timer;
+	int rCount = game->lvl.rCount, rMissiles = 10;
+	int cCount = game->lvl.cCount, rCities = 5;
+    double diff = game->lvl.diff;
+    double delay = game->lvl.delay;
+    double m_delay = game->lvl.m_delay;
+    double c_delay = game->lvl.c_delay;
+	bool clockReset = game->lvl.cReset;
 	Audio *a;
 	a = &game->sounds;
-	time(&start);
-	//Calculate Score
-	do {
-		t = clock();
-		while (rCount != rMissiles) {
-			diff = clock() - t;
-			diff /= CLOCKS_PER_SEC;
-			if (diff > m_delay) {	
-				a->playAudio(34);
-				//Draw Text/Missile Images
-				//Increment Score
-				rCount++;
-				t = clock();
-			}
-		}
-		t = clock();
-		usleep(500000);
-		while (cCount != rCities) {
-			diff = clock() - t;
-			diff /= CLOCKS_PER_SEC;
-			if (diff > c_delay) {	
-				a->playAudio(34);
-				//Draw Text/Cities
-				//Increment Score
-				cCount++;
-				t = clock();
-			}
-		}
+	if (rCount == rMissiles && game->lvl.mDone == 1)  {
+		clockReset = true;
 		sleep(1);
-		if (!alertPlayed) {
-			a->playAudio(39);
-			alertPlayed = 1;
+	}
+	if (clockReset) {
+		//printf("Clock Reset\n");
+		time(&start);
+		timer = 0.0;
+		//t = clock();
+		clockReset = false;
+	}
+	//Calculate Score
+	if (rCount != rMissiles) {
+		timer += 0.1;
+		if (timer > m_delay) {	
+			a->playAudio(34);
+			//Draw Text/Missile Images
+			//Increment Score
+			rCount++;
+			timer = 0.0;
+			//t = clock();
 		}
-		time(&end);
-	} while (difftime(end, start) < delay);
-	game->gState = 0;
+	} else if (cCount != rCities) {
+		game->lvl.mDone = 0;
+		timer += 0.1;
+		if (timer > c_delay) {
+			a->playAudio(34);
+			//Draw Text/Missile Images
+			//Increment Score
+			cCount++;
+			timer = 0.0;
+		}
+	} else {
+		if (game->lvl.alertPlayed == 0 && difftime(end, start) > 2.0) {
+			a->playAudio(39);
+			game->lvl.alertPlayed = 1;
+		}
+	}
+	time(&end);
+	//Reset Game State once delay is reached
+	if (difftime(end, start) >= delay) {
+		printf("Next Level\n");
+		game->gState = 0;
+	}
+	//Store calculated data
+	game->lvl.start = start;
+	game->lvl.end = end;
+	game->lvl.rCount = rCount;
+	game->lvl.cCount = cCount;
+	game->lvl.diff = diff;
+	game->lvl.cReset = clockReset;
+	game->lvl.timer = timer;
 }
 
 void mouseOver(int savex, int savey, Game *game)
