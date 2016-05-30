@@ -420,6 +420,7 @@ void levelEnd(Game *game)
 	time(&end);
 	//Reset Game State once delay is reached
 	if (difftime(end, start) >= delay) {
+		glClear(GL_COLOR_BUFFER_BIT);
 		printf("Next Level\n");
 		game->gState = 0;
 	}
