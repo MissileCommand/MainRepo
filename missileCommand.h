@@ -22,6 +22,7 @@
 #include <cstring>
 #include <string>
 #include <cmath>
+#include <time.h>
 #include <unistd.h>
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
@@ -58,34 +59,34 @@ struct Vec {
 };
 
 struct Shape {
-	int alive;
-	float width, height;
-	float radius;
-	Vec center;
+    int alive;
+    float width, height;
+    float radius;
+    Vec center;
 };
   
 // JBC 05/08/16 JBC switched from DefenseMissile to dMissile/DefenseMissile
 //struct DefenseMissile {
-//	Shape s;
-//	Shape s2;
-//	Shape s3;
-//	Vec velocity;
+//  Shape s;
+//  Shape s2;
+//  Shape s3;
+//  Vec velocity;
 //};
 struct DefenseMissile {
-	Shape shape;
-//	Shape s2;
-//	Shape s3;
-        int color[3];
-	Vec velocity;
-        int destinationX;
-        int destinationY;
-        int minimumY;
+    Shape shape;
+//  Shape s2;
+//  Shape s3;
+    int color[3];
+    Vec velocity;
+    int destinationX;
+    int destinationY;
+    int minimumY;
         
 };
 
 struct Structures {
-        Shape floor;
-        Shape city[CITYNUM];
+    Shape floor;
+    Shape city[CITYNUM];
 }; 
 
 struct EMTrail {
@@ -161,6 +162,34 @@ class Audio
         void playAudio(int num);
 };
 
+struct levelInfo {    
+    time_t start, end;
+    clock_t gtime;
+    float timer;
+    int rCount, cCount, mDone, alertPlayed;
+    double diff;
+    bool cReset;
+    //Time to stay in function by seconds
+    double delay;
+    //How fast missiles and cities are tallied
+    double m_delay;
+    double c_delay;
+    levelInfo() {
+        delay = 5.0;
+        m_delay = 0.7;
+        c_delay = 2.0;
+        diff = 0;
+        cReset = true;
+        gtime = 0.0;
+        rCount = 0.0;
+        cCount = 0.0;
+        start = 0, end = 0;
+        timer = 0.0;
+        mDone = 1;
+        alertPlayed = 0;
+    }
+};
+
 struct Game {
     //global variable for level 5-17-16 -DT
     int level;
@@ -193,43 +222,44 @@ struct Game {
     //JR:
     int buttonSpacer[BUTTONS];
     int mouseOnButton[T_BUTTONS];
-    int menuExit;
-    int gState;
-    int inGame;
-    int vVolume;
+    int menuExit, gState, inGame, vVolume, gStart;
     Shape mButton[BUTTONS];
     Shape sButton[BUTTONS_S];
     Shape menuBG;
+    Shape BonusA[10];
+    Shape BonusB[5];
     Audio sounds;
+    levelInfo lvl;
 
     Structures structures;
 
     //Constructor 
     Game() {
-    	//DT
+        //DT
         level = 0;
-    	emarr = new EMissile[15];
-	smarr = new SMissile[10];
+        emarr = new EMissile[15];
+        smarr = new SMissile[10];
         eearr = new EExplosion[1000];
-    	numberDefenseMissiles = 0;
-    	nmissiles = 0;
+        numberDefenseMissiles = 0;
+        nmissiles = 0;
         neexplosions = 0;
-	nsmissiles = 0;
-	radarOn = 0;
-	
+        nsmissiles = 0;
+        radarOn = 0;
+
         menuExit = 0;
         gState = 1;
+        gStart = 1;
         inGame = 0;
         vVolume = 100;
-        for (int i=0;i<T_BUTTONS;i++) {
+        for (int i=0;i<BUTTONS;i++) {
             mouseOnButton[i] = 0;
         }
     }
     //Deconstructor
     ~Game() {
-	   delete [] emarr;
-	   delete [] eearr;
-	   delete [] smarr;
+       delete [] emarr;
+       delete [] eearr;
+       delete [] smarr;
     }    
 };
 

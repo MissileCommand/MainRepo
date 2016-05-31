@@ -12,7 +12,11 @@ extern void renderMenuObjects(Game *game);
 extern void renderMenuText(Game *game);
 extern void renderSettings(Game *game);
 extern void renderSettingsText(Game *game);
-extern void endLevel(Game *game);
+extern int lvlState(Game *game);
+extern void resetLevelEnd(Game *game);
+extern void levelEnd(Game *game);
+extern void renderBonusA(Game *game, int rCount, int cCount, bool type);
+extern void renderNewLevelMsg(Game *game);
 extern void menuClick(Game *game);
 extern int gameState(Game *game);
 
