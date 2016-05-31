@@ -57,7 +57,8 @@ void nukeEmAll (Game *game);
 // JR Prototypes
 void render_menu(Game *game);
 void render_settings(Game *game);
-void render_newgame(Game *game); 
+void render_newgame(Game *game);
+void render_gameover(Game *game);
 
 void render(Game *game);
 
@@ -65,6 +66,8 @@ Ppmimage *cityImage=NULL;
 Ppmimage *starsImage=NULL;
 Ppmimage *streetImage=NULL;
 Ppmimage *civilianImage=NULL;
+Ppmimage *gameoverImage=NULL;
+Ppmimage *mainmenuImage=NULL;
 GLuint starsTexture;
 
 int main(void)
@@ -122,7 +125,7 @@ int main(void)
 			}
 		} else {
 			printf("Game Over!\n");
-			//renderGameOver(&game);
+			render_gameover(&game);
 		}
 		glXSwapBuffers(dpy, win);
 	}
@@ -190,7 +193,7 @@ void init_opengl(void)
 	glDisable(GL_FOG);
 	glDisable(GL_CULL_FACE);
 	//Set the screen background color
-	glClearColor(0.1, 0.1, 0.1, 1.0);
+	glClearColor(0.0, 0.0, 0.0, 1.0);
 	//Initialize Fonts
 	glEnable(GL_TEXTURE_2D);
 	initialize_fonts();
@@ -199,11 +202,23 @@ void init_opengl(void)
 	system("convert ./images/street.jpg ./images/street.ppm");
 	system("convert ./images/stars.png ./images/stars.ppm");
 	system("convert ./images/civilian.jpg ./images/civilian.ppm");
+	//
+	//system("convert ./images/c_city.png ./images/c_city.ppm");
+	//system("convert ./images/c_bomber.png ./images/c_bomber.ppm");
+	//system("convert ./images/c_satellite.png ./images/c_satellite.ppm");
+	//system("convert ./images/c_silo.png ./images/c_silo.ppm");
+	//system("convert ./images/c_sbomb.png ./images/c_sbomb.ppm");
+	system("convert ./images/gameover.png ./images/gameover.ppm");
+	system("convert ./images/mainmenu.png ./images/mainmenu.ppm");
 	//load images into a ppm structure
 	cityImage = ppm6GetImage("./images/city.ppm");
 	starsImage = ppm6GetImage("./images/stars.ppm");
 	streetImage = ppm6GetImage("./images/street.ppm");
 	civilianImage = ppm6GetImage("./images/civilian.ppm");
+	gameoverImage =ppm6GetImage("./images/gameover.ppm");
+	mainmenuImage = ppm6GetImage("./images/mainmenu.ppm");
+	//load classic images
+
 	//create opengl texture elements
 	//stars
 	starsTexture = makeTexture(starsTexture, starsImage);
@@ -213,11 +228,16 @@ void init_opengl(void)
 	cityTexture = makeTransparentTexture(cityTexture, cityImage);
 	//civilian
 	civilianTexture = makeTransparentTexture(civilianTexture, civilianImage);
+	//Others
+	gameoverTexture = makeTransparentTexture(gameoverTexture, gameoverImage);
+	mainmenuTexture = makeTexture(mainmenuTexture, mainmenuImage);
 
 	remove("./images/city.ppm");
 	remove("./images/stars.ppm");
 	remove("./images/street.ppm");
 	remove("./images/civilian.ppm");
+	remove("./images/gameover.ppm");
+	remove("./images/mainmenu.ppm");
 }
 
 
@@ -343,14 +363,14 @@ void movement(Game *game)
 
 void render_menu(Game *game)
 {
-	renderBackground(starsTexture);
+	renderBackground(mainmenuTexture);
 	renderMenuObjects(game);
 	renderMenuText(game);
 }
 
 void render_settings(Game *game)
 {
-	renderBackground(starsTexture);
+	renderBackground(mainmenuTexture);
 	renderSettings(game);
 	renderSettingsText(game);
 }
@@ -360,7 +380,12 @@ void render_newgame(Game *game)
 	renderBackground(starsTexture);
 	renderStruc(game);
 	renderNewLevelMsg(game);
+}
 
+void render_gameover(Game *game)
+{
+	//renderBackground(gameoverTexture);
+	gameOver(game);
 }
 
 void render(Game *game)

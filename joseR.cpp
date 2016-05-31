@@ -52,6 +52,11 @@ extern void renderStruc(Game *game);
 extern void renderRadar(Game *game);
 extern void renderScores(Game *game);
 
+GLuint mCounter;
+GLuint cCounter;
+GLuint gameoverTexture;
+GLuint mainmenuTexture;
+
 Audio::Audio()
 {
 	alutInit(0, NULL);
@@ -202,39 +207,9 @@ void drawMenu(Game *game)
 	}
 }
 
-void renderGameOver(Game *game)
-{
-	Audio *a;
-	a = &game->sounds;
-	//a.playAudio(32);
-	//Draw
-	Shape *c;
-	c = &game->gameOver;
-	c->radius = 50;
-	c->center.x = WINDOW_WIDTH / 2;
-	c->center.y = WINDOW_HEIGHT / 2;
-	//Render
-	//clear
-	glPushMatrix();
-	glTranslatef(c->center.x, c->center.y, 0);
-	float r = c->radius;
-	glBegin(GL_TRIANGLE_FAN);
-	for (int i = 0; i < 360; i++) {
-		float deg2rad = i * (3.14159/180);
-		glVertex2d(cos(deg2rad)*r, sin(deg2rad)*r);
-	}
-	glEnd();
-	glPopMatrix();
-	printf("State: %d\n", game->gState);
-}
-
 void renderMenuObjects(Game *game)
 {
 	Shape *s;
-	//Check if game is in progress so menu can act as a pause menu.
-	//Otherwise will clear screen
-	//glClearColor(0.15, 0.15, 0.15, 0.15);
-	//glClear(GL_COLOR_BUFFER_BIT);
 	float w, h;
 	//glBindTexture(GL_TEXTURE_2D, 0);
 	for (int i = 0; i < BUTTONS; i++) {
@@ -387,9 +362,17 @@ int lvlState(Game *game)
 	//printf("lvlState()\n");
 	if (gameState(game) != 5)
 		return -1;
+	int rMissiles = 0;
+	int rCities   = 0;
 	//TODO: Attach to correct struct variables
-	int rMissiles = 15;
-	int rCities   = 5;
+	Shape *c;
+	for (int i = 0; i < CITYNUM; i++) {
+		c = &game->structures.city[i];
+		if (c[i].alive) {
+			rCities++;
+			game->lvl.aCities = rCities;
+		}
+	}
 	//Check for Game Over
 	if (rCities == 0 && rMissiles == 0) {
 		//Set state to some unused value
@@ -404,12 +387,14 @@ void resetLevelEnd(Game *game)
 {
     game->lvl.diff = 0;
     game->lvl.cReset = true;
+    game->lvl.explMax = false;
     game->lvl.gtime = 0.0;
     game->lvl.rCount = 0.0;
     game->lvl.cCount = 0.0;
     game->lvl.start = 0;
     game->lvl.end = 0;
     game->lvl.timer = 0.0;
+    game->lvl.alpha = 1.0;
     game->lvl.mDone = 1;
     game->lvl.alertPlayed = 0;
 }
@@ -422,7 +407,7 @@ void levelEnd(Game *game)
     double delay = game->lvl.delay;
 	float timer = game->lvl.timer;
 	int rCount = game->lvl.rCount, rMissiles = 10;
-	int cCount = game->lvl.cCount, rCities = 5;
+	int cCount = game->lvl.cCount, rCities = game->lvl.aCities;
     double diff = game->lvl.diff;
     double m_delay = game->lvl.m_delay;
     double c_delay = game->lvl.c_delay;
@@ -438,7 +423,6 @@ void levelEnd(Game *game)
 		//printf("Clock Reset\n");
 		time(&start);
 		timer = 0.0;
-		//t = clock();
 		clockReset = false;
 	}
 	//Calculate Score
@@ -452,10 +436,7 @@ void levelEnd(Game *game)
 				renderBackground(starsTexture);
 				renderStruc(game);
 				renderBonusA(game, rCount, cCount, type);
-				//Draw Text/Missile Images
-				//Increment Score
 				timer = 0.0;
-				//t = clock();
 			}
 		} else if (cCount != rCities) {
 			game->lvl.mDone = 0;
@@ -467,8 +448,6 @@ void levelEnd(Game *game)
 				renderBackground(starsTexture);
 				renderStruc(game);
 				renderBonusA(game, rCount, cCount, type);
-				//Draw Text/Missile Images
-				//Increment Score
 				timer = 0.0;
 			}
 		} else {
@@ -479,7 +458,6 @@ void levelEnd(Game *game)
 				//renderRadar(game);
 				renderNewLevelMsg(game);
 				renderScores(game);
-				//a->playAudio(39);
 				game->lvl.alertPlayed = 1;
 			}
 		}
@@ -500,6 +478,90 @@ void levelEnd(Game *game)
 		game->lvl.cReset = clockReset;
 		game->lvl.timer = timer;
 	}
+}
+
+void gameOver(Game *game)
+{
+	//resetLevelEnd(game);
+	time_t start = game->lvl.start;
+	time_t end   = game->lvl.end;
+	double counter = game->lvl.diff;
+	bool max = game->lvl.explMax;
+	Audio *a;
+	a = &game->sounds;
+
+	if (game->lvl.cReset) {
+		time(&start);
+		//a.playAudio(32);
+		counter = 1;
+		game->lvl.cReset = false;
+	}
+	//
+	if (counter > 325.0) {
+		game->lvl.mDone = 0;
+		game->lvl.explMax = 1;
+	}
+	if (game->lvl.mDone == 1)
+		counter += 1.55;
+	else
+		if (counter >= 0.0)
+			counter -= 0.75;
+	glClear(GL_COLOR_BUFFER_BIT);
+	if (max)
+		renderBackground(gameoverTexture);
+	renderGameOverExpl(game, counter);
+	time(&end);
+	if (difftime(end, start) > 10.0) {
+		//RESET level, score, cities, etc
+		printf("10 seconds have passed...\n");
+		resetLevelEnd(game);
+		game->gState = 1;
+		//highscore
+		//reset everything (score, levels, cities, etc...)
+		//render exit button?
+	} else {
+		//Store calculated data
+		game->lvl.start = start;
+		game->lvl.end = end;
+		game->lvl.diff = counter;
+	}
+
+}
+
+void renderGameOverExpl(Game *game, double n)
+{
+	//Draw
+	Shape *c;
+	bool max = game->lvl.explMax;
+	float alpha = game->lvl.alpha;
+	if (max) {
+		alpha -= 0.0045;
+		game->lvl.alpha = alpha;
+	}
+	glColor4f(1.0, 1.0, 1.0, alpha);
+	c = &game->endExplosion;
+	c->radius = 0;
+	c->radius += n;
+	printf("%f\n", c->radius);
+	c->center.x = WINDOW_WIDTH / 2;
+	c->center.y = WINDOW_HEIGHT / 2;
+	//Render
+	//clear
+	glPushMatrix();
+	glTranslatef(c->center.x, c->center.y, 0);
+	float r = c->radius;
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+	glBegin(GL_TRIANGLE_FAN);
+	for (int i = 0; i < 360; i++) {
+		float deg2rad = i * (3.14159/180);
+		glTexCoord2f(cos(deg2rad)*0.5+0.5, 5.0-sin(deg2rad));
+		glVertex3d(cos(deg2rad)*r, sin(deg2rad)*r, -0.5);
+	}
+	glEnd();
+	glPopMatrix();
+	glDisable(GL_BLEND);
+	printf("State: %d\n", game->gState);
 }
 
 void renderBonusA(Game *game, int rCount, int cCount, bool type)

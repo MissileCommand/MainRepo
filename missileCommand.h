@@ -172,26 +172,28 @@ class Audio
 struct levelInfo {    
     time_t start, end;
     clock_t gtime;
-    float timer;
+    float timer, alpha;
     int rCount, cCount, mDone, alertPlayed;
     double diff;
-    bool cReset;
+    bool cReset, explMax;
     //Time to stay in function by seconds
     double delay;
     //How fast missiles and cities are tallied
     double m_delay;
     double c_delay;
+    int aCities;
     levelInfo() {
         delay = 5.0;
         m_delay = 0.7;
         c_delay = 2.0;
         diff = 0;
-        cReset = true;
+        cReset = true, explMax = false;
         gtime = 0.0;
         rCount = 0.0;
         cCount = 0.0;
         start = 0, end = 0;
         timer = 0.0;
+        alpha = 1.0;
         mDone = 1;
         alertPlayed = 0;
     }
@@ -235,7 +237,7 @@ struct Game {
     Shape menuBG;
     Shape BonusA[10];
     Shape BonusB[5];
-    Shape gameOver;
+    Shape endExplosion;
     Audio sounds;
     levelInfo lvl;
 
