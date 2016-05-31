@@ -57,7 +57,7 @@ void nukeEmAll (Game *game);
 // JR Prototypes
 void render_menu(Game *game);
 void render_settings(Game *game);
-void render_lvlbreak(Game *game); 
+void render_newgame(Game *game); 
 
 void render(Game *game);
 
@@ -106,6 +106,8 @@ int main(void)
 			render_menu(&game);
 		} else if (state == 2) {
 			render_settings(&game);
+		} else if (state == 3) {
+			render_newgame(&game);
 		} else {
 			if (lvlState(&game) < 0) {
 				movement(&game);
@@ -386,11 +388,11 @@ void render_settings(Game *game)
 	renderSettingsText(game);
 }
 
-void render_lvlbreak(Game *game)
+void render_newgame(Game *game)
 {
-	if (lvlState(game) < 0)
-		return;
-	printf("Greater than 0\n");
+	renderBackground(starsTexture);
+	renderStruc(game);
+	renderNewLevelMsg(game);
 
 }
 

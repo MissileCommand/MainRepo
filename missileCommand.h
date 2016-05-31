@@ -222,10 +222,12 @@ struct Game {
     //JR:
     int buttonSpacer[BUTTONS];
     int mouseOnButton[T_BUTTONS];
-    int menuExit, gState, inGame, vVolume;
+    int menuExit, gState, inGame, vVolume, gStart;
     Shape mButton[BUTTONS];
     Shape sButton[BUTTONS_S];
     Shape menuBG;
+    Shape BonusA[10];
+    Shape BonusB[5];
     Audio sounds;
     levelInfo lvl;
 
@@ -246,6 +248,7 @@ struct Game {
 
         menuExit = 0;
         gState = 1;
+        gStart = 1;
         inGame = 0;
         vVolume = 100;
         for (int i=0;i<BUTTONS;i++) {
