@@ -198,7 +198,6 @@ struct levelInfo {
 };
 
 struct Game {
-    //global variable for level 5-17-16 -DT
     int level;
     
     //global variable for score 5-25-16 -JG
