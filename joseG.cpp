@@ -30,10 +30,10 @@ void initStruc(Game *game)
 	//city shape
 	for (int i=0; i < CITYNUM; i++) {
 		shape->city[i].alive = 1;
-		shape->city[i].width = 30;
-		shape->city[i].height = 50;
-		shape->city[i].center.x = 225 + i*130;
-		shape->city[i].center.y = 100;
+		shape->city[i].width = 60;
+		shape->city[i].height = 30;
+		shape->city[i].center.x = 100 + i*200;
+		shape->city[i].center.y = 80;
 	}
 }
 
