@@ -87,7 +87,13 @@ struct DefenseMissile {
 struct Structures {
     Shape floor;
     Shape city[CITYNUM];
-}; 
+};
+
+struct Particle {
+	Shape part;
+	Vec velocity;
+	Vec pos;
+};
 
 struct EMTrail {
     Vec start;
@@ -231,6 +237,10 @@ struct Game {
     Audio sounds;
     levelInfo lvl;
 
+	//JG
+	Particle particle[MAX_PARTICLES];
+	int nparticles;
+	
     Structures structures;
 
     //Constructor 
