@@ -47,6 +47,7 @@
 #define WINDOW_WIDTH  1024
 #define WINDOW_HEIGHT 768
 #define MAX_D_MISSILES 100
+#define MAX_PARTICLES 100
 #define GRAVITY 0.1
 
 //X Windows variables
@@ -87,7 +88,13 @@ struct DefenseMissile {
 struct Structures {
     Shape floor;
     Shape city[CITYNUM];
-}; 
+};
+
+struct Particle {
+	Shape part;
+	Vec velocity;
+	Vec pos;
+};
 
 struct EMTrail {
     Vec start;
@@ -232,6 +239,10 @@ struct Game {
     Audio sounds;
     levelInfo lvl;
 
+	//JG
+	Particle particle[MAX_PARTICLES];
+	int nparticles;
+	
     Structures structures;
 
     //Constructor 
