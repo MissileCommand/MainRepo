@@ -93,29 +93,30 @@ int main(void)
 	game.sounds.loadAudio();
 	//start animation
 	while (!done) {
+		int state = gameState(&game);
 		while (XPending(dpy)) {
 			XEvent e;
 			XNextEvent(dpy, &e);
-			if (lvlState(&game) < 0) {
-				check_mouse(&e, &game);
-				done = check_keys(&e, &game);
-			}
+			check_mouse(&e, &game);
+			done = check_keys(&e, &game);
 		}
-		int state = gameState(&game);
 		if (state == 1) {
 			render_menu(&game);
 		} else if (state == 2) {
 			render_settings(&game);
 		} else if (state == 3) {
 			render_newgame(&game);
-		} else {
+		} else if (state == 0 || state == 5) {
 			if (lvlState(&game) < 0) {
 				movement(&game);
 				render(&game);
-			} else {
-				//level-to-level code
+			} 
+			if (lvlState(&game) == 1) {
 				levelEnd(&game);
 			}
+		} else {
+			printf("Game Over!\n");
+			//renderGameOver(&game);
 		}
 		glXSwapBuffers(dpy, win);
 	}

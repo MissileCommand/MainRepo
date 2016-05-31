@@ -228,6 +228,7 @@ struct Game {
     Shape menuBG;
     Shape BonusA[10];
     Shape BonusB[5];
+    Shape gameOver;
     Audio sounds;
     levelInfo lvl;
 

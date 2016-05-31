@@ -202,6 +202,32 @@ void drawMenu(Game *game)
 	}
 }
 
+void renderGameOver(Game *game)
+{
+	Audio *a;
+	a = &game->sounds;
+	//a.playAudio(32);
+	//Draw
+	Shape *c;
+	c = &game->gameOver;
+	c->radius = 50;
+	c->center.x = WINDOW_WIDTH / 2;
+	c->center.y = WINDOW_HEIGHT / 2;
+	//Render
+	//clear
+	glPushMatrix();
+	glTranslatef(c->center.x, c->center.y, 0);
+	float r = c->radius;
+	glBegin(GL_TRIANGLE_FAN);
+	for (int i = 0; i < 360; i++) {
+		float deg2rad = i * (3.14159/180);
+		glVertex2d(cos(deg2rad)*r, sin(deg2rad)*r);
+	}
+	glEnd();
+	glPopMatrix();
+	printf("State: %d\n", game->gState);
+}
+
 void renderMenuObjects(Game *game)
 {
 	Shape *s;
@@ -362,14 +388,14 @@ int lvlState(Game *game)
 	if (gameState(game) != 5)
 		return -1;
 	//TODO: Attach to correct struct variables
-	int rMissiles = 10;
-	int rCities = 5;
+	int rMissiles = 15;
+	int rCities   = 5;
 	//Check for Game Over
 	if (rCities == 0 && rMissiles == 0) {
 		//Set state to some unused value
-		game->gState = 10;
-		//gameOver(game);
-		return 5;
+		game->gState = 99;
+		//renderGameOver(game);
+		return 2;
 	}
 	return 1;
 }
@@ -628,9 +654,11 @@ void menuClick(Game *game)
 {
 	if (gameState(game) == 1) {
 		//Play Button (2)
-		if (game->mouseOnButton[2] == 1) {
+		if (game->mouseOnButton[2] == 1 && game->inGame == 0) {
 			game->gState = 3;
 			game->inGame = 1;
+		} else if (game->mouseOnButton[2] == 1 && game->inGame == 1) {
+			game->gState = 0;
 		}
 		//Settings Button (1)
 		if (game->mouseOnButton[1] == 1) {
