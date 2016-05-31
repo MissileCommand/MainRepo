@@ -532,19 +532,19 @@ void renderBonusA(Game *game, int rCount, int cCount, bool type)
 		w = s->width;
 		h = s->height;
 		//Attach texture
-		glBindTexture(GL_TEXTURE_2D, cityTexture);
+		//glBindTexture(GL_TEXTURE_2D, cityTexture);
 		//For transparency
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+		//glEnable(GL_BLEND);
+		//glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 		glBegin(GL_QUADS);
 			glVertex2i(-w,-h);
 			glVertex2i(-w, h);
 			glVertex2i( w, h);
 			glVertex2i( w,-h);
 		glEnd();
-		glDisable(GL_BLEND);
+		//glDisable(GL_BLEND);
 		glPopMatrix();
-		glBindTexture(GL_TEXTURE_2D, 0);
+		//glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	//Cities
 	if (type) {
@@ -570,19 +570,19 @@ void renderBonusA(Game *game, int rCount, int cCount, bool type)
 			w = s->width;
 			h = s->height;
 			//Attach texture
-			glBindTexture(GL_TEXTURE_2D, cityTexture);
+			//glBindTexture(GL_TEXTURE_2D, cityTexture);
 			//For transparency
-			glEnable(GL_BLEND);
-			glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+			//glEnable(GL_BLEND);
+			//glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 			glBegin(GL_QUADS);
 				glVertex2i(-w,-h);
 				glVertex2i(-w, h);
 				glVertex2i( w, h);
 				glVertex2i( w,-h);
 			glEnd();
-			glDisable(GL_BLEND);
+			//glDisable(GL_BLEND);
 			glPopMatrix();
-			glBindTexture(GL_TEXTURE_2D, 0);
+			//glBindTexture(GL_TEXTURE_2D, 0);
 		}
 	}
 }
