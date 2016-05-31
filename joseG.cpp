@@ -41,7 +41,7 @@ void destroyCity(Game *game, int citynum)
 {
 	Shape *dcity = &game->structures.city[citynum];
 	dcity->alive = 0;
-	makeCivilian(game,dcity->width,dcity->height);
+	makeCivilian(game,dcity->center.x,dcity->center.y);
 	return;
 }
 
@@ -74,7 +74,7 @@ void renderStruc(Game *game)
 	Shape *c;
 	for (int i = 0; i < CITYNUM; i++) {
 		c = &shape->city[i];
-		if (c[i].alive) {
+		if (c->alive==1) {
 		glColor3f(1.0, 1.0, 1.0);
 		glPushMatrix();
 		glTranslatef(c->center.x, c->center.y, 0);
@@ -127,8 +127,8 @@ void makeCivilian(Game *game, int x, int y)
 	Particle *p = &game->particle[game->nparticles];
 	p->part.center.x = x;
 	p->part.center.y = y;
-	p->velocity.y = -4.0;
-	p->velocity.x =  0.5;
+	p->velocity.y = 0.05;
+	p->velocity.x = 0.5;
 	game->nparticles++;
 }
 
@@ -154,7 +154,7 @@ void civilianPhysics(Game *game)
 	}
 
 	//check for off-screen
-	if (p->part.center.y < 0.0) {
+	if (p->part.center.y < 0.0 || p->part.center.x > WINDOW_WIDTH) {
 			//std::cout << "off screen" << std::endl;
 			game->particle[i] = game->particle[game->nparticles-1];
 			game->nparticles--;
