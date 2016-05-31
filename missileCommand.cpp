@@ -63,6 +63,8 @@ void render(Game *game);
 
 Ppmimage *cityImage=NULL;
 Ppmimage *starsImage=NULL;
+Ppmimage *streetImage=NULL;
+Ppmimage *civilianImage=NULL;
 GLuint starsTexture;
 
 int main(void)
@@ -74,6 +76,10 @@ int main(void)
 	//declare game object
 	Game game;
 
+	game.numberDefenseMissiles=0;
+	
+	//JG
+	game.nparticles=MAX_PARTICLES;
 	game.numberDefenseMissiles=0;
 
 	// JBC 5/19/16
@@ -123,39 +129,6 @@ int main(void)
 	cleanupXWindows();
 	return 0;
 }
-
-unsigned char *buildAlphaData(Ppmimage *img)
-{
-	//add 4th component to RGB stream...
-	int i;
-	int a,b,c;
-	unsigned char *newdata, *ptr;
-	unsigned char *data = (unsigned char *)img->data;
-	newdata = (unsigned char *)malloc(img->width * img->height * 4);
-	ptr = newdata;
-	for (i=0; i<img->width * img->height * 3; i+=3) {
-		a = *(data+0);
-		b = *(data+1);
-		c = *(data+2);
-		*(ptr+0) = a;
-		*(ptr+1) = b;
-		*(ptr+2) = c;
-		//get largest color component...
-		//*(ptr+3) = (unsigned char)((
-		//              (int)*(ptr+0) +
-		//              (int)*(ptr+1) +
-		//              (int)*(ptr+2)) / 3);
-		//d = a;
-		//if (b >= a && b >= c) d = b;
-		//if (c >= a && c >= b) d = c;
-		//*(ptr+3) = d;
-		*(ptr+3) = (a|b|c);
-		ptr += 4;
-		data += 3;
-	}
-	return newdata;
-}
-
 
 void set_title(void)
 {
@@ -221,39 +194,30 @@ void init_opengl(void)
 	//Initialize Fonts
 	glEnable(GL_TEXTURE_2D);
 	initialize_fonts();
+	//system convert
+	system("convert ./images/city.png ./images/city.ppm");
+	system("convert ./images/street.jpg ./images/street.ppm");
+	system("convert ./images/stars.png ./images/stars.ppm");
+	system("convert ./images/civilian.jpg ./images/civilian.ppm");
 	//load images into a ppm structure
 	cityImage = ppm6GetImage("./images/city.ppm");
 	starsImage = ppm6GetImage("./images/stars.ppm");
+	streetImage = ppm6GetImage("./images/street.ppm");
+	civilianImage = ppm6GetImage("./images/civilian.ppm");
 	//create opengl texture elements
-	//forest
-	glGenTextures(1, &starsTexture);
-	glBindTexture(GL_TEXTURE_2D, starsTexture);
-	//
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, 3, starsImage->width, starsImage->height,
-			0, GL_RGB, GL_UNSIGNED_BYTE, starsImage->data);
-	//
-	//FOR TEXTURES WITH TRANSPARENT BACKGROUNDS
-	//=========================================
-	glGenTextures(1, &cityTexture);
-	int w = cityImage->width;
-	int h = cityImage->height;
-	glBindTexture(GL_TEXTURE_2D, cityTexture);
-	glTexImage2D(GL_TEXTURE_2D, 0, 3, w, h, 0,
-			GL_RGB, GL_UNSIGNED_BYTE, cityImage->data);
-	//Create Transparent Background
-	GLuint silhouetteTexture;
-	glGenTextures(1, &silhouetteTexture);
-	glBindTexture(GL_TEXTURE_2D, silhouetteTexture);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-	unsigned char *silhouetteData = buildAlphaData(cityImage);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0,
-			GL_RGBA, GL_UNSIGNED_BYTE, silhouetteData);
-	//Set data to original texture
-	cityTexture = silhouetteTexture;
-	delete [] silhouetteData;
+	//stars
+	starsTexture = makeTexture(starsTexture, starsImage);
+	//street
+	streetTexture = makeTexture(streetTexture, streetImage);
+	//city
+	cityTexture = makeTransparentTexture(cityTexture, cityImage);
+	//civilian
+	civilianTexture = makeTransparentTexture(civilianTexture, civilianImage);
+
+	remove("./images/city.ppm");
+	remove("./images/stars.ppm");
+	remove("./images/street.ppm");
+	remove("./images/civilian.ppm");
 }
 
 
@@ -374,6 +338,7 @@ void movement(Game *game)
 	eMissilePhysics(game);
 	//dMissilePhysics(game);
 	eExplosionPhysics(game);
+	civilianPhysics(game);
 }
 
 void render_menu(Game *game)

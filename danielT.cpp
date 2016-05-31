@@ -155,6 +155,7 @@ void eMissilePhysics(Game *game)
 		    e->pos.x <= c->center.x+c->width && 
 		    e->pos.x >= c->center.x-c->width) {
 		destroyCity(game, k);
+		makeCivilian(game,c->width,c->height);
 		eMissileExplode(game, i);
 		a->playAudio(10);
 		chCount++;
@@ -170,6 +171,7 @@ void eMissilePhysics(Game *game)
 	//check for collision with floor
 	c = &sh->floor;
 	if (e->pos.y <= c->center.y+c->height) {
+		makeCivilian(game,c->width,c->height);
 	    eMissileExplode(game, i);
 	    a->playAudio(0);
 	    continue;
@@ -183,6 +185,7 @@ void eMissilePhysics(Game *game)
 	    float yd = abs(e->pos.y-d->pos.y);
 	    float dist = sqrt(xd*xd+yd*yd);
 	    if (dist<=d->radius) {
+	    	makeCivilian(game,c->width,c->height);
 		eMissileExplode(game,i);
 		a->playAudio(0);
 		game->score += 100;
