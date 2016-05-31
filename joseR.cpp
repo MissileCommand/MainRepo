@@ -28,6 +28,10 @@
 //			Finalized audio code (still need in-line comments)
 //			Added settings menu (adjust volume for now)
 //			Can call sounds via game->sounds.playAudio(int);
+//		*May 29th, 2016*
+//			Finalized level-to-level code, still need to correctly
+//				setup missile and cities alive count.
+//			Starting on Game Over screen and High Scores?
 //			
 #include <GL/glx.h>
 #include "missileCommand.h"

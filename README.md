@@ -24,6 +24,7 @@ JR ToDo's:
 - [x] Level Endings
 - [ ] Integrate with Score and Cities
 - [ ] Game Over screen
+- [ ] High Scores?
 
 --------------------------------------------
 JG ToDo's: 
