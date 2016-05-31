@@ -21,7 +21,8 @@ DT ToDo's:
 
 --------------------------------------------
 JR ToDo's: 
-- [ ] Level Endings
+- [x] Level Endings
+- [ ] Integrate with Score and Cities
 - [ ] Game Over screen
 
 --------------------------------------------
