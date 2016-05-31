@@ -54,10 +54,17 @@ void renderDefenseMissile(Game *game);
 void makeDefenseMissile(Game *game, int x, int y);
 void nukeEmAll (Game *game);
 
+// JR Prototypes
+void render_menu(Game *game);
+void render_settings(Game *game);
+void render_newgame(Game *game); 
+
 void render(Game *game);
 
 Ppmimage *cityImage=NULL;
 Ppmimage *starsImage=NULL;
+Ppmimage *streetImage=NULL;
+Ppmimage *civilianImage=NULL;
 GLuint starsTexture;
 
 int main(void)
@@ -69,6 +76,10 @@ int main(void)
 	//declare game object
 	Game game;
 
+	game.numberDefenseMissiles=0;
+	
+	//JG
+	game.nparticles=MAX_PARTICLES;
 	game.numberDefenseMissiles=0;
 
 	// JBC 5/19/16
@@ -88,65 +99,36 @@ int main(void)
 	game.sounds.loadAudio();
 	//start animation
 	while (!done) {
+		int state = gameState(&game);
 		while (XPending(dpy)) {
 			XEvent e;
 			XNextEvent(dpy, &e);
 			check_mouse(&e, &game);
 			done = check_keys(&e, &game);
 		}
-		int state = gameState(&game);
 		if (state == 1) {
-			renderBackground(starsTexture);
-			renderMenuObjects(&game);
-			renderMenuText(&game);
+			render_menu(&game);
 		} else if (state == 2) {
-			renderBackground(starsTexture);
-			renderSettings(&game);
-			renderSettingsText(&game);
+			render_settings(&game);
+		} else if (state == 3) {
+			render_newgame(&game);
+		} else if (state == 0 || state == 5) {
+			if (lvlState(&game) < 0) {
+				movement(&game);
+				render(&game);
+			} 
+			if (lvlState(&game) == 1) {
+				levelEnd(&game);
+			}
 		} else {
-			movement(&game);
-			render(&game);
-			//moved to render func 5-25 -DT
-			//renderStruc(&sh);
+			printf("Game Over!\n");
+			//renderGameOver(&game);
 		}
 		glXSwapBuffers(dpy, win);
 	}
 	cleanupXWindows();
 	return 0;
 }
-
-unsigned char *buildAlphaData(Ppmimage *img)
-{
-	//add 4th component to RGB stream...
-	int i;
-	int a,b,c;
-	unsigned char *newdata, *ptr;
-	unsigned char *data = (unsigned char *)img->data;
-	newdata = (unsigned char *)malloc(img->width * img->height * 4);
-	ptr = newdata;
-	for (i=0; i<img->width * img->height * 3; i+=3) {
-		a = *(data+0);
-		b = *(data+1);
-		c = *(data+2);
-		*(ptr+0) = a;
-		*(ptr+1) = b;
-		*(ptr+2) = c;
-		//get largest color component...
-		//*(ptr+3) = (unsigned char)((
-		//              (int)*(ptr+0) +
-		//              (int)*(ptr+1) +
-		//              (int)*(ptr+2)) / 3);
-		//d = a;
-		//if (b >= a && b >= c) d = b;
-		//if (c >= a && c >= b) d = c;
-		//*(ptr+3) = d;
-		*(ptr+3) = (a|b|c);
-		ptr += 4;
-		data += 3;
-	}
-	return newdata;
-}
-
 
 void set_title(void)
 {
@@ -212,32 +194,30 @@ void init_opengl(void)
 	//Initialize Fonts
 	glEnable(GL_TEXTURE_2D);
 	initialize_fonts();
+	//system convert
+	system("convert ./images/city.png ./images/city.ppm");
+	system("convert ./images/street.jpg ./images/street.ppm");
+	system("convert ./images/stars.png ./images/stars.ppm");
+	system("convert ./images/civilian.jpg ./images/civilian.ppm");
 	//load images into a ppm structure
 	cityImage = ppm6GetImage("./images/city.ppm");
 	starsImage = ppm6GetImage("./images/stars.ppm");
+	streetImage = ppm6GetImage("./images/street.ppm");
+	civilianImage = ppm6GetImage("./images/civilian.ppm");
 	//create opengl texture elements
-	//forest
-	glGenTextures(1, &starsTexture);
-	glBindTexture(GL_TEXTURE_2D, starsTexture);
-	//
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
-	glTexImage2D(GL_TEXTURE_2D, 0, 3, starsImage->width, starsImage->height,
-			0, GL_RGB, GL_UNSIGNED_BYTE, starsImage->data);
-	//
-	glGenTextures(1, &cityTexture);
-	int w = cityImage->width;
-	int h = cityImage->height;
+	//stars
+	starsTexture = makeTexture(starsTexture, starsImage);
+	//street
+	streetTexture = makeTexture(streetTexture, streetImage);
 	//city
-	//
-	glBindTexture(GL_TEXTURE_2D, cityTexture);
-	//
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	unsigned char *cityData = buildAlphaData(cityImage);
-	glTexImage2D(GL_TEXTURE_2D, 0, 3, w, h, 0,
-			GL_RGB, GL_UNSIGNED_BYTE, cityImage->data);
-	free(cityData);
+	cityTexture = makeTransparentTexture(cityTexture, cityImage);
+	//civilian
+	civilianTexture = makeTransparentTexture(civilianTexture, civilianImage);
+
+	remove("./images/city.ppm");
+	remove("./images/stars.ppm");
+	remove("./images/street.ppm");
+	remove("./images/civilian.ppm");
 }
 
 
@@ -253,7 +233,7 @@ void check_mouse(XEvent *e, Game *game)
 	if (e->type == ButtonRelease) {
 		return;
 	}
-	if (e->type == ButtonPress) {
+	if (e->type == ButtonPress && lvlState(game) < 0) {
 		//LEFT-CLICK
 		if (e->xbutton.button==1) {
 			//Left button was pressed
@@ -263,13 +243,14 @@ void check_mouse(XEvent *e, Game *game)
 				a->playAudio(30);
 				menuClick(game);
 				a->playAudio(32);
-			} else {
-				// changeTitle();
-				makeDefenseMissile(game, e->xbutton.x, y);
-				a->playAudio(20);
-				// JBC note 5/13
-				// moved the "particle" stuff out of here 
-				// makeParticle(game, e->xbutton.x, y);
+			} else if (gameState(game) == 0) {
+				// JBC Added 5/30 to only make defense 
+                // missiles and play sound when enemy 
+                // missiles are present
+				if (game->nmissiles > 0) {
+					makeDefenseMissile(game, e->xbutton.x, y);
+					a->playAudio(20);
+				}
 			}
 			return;
 		}
@@ -357,7 +338,28 @@ void movement(Game *game)
 	eMissilePhysics(game);
 	//dMissilePhysics(game);
 	eExplosionPhysics(game);
+	civilianPhysics(game);
+}
 
+void render_menu(Game *game)
+{
+	renderBackground(starsTexture);
+	renderMenuObjects(game);
+	renderMenuText(game);
+}
+
+void render_settings(Game *game)
+{
+	renderBackground(starsTexture);
+	renderSettings(game);
+	renderSettingsText(game);
+}
+
+void render_newgame(Game *game)
+{
+	renderBackground(starsTexture);
+	renderStruc(game);
+	renderNewLevelMsg(game);
 
 }
 
@@ -373,7 +375,7 @@ void render(Game *game)
 	//		createEMissiles(game);
 	//	}
 	renderBackground(starsTexture);
-	endLevel(game);
+	//endLevel(game);
 	renderRadar(game);
 	renderEMissiles(game);
 	renderEExplosions(game);

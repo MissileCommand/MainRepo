@@ -8,6 +8,7 @@ JBC ToDo's:
 - [ ] Pics of missiles in Silos  
 - [ ] Detection of Silo destruction  
 - [ ] Maybe Flashing "X" (crosshairs)  
+- [ ] make count components global in game struct
 
 --------------------------------------------
 DT ToDo's: 
@@ -20,8 +21,10 @@ DT ToDo's:
 
 --------------------------------------------
 JR ToDo's: 
-- [ ] Level Endings
+- [x] Level Endings
+- [ ] Integrate with Score and Cities
 - [ ] Game Over screen
+- [ ] High Scores?
 
 --------------------------------------------
 JG ToDo's: 
