@@ -8,11 +8,16 @@ JBC ToDo's:
 - [ ] Pics of missiles in Silos  
 - [ ] Detection of Silo destruction  
 - [ ] Maybe Flashing "X" (crosshairs)  
+- [ ] make count components global in game struct
 
 --------------------------------------------
 DT ToDo's: 
 - [ ] Help the rest of us since he codes too damn fast :-)
 - [ ] City count after destruction (maybe via JG's code)
+- [ ] Missile spawn from UFOs
+- [ ] Smart Missile
+- [ ] Possible texture on missiles
+- [ ] make count componets global in game struct
 
 --------------------------------------------
 JR ToDo's: 

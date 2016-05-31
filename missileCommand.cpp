@@ -54,6 +54,11 @@ void renderDefenseMissile(Game *game);
 void makeDefenseMissile(Game *game, int x, int y);
 void nukeEmAll (Game *game);
 
+// JR Prototypes
+void render_menu(Game *game);
+void render_settings(Game *game);
+void render_newgame(Game *game); 
+
 void render(Game *game);
 
 Ppmimage *cityImage=NULL;
@@ -91,23 +96,26 @@ int main(void)
 		while (XPending(dpy)) {
 			XEvent e;
 			XNextEvent(dpy, &e);
-			check_mouse(&e, &game);
-			done = check_keys(&e, &game);
+			if (lvlState(&game) < 0) {
+				check_mouse(&e, &game);
+				done = check_keys(&e, &game);
+			}
 		}
 		int state = gameState(&game);
 		if (state == 1) {
-			renderBackground(starsTexture);
-			renderMenuObjects(&game);
-			renderMenuText(&game);
+			render_menu(&game);
 		} else if (state == 2) {
-			renderBackground(starsTexture);
-			renderSettings(&game);
-			renderSettingsText(&game);
+			render_settings(&game);
+		} else if (state == 3) {
+			render_newgame(&game);
 		} else {
-			movement(&game);
-			render(&game);
-			//moved to render func 5-25 -DT
-			//renderStruc(&sh);
+			if (lvlState(&game) < 0) {
+				movement(&game);
+				render(&game);
+			} else {
+				//level-to-level code
+				levelEnd(&game);
+			}
 		}
 		glXSwapBuffers(dpy, win);
 	}
@@ -225,19 +233,26 @@ void init_opengl(void)
 	glTexImage2D(GL_TEXTURE_2D, 0, 3, starsImage->width, starsImage->height,
 			0, GL_RGB, GL_UNSIGNED_BYTE, starsImage->data);
 	//
+	//FOR TEXTURES WITH TRANSPARENT BACKGROUNDS
+	//=========================================
 	glGenTextures(1, &cityTexture);
 	int w = cityImage->width;
 	int h = cityImage->height;
-	//city
-	//
 	glBindTexture(GL_TEXTURE_2D, cityTexture);
-	//
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-	unsigned char *cityData = buildAlphaData(cityImage);
 	glTexImage2D(GL_TEXTURE_2D, 0, 3, w, h, 0,
 			GL_RGB, GL_UNSIGNED_BYTE, cityImage->data);
-	free(cityData);
+	//Create Transparent Background
+	GLuint silhouetteTexture;
+	glGenTextures(1, &silhouetteTexture);
+	glBindTexture(GL_TEXTURE_2D, silhouetteTexture);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_NEAREST);
+	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_NEAREST);
+	unsigned char *silhouetteData = buildAlphaData(cityImage);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0,
+			GL_RGBA, GL_UNSIGNED_BYTE, silhouetteData);
+	//Set data to original texture
+	cityTexture = silhouetteTexture;
+	delete [] silhouetteData;
 }
 
 
@@ -253,7 +268,7 @@ void check_mouse(XEvent *e, Game *game)
 	if (e->type == ButtonRelease) {
 		return;
 	}
-	if (e->type == ButtonPress) {
+	if (e->type == ButtonPress && lvlState(game) < 0) {
 		//LEFT-CLICK
 		if (e->xbutton.button==1) {
 			//Left button was pressed
@@ -263,7 +278,7 @@ void check_mouse(XEvent *e, Game *game)
 				a->playAudio(30);
 				menuClick(game);
 				a->playAudio(32);
-			} else {
+			} else if (gameState(game) == 0) {
 				// changeTitle();
 				makeDefenseMissile(game, e->xbutton.x, y);
 				a->playAudio(20);
@@ -357,7 +372,27 @@ void movement(Game *game)
 	eMissilePhysics(game);
 	//dMissilePhysics(game);
 	eExplosionPhysics(game);
+}
 
+void render_menu(Game *game)
+{
+	renderBackground(starsTexture);
+	renderMenuObjects(game);
+	renderMenuText(game);
+}
+
+void render_settings(Game *game)
+{
+	renderBackground(starsTexture);
+	renderSettings(game);
+	renderSettingsText(game);
+}
+
+void render_newgame(Game *game)
+{
+	renderBackground(starsTexture);
+	renderStruc(game);
+	renderNewLevelMsg(game);
 
 }
 
@@ -373,11 +408,13 @@ void render(Game *game)
 	//		createEMissiles(game);
 	//	}
 	renderBackground(starsTexture);
-	endLevel(game);
+	//endLevel(game);
 	renderRadar(game);
 	renderEMissiles(game);
 	renderEExplosions(game);
 	renderDefenseMissile(game);
 	renderStruc(game);
+	renderScores(game);
+	renderSMissile(game);
 	// renderDefExplosions(game);
 }
