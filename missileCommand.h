@@ -208,6 +208,7 @@ struct levelInfo {
 
 struct Game {
     int level;
+    int prevLevel;
     
     //global variable for score 5-25-16 -JG
     int score;
@@ -264,6 +265,7 @@ struct Game {
     Game() {
         //DT
         level = 0;
+	prevLevel = 0;
         emarr = new EMissile[15];
         smarr = new SMissile[10];
         eearr = new EExplosion[1000];
