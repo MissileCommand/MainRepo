@@ -65,7 +65,12 @@ struct Shape {
     float radius;
     Vec center;
 };
-  
+
+struct UFO {
+	Vec pos;
+	Vec vel;
+};
+
 // JBC 05/08/16 JBC switched from DefenseMissile to dMissile/DefenseMissile
 //struct DefenseMissile {
 //  Shape s;
@@ -213,12 +218,14 @@ struct Game {
     //DT
     EMissile *emarr;                                  
     int nmissiles;
+    int mCount;
     EExplosion *eearr;
     int neexplosions;
     SMissile *smarr;
     int nsmissiles;
     Radar radar;
     int radarOn;
+    int highScores[5];
 
     // DefenseMissile section
     int numberDefenseMissiles;
@@ -248,6 +255,8 @@ struct Game {
 	//JG
 	Particle particle[MAX_PARTICLES];
 	int nparticles;
+	UFO ufo;
+	int ufoOn;
 	
     Structures structures;
 
@@ -260,10 +269,11 @@ struct Game {
         eearr = new EExplosion[1000];
         numberDefenseMissiles = 0;
         nmissiles = 0;
+	mCount = 0;
         neexplosions = 0;
         nsmissiles = 0;
         radarOn = 0;
-
+		ufoOn = 0;
         menuExit = 0;
         gState = 1;
         gStart = 1;

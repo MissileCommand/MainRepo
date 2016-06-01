@@ -82,23 +82,22 @@ GLuint dmissileTexture;
 
 void renderDefenseMissile(Game *game)
 {
-    extern int mCount;
          if (game->nmissiles == 0 && 
         game->defMissilesRemaining > 0 &&
-            mCount == 0) {
+            game->mCount == 0) {
             game->defMissilesRemainingAfterLevel = 
             game->defMissilesRemaining;
             cout << "nmissiles: " <<  game->nmissiles << 
                     "  defMissilesRemainingAfterLevel: " <<  game->defMissilesRemainingAfterLevel << 
-                    "  mCount: " <<  mCount <<
+                    "  mCount: " <<  game->mCount <<
                     endl;
          }
-    if (game->level * 10 == mCount ) {
+    if (5.0 + game->level*5.0 == game->mCount ) {
 
         game->defMissilesRemaining = game->level * 10 *1.5;
         // cout << "defMissiles left in IF: " << game->defMissilesRemaining << endl;
     }
-    if (game->level * 5 == mCount) {
+    if (game->level * 5 == game->mCount) {
         // cout << "mCount from JBC: " << mCount << endl;
     }
         // cout << "defMissiles left: " << game->defMissilesRemaining << endl;
@@ -114,10 +113,11 @@ void renderDefenseMissile(Game *game)
     ggprint8b(&r, 16, 0x00005599, "");
     ggprint8b(&r, 16, 0x00005599, "Keys Menu:");
     ggprint8b(&r, 16, 0x00005599, "-------------");
-    ggprint8b(&r, 16, 0x00005599, "'n' = Nuke'em");
-    ggprint8b(&r, 16, 0x00005599, "'m' = Menu");
-    ggprint8b(&r, 16, 0x00005599, "'r' = Radar");
-    ggprint8b(&r, 16, 0x00005599, "'z' = Quit");
+    ggprint8b(&r, 16, 0x00005599, "'N' = Nuke'em");
+    ggprint8b(&r, 16, 0x00005599, "'M' = Menu");
+    ggprint8b(&r, 16, 0x00005599, "'R' = Radar");
+    ggprint8b(&r, 16, 0x00005599, "'B' = UFO");
+    ggprint8b(&r, 16, 0x00005599, "'Z' = Quit");
     ggprint8b(&r, 16, 0x00005599, "'[esc]' = Quit");
     
 

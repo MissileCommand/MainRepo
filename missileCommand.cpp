@@ -71,7 +71,11 @@ Ppmimage *mainmenuImage=NULL;
 Ppmimage *emissileImage=NULL;
 Ppmimage *dmissileImage=NULL;
 Ppmimage *dcityImage=NULL;
+<<<<<<< HEAD
 Ppmimage *c_cityImage=NULL;
+=======
+Ppmimage *ufoImage=NULL;
+>>>>>>> refs/remotes/origin/master
 GLuint starsTexture;
 
 int main(void)
@@ -100,6 +104,8 @@ int main(void)
 	//Changed call for function prototype 5-17-16 -DT
 	createEMissiles(&game, 0, 0);
 	initRadar(&game);
+	initUFO(&game);
+	initHighScores(&game);
 	//JR - Menu Object Shapes and Locations
 	drawMenu(&game);
 	drawSettings(&game);
@@ -128,6 +134,7 @@ int main(void)
 				levelEnd(&game);
 			}
 		} else {
+		    	addHighScore(&game);
 			render_gameover(&game);
 		}
 		glXSwapBuffers(dpy, win);
@@ -210,6 +217,7 @@ void init_opengl(void)
 	system("convert ./images/dcity.png ./images/dcity.ppm");
 	system("convert ./images/emissile.png ./images/emissile.ppm");
 	system("convert ./images/dmissile.png ./images/dmissile.ppm");
+	system("convert ./images/ufo.png ./images/ufo.ppm");
 	system("convert ./images/c_city.png ./images/c_city.ppm");
 	//system("convert ./images/c_bomber.png ./images/c_bomber.ppm");
 	//system("convert ./images/c_satellite.png ./images/c_satellite.ppm");
@@ -225,6 +233,7 @@ void init_opengl(void)
 	dcityImage = ppm6GetImage("./images/dcity.ppm");
 	emissileImage = ppm6GetImage("./images/emissile.ppm");
 	dmissileImage = ppm6GetImage("./images/dmissile.ppm");
+	ufoImage = ppm6GetImage("./images/ufo.ppm");
 	//classic images
 	c_cityImage = ppm6GetImage("./images/c_city.ppm");
 	//create opengl texture elements
@@ -242,6 +251,8 @@ void init_opengl(void)
 	emissileTexture = makeTransparentTexture(cityTexture, emissileImage);
 	//dmissile
 	dmissileTexture = makeTransparentTexture(cityTexture, dmissileImage);
+	//ufo
+	ufoTexture = makeTransparentTexture(cityTexture, ufoImage);
 	//Others
 	gameoverTexture = makeTransparentTexture(gameoverTexture, gameoverImage);
 	mainmenuTexture = makeTexture(mainmenuTexture, mainmenuImage);
@@ -259,6 +270,7 @@ void init_opengl(void)
 	remove("./images/emissile.ppm");
 	remove("./images/dmissile.ppm");
 	remove("./images/c_city.ppm");
+	remove("./images/ufo.ppm");
 }
 
 
@@ -288,8 +300,9 @@ void check_mouse(XEvent *e, Game *game)
                 // JBC Added 5/30 to only make defense 
                 // missiles and play sound when enemy 
                 // missiles are present
-                if (game->nmissiles > 0 && 
-                    game->defMissilesRemaining > 0) {
+                if ((game->nmissiles > 0 ||
+		       game->nsmissiles > 0) &&
+			game->defMissilesRemaining > 0) {
                         makeDefenseMissile(game, e->xbutton.x, y);
                         a->playAudio(20);
                     	game->defMissilesRemainingAfterLevel = 
@@ -362,6 +375,12 @@ int check_keys(XEvent *e, Game *game)
 			game->radarOn ^= 1;
 		}
 
+		//JG: ufo
+		if (key == XK_b) {
+			game->ufoOn ^= 1;
+			initUFO(game);
+		}
+		
 		//You may check other keys here.
 	}
 	//JR: Check if exit button was clicked
@@ -380,9 +399,11 @@ void movement(Game *game)
 {    
 	radarPhysics(game);
 	eMissilePhysics(game);
+	sMissilePhysics(game);
 	//dMissilePhysics(game);
 	eExplosionPhysics(game);
 	civilianPhysics(game);
+	ufoPhysics(game);
 }
 
 void render_menu(Game *game)
@@ -426,6 +447,7 @@ void render(Game *game)
 	renderBackground(starsTexture);
 	//endLevel(game);
 	renderRadar(game);
+	renderUFO(game);
 	renderEMissiles(game);
 	renderEExplosions(game);
 	renderDefenseMissile(game);

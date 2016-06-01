@@ -6,17 +6,32 @@
 //Modified: 5/6/16
 
 #include "joseG.h"
+#include "danielT.h"
+#include "joseR.h"
+#include <iostream>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <unistd.h>
+#include <time.h>
+#include <math.h>
+#include <vector>
+#include <X11/Xlib.h>
+#include <X11/keysym.h>
 #include <GL/glx.h>
 extern "C" {
 #include "fonts.h"
 }
 
-//extern void init_opengl();
+using namespace std;
+
+#define MakeVector(x, y, z, v) (v)[0]=(x),(v)[1]=(y),(v)[2]=(z)
 
 GLuint cityTexture;
 GLuint streetTexture;
 GLuint civilianTexture;
 GLuint dcityTexture;
+GLuint ufoTexture;
 //JR
 GLuint c_cityTexture;
 
@@ -38,6 +53,82 @@ void initStruc(Game *game)
 		shape->city[i].center.x = 100 + i*200;
 		shape->city[i].center.y = 80;
 	}
+}
+
+void renderUFO(Game *game)
+{
+    if (game->ufoOn == 0)
+	return;
+	float w;
+	UFO *u = &game->ufo;
+	glColor3f(1.0, 1.0, 1.0);
+	glPushMatrix();
+	glTranslatef(u->pos.x, u->pos.y, 0);
+	w = 20;
+	//h = c->height + 10;
+	glBindTexture(GL_TEXTURE_2D, ufoTexture);
+	//For transparency
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+	glBegin(GL_QUADS);
+	if (u->vel.x > 0.0) {
+		glTexCoord2f(0.0f, 1.0f); glVertex2i(-w,-w);
+		glTexCoord2f(0.0f, 0.0f); glVertex2i(-w, w);
+		glTexCoord2f(1.0f, 0.0f); glVertex2i( w, w);
+		glTexCoord2f(1.0f, 1.0f); glVertex2i( w,-w);
+	}
+	else
+	{
+		glTexCoord2f(1.0f, 1.0f); glVertex2i(-w,-w);
+		glTexCoord2f(1.0f, 0.0f); glVertex2i(-w, w);
+		glTexCoord2f(0.0f, 0.0f); glVertex2i( w, w);
+		glTexCoord2f(0.0f, 1.0f); glVertex2i( w,-w);
+	}
+	glEnd();
+	glDisable(GL_BLEND);
+	glPopMatrix();
+	glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void initUFO(Game *g)
+{
+	UFO *u = &g->ufo;
+	//MakeVector(-150.0,180.0,0.0, u->pos);
+	//MakeVector(6.0,0.0,0.0, u->vel);
+	u->pos.x = -150.0;
+	//spawns UFO between 380 and 680
+	u->pos.y = (rand()%300)+480.0;
+	u->pos.z = 0.0;
+	u->vel.x = 4.0;
+	u->vel.y = 0.0;
+	u->vel.z = 0.0;
+}
+
+void ufoPhysics(Game *game)
+{
+    if (game->ufoOn == 0)
+	return;
+	UFO *u = &game->ufo;
+	//UFO *u;
+	//move ufo...
+	int addgrav = 1;
+	//Update position
+	u->pos.x += u->vel.x;
+	u->pos.y += u->vel.y;
+	//Check for collision with window edges
+	if ((u->pos.x < -140.0 && u->vel.x < 0.0) ||
+				(u->pos.x >= (float)WINDOW_WIDTH+140.0 && u->vel.x > 0.0)) {
+		u->vel.x = -u->vel.x;
+		addgrav = 0;
+	}
+	if ((u->pos.y < 470.0 && u->vel.y < 0.0) ||
+				(u->pos.y >= (float)WINDOW_HEIGHT && u->vel.y > 0.0)) {
+		u->vel.y = -u->vel.y;
+		addgrav = 0;
+	}
+	//Gravity
+	if (addgrav)
+		u->vel.y -= 0.50;
 }
 
 void destroyCity(Game *game, int citynum)
@@ -190,7 +281,9 @@ void civilianPhysics(Game *game)
 
 void renderBackground(GLuint starsTexture)
 {
-	glBindTexture(GL_TEXTURE_2D, starsTexture);
+	glPushMatrix();	
+	glColor3f(1.0,1.0,1.0);
+    	glBindTexture(GL_TEXTURE_2D, starsTexture);
 	glBegin(GL_QUADS);
 	glTexCoord2f(0.0f, 1.0f); glVertex2i(0, 0);
 	glTexCoord2f(0.0f, 0.0f); glVertex2i(0, WINDOW_HEIGHT);
@@ -198,6 +291,7 @@ void renderBackground(GLuint starsTexture)
 	glTexCoord2f(1.0f, 1.0f); glVertex2i(WINDOW_WIDTH, 0);
 	glEnd();
 	glBindTexture(GL_TEXTURE_2D, 0);
+	glPopMatrix();
 }
 
 void renderScores(Game *game)
