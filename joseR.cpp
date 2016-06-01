@@ -432,9 +432,10 @@ void levelEnd(Game *game)
 	//Calculate Score
 	if (rCount != rMissiles || cCount != rCities || game->lvl.alertPlayed == 0) {
 		timer += 0.1;
+		printf("%d | %d\n", rCount, rMissiles);
 		if (rCount != rMissiles) {
 			if (timer > m_delay) {
-				if (rMissiles > 15)
+				if (rMissiles > 14)
 					time(&start);
 				++rCount;
 				a->playAudio(34);			
