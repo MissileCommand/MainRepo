@@ -83,6 +83,20 @@ GLuint dmissileTexture;
 void renderDefenseMissile(Game *game)
 {
     extern int mCount;
+
+    
+    if (game->nmissiles == 0 && 
+        game->defMissilesRemaining > 0 &&
+            mCount == 0) {
+            game->defMissilesRemainingAfterLevel = 
+            game->defMissilesRemaining;
+//            cout << "nmissiles: " <<  game->nmissiles << 
+//                    "  defMissilesRemainingAfterLevel: " <<  game->defMissilesRemainingAfterLevel << 
+//                    "  mCount: " <<  mCount <<
+//                    endl;
+            
+    } 
+    
     
     if (game->level * 10 == mCount ) {
         
@@ -137,8 +151,11 @@ void renderDefenseMissile(Game *game)
     }
     
 
-    if (game->numberDefenseMissiles <= 0)
+    if (game->numberDefenseMissiles <= 0) {
+
         return;
+    }
+        
 
     
     
@@ -231,11 +248,7 @@ void nukeEmAll (Game *game)
 // seems OK now... :-)
 void makeDefenseMissile(Game *game, int x, int y)
 {
-    Audio *a;
-    if (game->nmissiles > 0 &&  game->defMissilesRemaining > 0) {
-        a->playAudio(20);
-    } 
-
+   
     
     if (game->numberDefenseMissiles >= MAX_D_MISSILES || 
             game->defMissilesRemaining <1) {
