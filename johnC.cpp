@@ -234,9 +234,8 @@ void nukeEmAll (Game *game)
 // seems OK now... :-)
 void makeDefenseMissile(Game *game, int x, int y)
 {
-    Audio *a;
     if (game->nmissiles > 0 &&  game->defMissilesRemaining > 0) {
-        a->playAudio(20);
+        //a->playAudio(20);
     } 
 
     
