@@ -14,6 +14,7 @@
 using namespace std;
 
 extern GLuint emissileTexture;
+extern GLuint c_emissileTexture;
 
 extern void eExplosionPhysics(Game *game);
 extern void eMissilePhysics(Game *game);

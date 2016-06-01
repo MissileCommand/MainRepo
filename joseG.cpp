@@ -32,6 +32,9 @@ GLuint streetTexture;
 GLuint civilianTexture;
 GLuint dcityTexture;
 GLuint ufoTexture;
+//JR
+GLuint c_cityTexture;
+GLuint c_floorTexture;
 
 void initStruc(Game *game)
 {
@@ -152,7 +155,10 @@ void renderStruc(Game *game)
 	glTranslatef(s->center.x, s->center.y, 0);
 	w = s->width;
 	h = s->height;
-	glBindTexture(GL_TEXTURE_2D, streetTexture);
+	if (game->gfxMode)
+		glBindTexture(GL_TEXTURE_2D, streetTexture);
+	else
+		glBindTexture(GL_TEXTURE_2D, c_floorTexture);
 	glBegin(GL_QUADS);
 	glTexCoord2f(0.0f, 1.0f); glVertex2i(-w,-h);
 	glTexCoord2f(0.0f, 0.0f); glVertex2i(-w, h);
@@ -172,7 +178,10 @@ void renderStruc(Game *game)
 		glTranslatef(c->center.x, c->center.y, 0);
 		w2 = c->width;
 		h2 = c->height;
-		glBindTexture(GL_TEXTURE_2D, cityTexture);
+		if (game->gfxMode)
+			glBindTexture(GL_TEXTURE_2D, cityTexture);
+		else
+			glBindTexture(GL_TEXTURE_2D, c_cityTexture);
 		//For transparency
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);

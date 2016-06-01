@@ -71,6 +71,10 @@ Ppmimage *mainmenuImage=NULL;
 Ppmimage *emissileImage=NULL;
 Ppmimage *dmissileImage=NULL;
 Ppmimage *dcityImage=NULL;
+Ppmimage *c_cityImage=NULL;
+Ppmimage *c_emissileImage=NULL;
+Ppmimage *c_dmissileImage=NULL;
+Ppmimage *c_floorImage=NULL;
 Ppmimage *ufoImage=NULL;
 GLuint starsTexture;
 
@@ -130,7 +134,6 @@ int main(void)
 				levelEnd(&game);
 			}
 		} else {
-		    	addHighScore(&game);
 			render_gameover(&game);
 		}
 		glXSwapBuffers(dpy, win);
@@ -208,17 +211,21 @@ void init_opengl(void)
 	system("convert ./images/street.jpg ./images/street.ppm");
 	system("convert ./images/stars.png ./images/stars.ppm");
 	system("convert ./images/civilian.jpg ./images/civilian.ppm");
-	//system("convert ./images/c_city.png ./images/c_city.ppm");
-	//system("convert ./images/c_bomber.png ./images/c_bomber.ppm");
-	//system("convert ./images/c_satellite.png ./images/c_satellite.ppm");
-	//system("convert ./images/c_silo.png ./images/c_silo.ppm");
-	//system("convert ./images/c_sbomb.png ./images/c_sbomb.ppm");
 	system("convert ./images/gameover.png ./images/gameover.ppm");
 	system("convert ./images/mainmenu.png ./images/mainmenu.ppm");
 	system("convert ./images/dcity.png ./images/dcity.ppm");
 	system("convert ./images/emissile.png ./images/emissile.ppm");
 	system("convert ./images/dmissile.png ./images/dmissile.ppm");
 	system("convert ./images/ufo.png ./images/ufo.ppm");
+	system("convert ./images/c_city.png ./images/c_city.ppm");
+	system("convert ./images/c_emissile.png ./images/c_emissile.ppm");
+	system("convert ./images/c_dmissile.png ./images/c_dmissile.ppm");
+	system("convert ./images/c_floor.png ./images/c_floor.ppm");
+	//system("convert ./images/c_bomber.png ./images/c_bomber.ppm");
+	//system("convert ./images/c_satellite.png ./images/c_satellite.ppm");
+	//system("convert ./images/c_silo.png ./images/c_silo.ppm");
+	//system("convert ./images/c_sbomb.png ./images/c_sbomb.ppm");
+
 	//load images into a ppm structure
 	cityImage = ppm6GetImage("./images/city.ppm");
 	starsImage = ppm6GetImage("./images/stars.ppm");
@@ -226,11 +233,16 @@ void init_opengl(void)
 	civilianImage = ppm6GetImage("./images/civilian.ppm");
 	gameoverImage =ppm6GetImage("./images/gameover.ppm");
 	mainmenuImage = ppm6GetImage("./images/mainmenu.ppm");
-	//load classic images
 	dcityImage = ppm6GetImage("./images/dcity.ppm");
 	emissileImage = ppm6GetImage("./images/emissile.ppm");
 	dmissileImage = ppm6GetImage("./images/dmissile.ppm");
 	ufoImage = ppm6GetImage("./images/ufo.ppm");
+	//classic images
+	c_cityImage = ppm6GetImage("./images/c_city.ppm");
+	c_emissileImage = ppm6GetImage("./images/c_emissile.ppm");
+	c_dmissileImage = ppm6GetImage("./images/c_dmissile.ppm");
+	c_floorImage = ppm6GetImage("./images/c_floor.ppm");
+
 	//create opengl texture elements
 	//stars
 	starsTexture = makeTexture(starsTexture, starsImage);
@@ -240,9 +252,6 @@ void init_opengl(void)
 	cityTexture = makeTransparentTexture(cityTexture, cityImage);
 	//civilian
 	civilianTexture = makeTransparentTexture(civilianTexture, civilianImage);
-	//Others
-	gameoverTexture = makeTransparentTexture(gameoverTexture, gameoverImage);
-	mainmenuTexture = makeTexture(mainmenuTexture, mainmenuImage);
 	//dcity
 	dcityTexture = makeTransparentTexture(cityTexture, dcityImage);
 	//emissile
@@ -251,6 +260,14 @@ void init_opengl(void)
 	dmissileTexture = makeTransparentTexture(cityTexture, dmissileImage);
 	//ufo
 	ufoTexture = makeTransparentTexture(cityTexture, ufoImage);
+	//Others
+	gameoverTexture = makeTransparentTexture(gameoverTexture, gameoverImage);
+	mainmenuTexture = makeTexture(mainmenuTexture, mainmenuImage);
+	//Classic
+	c_floorTexture = makeTexture(c_floorTexture, c_floorImage);
+	c_cityTexture = makeTransparentTexture(c_cityTexture, c_cityImage);
+	c_emissileTexture = makeTransparentTexture(c_emissileTexture, c_emissileImage);
+	c_dmissileTexture = makeTransparentTexture(c_dmissileTexture, c_dmissileImage);
 	
 	//remove ppm's
 	remove("./images/city.ppm");
@@ -263,6 +280,11 @@ void init_opengl(void)
 	remove("./images/emissile.ppm");
 	remove("./images/dmissile.ppm");
 	remove("./images/ufo.ppm");
+	//remove classic stuff	
+	remove("./images/c_city.ppm");
+	remove("./images/c_emissile.ppm");
+	remove("./images/c_dmissile.ppm");
+	remove("./images/c_floor.ppm");
 }
 
 
@@ -354,12 +376,12 @@ int check_keys(XEvent *e, Game *game)
 		if (key == XK_n) {
 			nukeEmAll(game);
 		}
-                
-                
-                
-		//JR: Allows pause menu if play has been clicked
+        //JR: Allows pause menu if play has been clicked
 		if (key == XK_m && game->inGame == 1) {
 			game->gState ^= 1;
+		}
+		if (key == XK_c) {
+			classicMode(game);
 		}
 
 		//DT special feature - radar

@@ -75,6 +75,7 @@ extern void dMissileRemove(Game *game, int dMissilenumber);
 extern void createEExplosion(Game *game, float x, float y);
 int tempOneTime = 0;
 GLuint dmissileTexture;
+GLuint c_dmissileTexture;
 //void changeTitle() 
 //{
 //    XStoreName(dpy, win, "335 Lab1 JBC Changed Title to prove a point");
@@ -117,6 +118,7 @@ void renderDefenseMissile(Game *game)
     ggprint8b(&r, 16, 0x00005599, "'M' = Menu");
     ggprint8b(&r, 16, 0x00005599, "'R' = Radar");
     ggprint8b(&r, 16, 0x00005599, "'B' = UFO");
+    ggprint8b(&r, 16, 0x00005599, "'C' = Toggle GFX");
     ggprint8b(&r, 16, 0x00005599, "'Z' = Quit");
     ggprint8b(&r, 16, 0x00005599, "'[esc]' = Quit");
     
@@ -130,7 +132,10 @@ void renderDefenseMissile(Game *game)
         Vec *c = &game->dMissile[i].shape.center;
         w = 10;
         h = 10;
-		glBindTexture(GL_TEXTURE_2D, dmissileTexture);
+        if (game->gfxMode)
+            glBindTexture(GL_TEXTURE_2D, dmissileTexture);
+        else
+            glBindTexture(GL_TEXTURE_2D, c_dmissileTexture);
 		//For transparency
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);

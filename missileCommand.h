@@ -242,6 +242,7 @@ struct Game {
     int buttonSpacer[BUTTONS];
     int mouseOnButton[T_BUTTONS];
     int menuExit, gState, inGame, vVolume, gStart;
+    bool gfxMode;
     Shape mButton[BUTTONS];
     Shape sButton[BUTTONS_S];
     Shape menuBG;
@@ -268,7 +269,7 @@ struct Game {
         eearr = new EExplosion[1000];
         numberDefenseMissiles = 0;
         nmissiles = 0;
-	mCount = 0;
+        mCount = 0;
         neexplosions = 0;
         nsmissiles = 0;
         radarOn = 0;
@@ -278,6 +279,7 @@ struct Game {
         gStart = 1;
         inGame = 0;
         vVolume = 100;
+        gfxMode = 1;
         for (int i=0;i<BUTTONS;i++) {
             mouseOnButton[i] = 0;
         }
