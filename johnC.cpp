@@ -85,7 +85,7 @@ void renderDefenseMissile(Game *game)
     extern int mCount;
     
     if (game->level * 10 == mCount ) {
-        
+
         game->defMissilesRemaining = game->level * 10 *1.5;
         // cout << "defMissiles left in IF: " << game->defMissilesRemaining << endl;
     }
@@ -231,9 +231,8 @@ void nukeEmAll (Game *game)
 // seems OK now... :-)
 void makeDefenseMissile(Game *game, int x, int y)
 {
-    Audio *a;
     if (game->nmissiles > 0 &&  game->defMissilesRemaining > 0) {
-        a->playAudio(20);
+        //a->playAudio(20);
     } 
 
     

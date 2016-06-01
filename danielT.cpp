@@ -156,7 +156,7 @@ void eMissilePhysics(Game *game)
 		    e->pos.x <= c->center.x+c->width && 
 		    e->pos.x >= c->center.x-c->width) {
 		destroyCity(game, k);
-		game->lvl.cCount--;
+		//game->lvl.cCount--;
 		makeCivilian(game,c->center.x,c->center.y);
 		eMissileExplode(game, i);
 		a->playAudio(10);

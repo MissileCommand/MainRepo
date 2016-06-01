@@ -57,7 +57,8 @@ void nukeEmAll (Game *game);
 // JR Prototypes
 void render_menu(Game *game);
 void render_settings(Game *game);
-void render_newgame(Game *game); 
+void render_newgame(Game *game);
+void render_gameover(Game *game);
 
 void render(Game *game);
 
@@ -65,6 +66,8 @@ Ppmimage *cityImage=NULL;
 Ppmimage *starsImage=NULL;
 Ppmimage *streetImage=NULL;
 Ppmimage *civilianImage=NULL;
+Ppmimage *gameoverImage=NULL;
+Ppmimage *mainmenuImage=NULL;
 Ppmimage *emissileImage=NULL;
 Ppmimage *dmissileImage=NULL;
 Ppmimage *dcityImage=NULL;
@@ -124,8 +127,7 @@ int main(void)
 				levelEnd(&game);
 			}
 		} else {
-			printf("Game Over!\n");
-			//renderGameOver(&game);
+			render_gameover(&game);
 		}
 		glXSwapBuffers(dpy, win);
 	}
@@ -193,7 +195,7 @@ void init_opengl(void)
 	glDisable(GL_FOG);
 	glDisable(GL_CULL_FACE);
 	//Set the screen background color
-	glClearColor(0.1, 0.1, 0.1, 1.0);
+	glClearColor(0.0, 0.0, 0.0, 1.0);
 	//Initialize Fonts
 	glEnable(GL_TEXTURE_2D);
 	initialize_fonts();
@@ -202,6 +204,13 @@ void init_opengl(void)
 	system("convert ./images/street.jpg ./images/street.ppm");
 	system("convert ./images/stars.png ./images/stars.ppm");
 	system("convert ./images/civilian.jpg ./images/civilian.ppm");
+	//system("convert ./images/c_city.png ./images/c_city.ppm");
+	//system("convert ./images/c_bomber.png ./images/c_bomber.ppm");
+	//system("convert ./images/c_satellite.png ./images/c_satellite.ppm");
+	//system("convert ./images/c_silo.png ./images/c_silo.ppm");
+	//system("convert ./images/c_sbomb.png ./images/c_sbomb.ppm");
+	system("convert ./images/gameover.png ./images/gameover.ppm");
+	system("convert ./images/mainmenu.png ./images/mainmenu.ppm");
 	system("convert ./images/dcity.png ./images/dcity.ppm");
 	system("convert ./images/emissile.png ./images/emissile.ppm");
 	system("convert ./images/dmissile.png ./images/dmissile.ppm");
@@ -210,6 +219,9 @@ void init_opengl(void)
 	starsImage = ppm6GetImage("./images/stars.ppm");
 	streetImage = ppm6GetImage("./images/street.ppm");
 	civilianImage = ppm6GetImage("./images/civilian.ppm");
+	gameoverImage =ppm6GetImage("./images/gameover.ppm");
+	mainmenuImage = ppm6GetImage("./images/mainmenu.ppm");
+	//load classic images
 	dcityImage = ppm6GetImage("./images/dcity.ppm");
 	emissileImage = ppm6GetImage("./images/emissile.ppm");
 	dmissileImage = ppm6GetImage("./images/dmissile.ppm");
@@ -222,6 +234,9 @@ void init_opengl(void)
 	cityTexture = makeTransparentTexture(cityTexture, cityImage);
 	//civilian
 	civilianTexture = makeTransparentTexture(civilianTexture, civilianImage);
+	//Others
+	gameoverTexture = makeTransparentTexture(gameoverTexture, gameoverImage);
+	mainmenuTexture = makeTexture(mainmenuTexture, mainmenuImage);
 	//dcity
 	dcityTexture = makeTransparentTexture(cityTexture, dcityImage);
 	//emissile
@@ -234,6 +249,8 @@ void init_opengl(void)
 	remove("./images/stars.ppm");
 	remove("./images/street.ppm");
 	remove("./images/civilian.ppm");
+	remove("./images/gameover.ppm");
+	remove("./images/mainmenu.ppm");
 	remove("./images/dcity.ppm");
 	remove("./images/emissile.ppm");
 	remove("./images/dmissile.ppm");
@@ -270,8 +287,7 @@ void check_mouse(XEvent *e, Game *game)
                     game->defMissilesRemaining > 0) {
                         makeDefenseMissile(game, e->xbutton.x, y);
                         a->playAudio(20);
-                } else {
-                    game->defMissilesRemainingAfterLevel = 
+                    	game->defMissilesRemainingAfterLevel = 
                             game->defMissilesRemaining;
                 }
             }
@@ -366,14 +382,14 @@ void movement(Game *game)
 
 void render_menu(Game *game)
 {
-	renderBackground(starsTexture);
+	renderBackground(mainmenuTexture);
 	renderMenuObjects(game);
 	renderMenuText(game);
 }
 
 void render_settings(Game *game)
 {
-	renderBackground(starsTexture);
+	renderBackground(mainmenuTexture);
 	renderSettings(game);
 	renderSettingsText(game);
 }
@@ -383,7 +399,12 @@ void render_newgame(Game *game)
 	renderBackground(starsTexture);
 	renderStruc(game);
 	renderNewLevelMsg(game);
+}
 
+void render_gameover(Game *game)
+{
+	//renderBackground(gameoverTexture);
+	gameOver(game);
 }
 
 void render(Game *game)
