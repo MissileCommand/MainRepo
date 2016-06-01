@@ -82,7 +82,7 @@ void renderDefenseMissile(Game *game)
     extern int mCount;
     
     if (game->level * 10 == mCount ) {
-        
+
         game->defMissilesRemaining = game->level * 10 *1.5;
         // cout << "defMissiles left in IF: " << game->defMissilesRemaining << endl;
     }

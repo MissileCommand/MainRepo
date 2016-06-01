@@ -362,13 +362,11 @@ int lvlState(Game *game)
 	//printf("lvlState()\n");
 	if (gameState(game) != 5)
 		return -1;
-	int rMissiles = 0;
+	int rMissiles = game->lvl.prevMCount;
 	int rCities   = 0;
 	//TODO: Attach to correct struct variables
-	Shape *c;
 	for (int i = 0; i < CITYNUM; i++) {
-		c = &game->structures.city[i];
-		if (c[i].alive) {
+		if (game->structures.city[i].alive==1) {
 			rCities++;
 			game->lvl.aCities = rCities;
 		}
@@ -406,7 +404,8 @@ void levelEnd(Game *game)
 	time_t end   = game->lvl.end;
     double delay = game->lvl.delay;
 	float timer = game->lvl.timer;
-	int rCount = game->lvl.rCount, rMissiles = 10;
+	int rCount = game->lvl.rCount, rMissiles = game->lvl.prevMCount;
+	printf("%d\n", rMissiles);
 	int cCount = game->lvl.cCount, rCities = game->lvl.aCities;
     double diff = game->lvl.diff;
     double m_delay = game->lvl.m_delay;
@@ -543,7 +542,6 @@ void renderGameOverExpl(Game *game, double n)
 	c = &game->endExplosion;
 	c->radius = 0;
 	c->radius += n;
-	printf("%f\n", c->radius);
 	c->center.x = WINDOW_WIDTH / 2;
 	c->center.y = WINDOW_HEIGHT / 2;
 	//Render
@@ -562,7 +560,6 @@ void renderGameOverExpl(Game *game, double n)
 	glEnd();
 	glPopMatrix();
 	glDisable(GL_BLEND);
-	printf("State: %d\n", game->gState);
 }
 
 void renderBonusA(Game *game, int rCount, int cCount, bool type)

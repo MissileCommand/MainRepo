@@ -173,7 +173,7 @@ struct levelInfo {
     time_t start, end;
     clock_t gtime;
     float timer, alpha;
-    int rCount, cCount, mDone, alertPlayed;
+    int rCount, cCount, mDone, alertPlayed, prevMCount;
     double diff;
     bool cReset, explMax;
     //Time to stay in function by seconds
@@ -189,8 +189,10 @@ struct levelInfo {
         diff = 0;
         cReset = true, explMax = false;
         gtime = 0.0;
-        rCount = 0.0;
-        cCount = 0.0;
+        rCount = 0;
+        cCount = 0;
+        prevMCount = 0;
+        aCities = 0;
         start = 0, end = 0;
         timer = 0.0;
         alpha = 1.0;
@@ -235,7 +237,7 @@ struct Game {
     Shape mButton[BUTTONS];
     Shape sButton[BUTTONS_S];
     Shape menuBG;
-    Shape BonusA[10];
+    Shape BonusA[50];
     Shape BonusB[5];
     Shape endExplosion;
     Audio sounds;

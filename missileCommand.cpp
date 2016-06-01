@@ -124,7 +124,6 @@ int main(void)
 				levelEnd(&game);
 			}
 		} else {
-			printf("Game Over!\n");
 			render_gameover(&game);
 		}
 		glXSwapBuffers(dpy, win);
