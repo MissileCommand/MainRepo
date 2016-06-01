@@ -71,11 +71,8 @@ Ppmimage *mainmenuImage=NULL;
 Ppmimage *emissileImage=NULL;
 Ppmimage *dmissileImage=NULL;
 Ppmimage *dcityImage=NULL;
-<<<<<<< HEAD
 Ppmimage *c_cityImage=NULL;
-=======
 Ppmimage *ufoImage=NULL;
->>>>>>> refs/remotes/origin/master
 GLuint starsTexture;
 
 int main(void)
