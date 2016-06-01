@@ -28,5 +28,6 @@ extern void initRadar(Game *game);
 extern void createSMissile(Game *game);
 extern void sMissilePhysics(Game *game);
 extern void renderSMissile(Game *game);
+extern int mCount;
 
 #endif 
