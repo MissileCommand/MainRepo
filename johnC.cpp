@@ -44,6 +44,9 @@
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <GL/glx.h>
+#include <AL/al.h>
+#include <AL/alc.h>
+#include <AL/alut.h>
 
 
 
@@ -71,7 +74,7 @@ using namespace std;
 extern void dMissileRemove(Game *game, int dMissilenumber);
 extern void createEExplosion(Game *game, float x, float y);
 int tempOneTime = 0;
-
+GLuint dmissileTexture;
 //void changeTitle() 
 //{
 //    XStoreName(dpy, win, "335 Lab1 JBC Changed Title to prove a point");
@@ -99,27 +102,38 @@ void renderDefenseMissile(Game *game)
     r.center = 0;
     ggprint8b(&r, 16, 0x00005599, "Defense Missiles: %i", 
             game->defMissilesRemaining);
+    ggprint8b(&r, 16, 0x00005599, "");
+    ggprint8b(&r, 16, 0x00005599, "Keys Menu:");
+    ggprint8b(&r, 16, 0x00005599, "-------------");
+    ggprint8b(&r, 16, 0x00005599, "'n' = Nuke'em");
+    ggprint8b(&r, 16, 0x00005599, "'m' = Menu");
+    ggprint8b(&r, 16, 0x00005599, "'r' = Radar");
+    ggprint8b(&r, 16, 0x00005599, "'z' = Quit");
+    ggprint8b(&r, 16, 0x00005599, "'[esc]' = Quit");
+    
 
 
     DefenseMissile *dMissilePtr;
     float w, h;
-    
+    glColor3f(1.0, 1.0, 1.0);
+	glPushMatrix();
     for (int i=0; i<game->numberDefenseMissiles; i++) {
         Vec *c = &game->dMissile[i].shape.center;
-        w = 5;
-        h = 5;
-        glColor3f(game->dMissile[i].color[0],
-                game->dMissile[i].color[1], 
-                game->dMissile[i].color[2]);
-
+        w = 10;
+        h = 10;
+		glBindTexture(GL_TEXTURE_2D, dmissileTexture);
+		//For transparency
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
         glBegin(GL_QUADS);
-            glVertex2i(c->x-w, c->y-h);
-            glVertex2i(c->x-w, c->y+h);
-            glVertex2i(c->x+w, c->y+h);
-            glVertex2i(c->x+w, c->y-h);
-
-            glEnd();
-        glPopMatrix();
+            glTexCoord2f(0.0f, 1.0f); glVertex2i(c->x-w, c->y-h);
+            glTexCoord2f(0.0f, 0.0f); glVertex2i(c->x-w, c->y+h);
+            glTexCoord2f(1.0f, 0.0f); glVertex2i(c->x+w, c->y+h);
+            glTexCoord2f(1.0f, 1.0f); glVertex2i(c->x+w, c->y-h);
+		glEnd();
+		glDisable(GL_BLEND);
+		glPopMatrix();
+		glBindTexture(GL_TEXTURE_2D, 0);
     }
     
 
@@ -220,13 +234,16 @@ void nukeEmAll (Game *game)
 // seems OK now... :-)
 void makeDefenseMissile(Game *game, int x, int y)
 {
+    Audio *a;
+    if (game->nmissiles > 0 &&  game->defMissilesRemaining > 0) {
+        a->playAudio(20);
+    } 
+
     
     if (game->numberDefenseMissiles >= MAX_D_MISSILES || 
             game->defMissilesRemaining <1) {
         return;
     }
-        //std::cout << "makeDefenseMissile()" << x << " " << y << std::endl;
-    
         DefenseMissile *dMissilePtr = 
                 &game->dMissile[game->numberDefenseMissiles];
         dMissilePtr->shape.width = 10;
@@ -254,8 +271,6 @@ void makeDefenseMissile(Game *game, int x, int y)
         // test location of explosion vs mouse pick coords
         cout << "X,Y Mouse coords:" << dMissilePtr->destinationX << 
                 "," << dMissilePtr->destinationY << endl;
-        
-        
         
         // set speed of missile
         // 0.5 is a good start, 0.25 seemed a bit to slow & 5.0 

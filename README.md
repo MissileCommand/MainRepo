@@ -5,10 +5,12 @@ JBC ToDo's:
 - [x] Make missiles stop at mouse coords (currently temp fixed with work-around)
 - [x] Nuke 'em  
 - [x] Missiles start higher 
+- [x] Keyboard Menu 
+- [x] Show remaining missiles (maybe instead of pics in silos)  
 - [ ] Pics of missiles in Silos  
 - [ ] Detection of Silo destruction  
 - [ ] Maybe Flashing "X" (crosshairs)  
-- [ ] make count components global in game struct
+- [x] make count components global in game struct
 
 --------------------------------------------
 DT ToDo's: 
