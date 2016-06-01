@@ -225,6 +225,7 @@ struct Game {
     int nsmissiles;
     Radar radar;
     int radarOn;
+    int highScores[5];
 
     // DefenseMissile section
     int numberDefenseMissiles;
