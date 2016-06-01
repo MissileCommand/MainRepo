@@ -65,6 +65,9 @@ Ppmimage *cityImage=NULL;
 Ppmimage *starsImage=NULL;
 Ppmimage *streetImage=NULL;
 Ppmimage *civilianImage=NULL;
+Ppmimage *emissileImage=NULL;
+Ppmimage *dmissileImage=NULL;
+Ppmimage *dcityImage=NULL;
 GLuint starsTexture;
 
 int main(void)
@@ -199,11 +202,17 @@ void init_opengl(void)
 	system("convert ./images/street.jpg ./images/street.ppm");
 	system("convert ./images/stars.png ./images/stars.ppm");
 	system("convert ./images/civilian.jpg ./images/civilian.ppm");
+	system("convert ./images/dcity.png ./images/dcity.ppm");
+	system("convert ./images/emissile.png ./images/emissile.ppm");
+	system("convert ./images/dmissile.png ./images/dmissile.ppm");
 	//load images into a ppm structure
 	cityImage = ppm6GetImage("./images/city.ppm");
 	starsImage = ppm6GetImage("./images/stars.ppm");
 	streetImage = ppm6GetImage("./images/street.ppm");
 	civilianImage = ppm6GetImage("./images/civilian.ppm");
+	dcityImage = ppm6GetImage("./images/dcity.ppm");
+	emissileImage = ppm6GetImage("./images/emissile.ppm");
+	dmissileImage = ppm6GetImage("./images/dmissile.ppm");
 	//create opengl texture elements
 	//stars
 	starsTexture = makeTexture(starsTexture, starsImage);
@@ -213,11 +222,21 @@ void init_opengl(void)
 	cityTexture = makeTransparentTexture(cityTexture, cityImage);
 	//civilian
 	civilianTexture = makeTransparentTexture(civilianTexture, civilianImage);
-
+	//dcity
+	dcityTexture = makeTransparentTexture(cityTexture, dcityImage);
+	//emissile
+	emissileTexture = makeTransparentTexture(cityTexture, emissileImage);
+	//dmissile
+	dmissileTexture = makeTransparentTexture(cityTexture, dmissileImage);
+	
+	//remove ppm's
 	remove("./images/city.ppm");
 	remove("./images/stars.ppm");
 	remove("./images/street.ppm");
 	remove("./images/civilian.ppm");
+	remove("./images/dcity.ppm");
+	remove("./images/emissile.ppm");
+	remove("./images/dmissile.ppm");
 }
 
 
