@@ -52,8 +52,6 @@ extern void renderStruc(Game *game);
 extern void renderRadar(Game *game);
 extern void renderScores(Game *game);
 
-GLuint mCounter;
-GLuint cCounter;
 GLuint gameoverTexture;
 GLuint mainmenuTexture;
 
@@ -384,21 +382,33 @@ int lvlState(Game *game)
 	return 1;
 }
 
+void resetMainGame(Game *game)
+{
+	game->level = 0;
+	game->score = 0;
+	game->inGame = 0;
+	game->radarOn = 0;
+	game->ufoOn = 0;
+	for (int i = 0; i < CITYNUM; i++) {
+		game->structures.city[i].alive = 1;
+	}
+}
+
 void resetLevelEnd(Game *game)
 {
-    game->lvl.diff = 0;
-    game->lvl.cReset = true;
-    game->lvl.explMax = false;
-    game->lvl.gtime = 0.0;
-    game->lvl.rCount = 0;
-    game->lvl.cCount = 0;
-    game->lvl.start = 0;
-    game->lvl.end = 0;
-    game->lvl.timer = 0.0;
-    game->lvl.alpha = 1.0;
-    game->lvl.mDone = 1;
-    game->lvl.alertPlayed = 0;
-    game->lvl.aCities = 0;
+	game->lvl.diff = 0;
+	game->lvl.cReset = true;
+	game->lvl.explMax = false;
+	game->lvl.gtime = 0.0;
+	game->lvl.rCount = 0;
+	game->lvl.cCount = 0;
+	game->lvl.start = 0;
+	game->lvl.end = 0;
+	game->lvl.timer = 0.0;
+	game->lvl.alpha = 1.0;
+	game->lvl.mDone = 1;
+	game->lvl.alertPlayed = 0;
+	game->lvl.aCities = 0;
 }
 
 void levelEnd(Game *game)
@@ -406,15 +416,15 @@ void levelEnd(Game *game)
 	//Variables stored in struct levelInfo
 	time_t start = game->lvl.start;
 	time_t end   = game->lvl.end;
-    double delay = game->lvl.delay;
+	double delay = game->lvl.delay;
 	float timer = game->lvl.timer;
 	int rCount = game->lvl.rCount;
 	int rMissiles = game->lvl.prevMCount;
 	int cCount = game->lvl.cCount;
 	int rCities = game->lvl.aCities;
-    double diff = game->lvl.diff;
-    double m_delay = game->lvl.m_delay;
-    double c_delay = game->lvl.c_delay;
+	double diff = game->lvl.diff;
+	double m_delay = game->lvl.m_delay;
+	double c_delay = game->lvl.c_delay;
 	bool clockReset = game->lvl.cReset;
 	bool type = 0;
 	Audio *a;
@@ -525,7 +535,10 @@ void gameOver(Game *game)
 	if (difftime(end, start) > 8.0) {
 		//RESET level, score, cities, etc
 		//printf("8 seconds have passed...\n");
+		addHighScore(game);
+		resetMainGame(game);
 		resetLevelEnd(game);
+		createEMissiles(game, 0, 0);
 		game->gState = 1;
 		//highscore
 		//reset everything (score, levels, cities, etc...)
@@ -591,9 +604,9 @@ void renderBonusA(Game *game, int rCount, int cCount, bool type)
 	//Missiles
 	for (int i = 0; i < n; i++) {
 		s = &game->BonusA[i];
-		s->width = 2;
-		s->height = 5;
-		s->center.x = (WINDOW_WIDTH / 2) - 50 + i*10;
+		s->width = 8;
+		s->height = 10;
+		s->center.x = (WINDOW_WIDTH / 2) - 50 + i*15;
 		s->center.y = (WINDOW_HEIGHT / 2) + 110;
 	}
 	for (int i = 0; i < n; i++) {
@@ -605,19 +618,22 @@ void renderBonusA(Game *game, int rCount, int cCount, bool type)
 		w = s->width;
 		h = s->height;
 		//Attach texture
-		//glBindTexture(GL_TEXTURE_2D, cityTexture);
+		if (game->gfxMode)
+			glBindTexture(GL_TEXTURE_2D, dmissileTexture);
+		else
+			glBindTexture(GL_TEXTURE_2D, c_dmissileTexture);
 		//For transparency
-		//glEnable(GL_BLEND);
-		//glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 		glBegin(GL_QUADS);
-			glVertex2i(-w,-h);
-			glVertex2i(-w, h);
-			glVertex2i( w, h);
-			glVertex2i( w,-h);
+			glTexCoord2f(0.0f, 1.0f); glVertex2i(-w,-h);
+			glTexCoord2f(0.0f, 0.0f); glVertex2i(-w, h);
+			glTexCoord2f(1.0f, 0.0f); glVertex2i( w, h);
+			glTexCoord2f(1.0f, 1.0f); glVertex2i( w,-h);
 		glEnd();
-		//glDisable(GL_BLEND);
+		glDisable(GL_BLEND);
 		glPopMatrix();
-		//glBindTexture(GL_TEXTURE_2D, 0);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	//Cities
 	if (type) {
@@ -630,9 +646,9 @@ void renderBonusA(Game *game, int rCount, int cCount, bool type)
 			game->score += 100;
 		for (int i = 0; i < m; i++) {
 			s = &game->BonusB[i];
-			s->width = 12;
-			s->height = 8;
-			s->center.x = (WINDOW_WIDTH / 2) - 50 + i*40;
+			s->width = 24;
+			s->height = 12;
+			s->center.x = (WINDOW_WIDTH / 2) - 50 + i*60;
 			s->center.y = (WINDOW_HEIGHT / 2) + 60;
 		}
 		for (int i = 0; i < m; i++) {
@@ -644,19 +660,22 @@ void renderBonusA(Game *game, int rCount, int cCount, bool type)
 			w = s->width;
 			h = s->height;
 			//Attach texture
-			//glBindTexture(GL_TEXTURE_2D, cityTexture);
+			if (game->gfxMode)
+				glBindTexture(GL_TEXTURE_2D, cityTexture);
+			else
+				glBindTexture(GL_TEXTURE_2D, c_cityTexture);
 			//For transparency
-			//glEnable(GL_BLEND);
-			//glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+			glEnable(GL_BLEND);
+			glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 			glBegin(GL_QUADS);
-				glVertex2i(-w,-h);
-				glVertex2i(-w, h);
-				glVertex2i( w, h);
-				glVertex2i( w,-h);
+				glTexCoord2f(0.0f, 1.0f); glVertex2i(-w,-h);
+				glTexCoord2f(0.0f, 0.0f); glVertex2i(-w, h);
+				glTexCoord2f(1.0f, 0.0f); glVertex2i( w, h);
+				glTexCoord2f(1.0f, 1.0f); glVertex2i( w,-h);
 			glEnd();
-			//glDisable(GL_BLEND);
+			glDisable(GL_BLEND);
 			glPopMatrix();
-			//glBindTexture(GL_TEXTURE_2D, 0);
+			glBindTexture(GL_TEXTURE_2D, 0);
 		}
 	}
 }
@@ -668,7 +687,7 @@ void renderNewLevelMsg(Game *game)
 	rt.left = (WINDOW_WIDTH / 2);
 	time_t start = game->lvl.start;
 	time_t end   = game->lvl.end;
-    double delay = game->lvl.delay;
+	double delay = game->lvl.delay;
 	//std::cout << rt.bot << " " << rt.left << std::endl;
 	rt.center = 1;
 	Audio *a;
@@ -790,5 +809,4 @@ void classicMode(Game *game)
 	//Toggle Between Project and Classic Images
 	game->gfxMode ^= 1;
 	//Reload Audio
-	
 }

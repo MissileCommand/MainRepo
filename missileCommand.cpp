@@ -72,6 +72,9 @@ Ppmimage *emissileImage=NULL;
 Ppmimage *dmissileImage=NULL;
 Ppmimage *dcityImage=NULL;
 Ppmimage *c_cityImage=NULL;
+Ppmimage *c_emissileImage=NULL;
+Ppmimage *c_dmissileImage=NULL;
+Ppmimage *c_floorImage=NULL;
 Ppmimage *ufoImage=NULL;
 GLuint starsTexture;
 
@@ -131,7 +134,6 @@ int main(void)
 				levelEnd(&game);
 			}
 		} else {
-		    	addHighScore(&game);
 			render_gameover(&game);
 		}
 		glXSwapBuffers(dpy, win);
@@ -216,10 +218,14 @@ void init_opengl(void)
 	system("convert ./images/dmissile.png ./images/dmissile.ppm");
 	system("convert ./images/ufo.png ./images/ufo.ppm");
 	system("convert ./images/c_city.png ./images/c_city.ppm");
+	system("convert ./images/c_emissile.png ./images/c_emissile.ppm");
+	system("convert ./images/c_dmissile.png ./images/c_dmissile.ppm");
+	system("convert ./images/c_floor.png ./images/c_floor.ppm");
 	//system("convert ./images/c_bomber.png ./images/c_bomber.ppm");
 	//system("convert ./images/c_satellite.png ./images/c_satellite.ppm");
 	//system("convert ./images/c_silo.png ./images/c_silo.ppm");
 	//system("convert ./images/c_sbomb.png ./images/c_sbomb.ppm");
+
 	//load images into a ppm structure
 	cityImage = ppm6GetImage("./images/city.ppm");
 	starsImage = ppm6GetImage("./images/stars.ppm");
@@ -233,6 +239,10 @@ void init_opengl(void)
 	ufoImage = ppm6GetImage("./images/ufo.ppm");
 	//classic images
 	c_cityImage = ppm6GetImage("./images/c_city.ppm");
+	c_emissileImage = ppm6GetImage("./images/c_emissile.ppm");
+	c_dmissileImage = ppm6GetImage("./images/c_dmissile.ppm");
+	c_floorImage = ppm6GetImage("./images/c_floor.ppm");
+
 	//create opengl texture elements
 	//stars
 	starsTexture = makeTexture(starsTexture, starsImage);
@@ -254,7 +264,10 @@ void init_opengl(void)
 	gameoverTexture = makeTransparentTexture(gameoverTexture, gameoverImage);
 	mainmenuTexture = makeTexture(mainmenuTexture, mainmenuImage);
 	//Classic
+	c_floorTexture = makeTexture(c_floorTexture, c_floorImage);
 	c_cityTexture = makeTransparentTexture(c_cityTexture, c_cityImage);
+	c_emissileTexture = makeTransparentTexture(c_emissileTexture, c_emissileImage);
+	c_dmissileTexture = makeTransparentTexture(c_dmissileTexture, c_dmissileImage);
 	
 	//remove ppm's
 	remove("./images/city.ppm");
@@ -266,8 +279,12 @@ void init_opengl(void)
 	remove("./images/dcity.ppm");
 	remove("./images/emissile.ppm");
 	remove("./images/dmissile.ppm");
-	remove("./images/c_city.ppm");
 	remove("./images/ufo.ppm");
+	//remove classic stuff	
+	remove("./images/c_city.ppm");
+	remove("./images/c_emissile.ppm");
+	remove("./images/c_dmissile.ppm");
+	remove("./images/c_floor.ppm");
 }
 
 

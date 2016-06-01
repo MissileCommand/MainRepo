@@ -15,6 +15,7 @@ extern void renderMenuText(Game *game);
 extern void renderSettings(Game *game);
 extern void renderSettingsText(Game *game);
 extern int lvlState(Game *game);
+extern void resetMainGame(Game *game);
 extern void resetLevelEnd(Game *game);
 extern void levelEnd(Game *game);
 extern void renderBonusA(Game *game, int rCount, int cCount, bool type);
@@ -23,9 +24,17 @@ extern void menuClick(Game *game);
 extern int gameState(Game *game);
 extern void classicMode(Game *game);
 
+//DT
+extern void addHighScore(Game *game);
+extern void createEMissiles(Game *game, float x, float y);
+
+//C
+extern GLuint dmissileTexture;
+extern GLuint c_dmissileTexture;
+extern GLuint cityTexture;
+extern GLuint c_cityTexture;
+
 //Textures
-extern GLuint mCounter;
-extern GLuint cCounter;
 extern GLuint gameoverTexture;
 extern GLuint mainmenuTexture;
 

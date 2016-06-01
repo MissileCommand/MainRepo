@@ -23,7 +23,7 @@ extern "C" {
 using namespace std;
 
 GLuint emissileTexture;
-
+GLuint c_emissileTexture;
 
 //macros for vectors
 #define rnd() (((double)rand())/(double)RAND_MAX)
@@ -358,7 +358,10 @@ void renderEMissiles(Game *g)
 	    //render Missiles using texture
 	    glColor3f(1.0,1.0,1.0);
 	    glPushMatrix();
-	    glBindTexture(GL_TEXTURE_2D, emissileTexture);
+	    if (g->gfxMode)
+	    	glBindTexture(GL_TEXTURE_2D, emissileTexture);
+	    else
+	    	glBindTexture(GL_TEXTURE_2D, c_emissileTexture);
 	    glEnable(GL_BLEND);
 	    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 	    glBegin(GL_QUADS);

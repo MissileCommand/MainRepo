@@ -15,6 +15,7 @@
 
 
 extern GLuint dmissileTexture;
+extern GLuint c_dmissileTexture;
 void fireDefenseMissile();
 // void changeTitle();
 
