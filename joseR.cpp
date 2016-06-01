@@ -103,7 +103,7 @@ void Audio::loadAudio()
 		"./sounds/missile_explosion.wav", "./sounds/missile_collision.wav",
 		"./sounds/missile_launch2.wav", "./sounds/mouse_click.wav",
 		"./sounds/mouse_release.wav", "./sounds/classic_tick.wav",
-		"./sounds/classic_lvl_start.wav" };
+		"./sounds/classic_lvl_start.wav", "./sounds/classic_gameover.wav" };
 	int val = 0;
 	//Load and assign sounds
 	for (int i = 0; i < TOTAL_SOUNDS; i++) {
@@ -142,7 +142,7 @@ void Audio::loadAudio()
 				//printf("File: %s stored in buffer[%d].\n", f, val);
 				source[val++] = alSource;
 			}
-		} else if (val >= 34 && val < 40) {
+		} else if (val >= 34 && val < 41) {
 			//Sets score counter and new level sound
 			if (val < 39) {
 				for (int n = 0; n < 5; n++) {
@@ -492,12 +492,13 @@ void gameOver(Game *game)
 
 	if (game->lvl.cReset) {
 		time(&start);
-		//a.playAudio(32);
+		//Play explosion
+		a->playAudio(40);
 		counter = 1;
 		game->lvl.cReset = false;
 	}
 	//
-	if (counter > 325.0) {
+	if (counter > 335.0) {
 		game->lvl.mDone = 0;
 		game->lvl.explMax = 1;
 	}
@@ -511,9 +512,9 @@ void gameOver(Game *game)
 		renderBackground(gameoverTexture);
 	renderGameOverExpl(game, counter);
 	time(&end);
-	if (difftime(end, start) > 10.0) {
+	if (difftime(end, start) > 8.0) {
 		//RESET level, score, cities, etc
-		printf("10 seconds have passed...\n");
+		//printf("8 seconds have passed...\n");
 		resetLevelEnd(game);
 		game->gState = 1;
 		//highscore

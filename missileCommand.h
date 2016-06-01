@@ -41,7 +41,7 @@
 //Divides WINDOW_WIDTH by the number below
 #define BUTTON_X 4.25
 #define CITYNUM 5
-#define TOTAL_SOUNDS 7
+#define TOTAL_SOUNDS 8
 //#define WINDOW_WIDTH  800
 //#define WINDOW_HEIGHT 600
 #define WINDOW_WIDTH  1024
