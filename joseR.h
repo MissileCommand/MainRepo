@@ -21,6 +21,7 @@ extern void renderBonusA(Game *game, int rCount, int cCount, bool type);
 extern void renderNewLevelMsg(Game *game);
 extern void menuClick(Game *game);
 extern int gameState(Game *game);
+extern void classicMode(Game *game);
 
 //Textures
 extern GLuint mCounter;

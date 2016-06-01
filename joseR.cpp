@@ -784,3 +784,11 @@ float gameVolume(Game *game)
 {
 	return game->sounds.gVolume;
 }
+
+void classicMode(Game *game)
+{
+	//Toggle Between Project and Classic Images
+	game->gfxMode ^= 1;
+	//Reload Audio
+	
+}

@@ -16,6 +16,7 @@ extern GLuint cityTexture;
 extern GLuint streetTexture;
 extern GLuint civilianTexture;
 extern GLuint dcityTexture;
+extern GLuint c_cityTexture;
 
 extern void initStruc(Game *game);
 extern void renderStruc(Game *game);

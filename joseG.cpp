@@ -17,6 +17,8 @@ GLuint cityTexture;
 GLuint streetTexture;
 GLuint civilianTexture;
 GLuint dcityTexture;
+//JR
+GLuint c_cityTexture;
 
 void initStruc(Game *game)
 {
@@ -81,7 +83,10 @@ void renderStruc(Game *game)
 		glTranslatef(c->center.x, c->center.y, 0);
 		w2 = c->width;
 		h2 = c->height;
-		glBindTexture(GL_TEXTURE_2D, cityTexture);
+		if (game->gfxMode)
+			glBindTexture(GL_TEXTURE_2D, cityTexture);
+		else
+			glBindTexture(GL_TEXTURE_2D, c_cityTexture);
 		//For transparency
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
