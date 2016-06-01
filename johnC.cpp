@@ -5,29 +5,6 @@
  * Purpose: Functions for firing Dmissiles (defense missiles) up to 
  *          destroy/Stop Emissiles (Enemy Missiles)
  *          
- *          (April 2016)
- *          So far I just change the title bar text with mouse left and 
- *          right buttons to prove I am accessing my functions from 
- *          main file "missileCommand.cpp" and visa-versa
- * 
- *          (05/07/2016)
- *          Added "fireDefenseMissile" (used to be "movement" 
- *          inside "missileCommand.cpp")
- *          
- *          removed the extra empty lines+ from within the functions
- *          (5/5/16)
- * 
- *          5/13-14
- *          Added missile firing to mouse coords from 0,0 ONLY!
- *          Still need to make it fire from other locations
- * 
- *          5/14-15/16
- *          added code to make defense missiles lime green and bigger
- *          also made them stop at mouse click location
- * 
- *          5/25/16
- *          Changed explosion coords to mouse location instead of missile 
- *          location to be more accurate. (SEE TODO #1)
  * 
  *          5/26-27/16
  *          - [x] Make missiles stop at mouse coords 
@@ -76,10 +53,6 @@ extern void createEExplosion(Game *game, float x, float y);
 int tempOneTime = 0;
 GLuint dmissileTexture;
 GLuint c_dmissileTexture;
-//void changeTitle() 
-//{
-//    XStoreName(dpy, win, "335 Lab1 JBC Changed Title to prove a point");
-//}
 
 void renderDefenseMissile(Game *game)
 {
