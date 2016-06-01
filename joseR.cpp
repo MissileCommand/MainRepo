@@ -363,7 +363,7 @@ int lvlState(Game *game)
 	if (gameState(game) != 5)
 		return -1;
 	int rMissiles = 0;
-	rMissiles = game->defMissilesRemainingAfterLevel - 1;
+	rMissiles = game->defMissilesRemainingAfterLevel;
 	int rCities   = 0;
 	//TODO: Attach to correct struct variables
 	for (int i = 0; i < CITYNUM; i++) {
@@ -434,6 +434,8 @@ void levelEnd(Game *game)
 		timer += 0.1;
 		if (rCount != rMissiles) {
 			if (timer > m_delay) {
+				if (rMissiles > 14)
+					time(&start);
 				++rCount;
 				a->playAudio(34);			
 				glClear(GL_COLOR_BUFFER_BIT);
@@ -582,6 +584,8 @@ void renderBonusA(Game *game, int rCount, int cCount, bool type)
 	//std::cout << rt.bot << " " << rt.left << std::endl;
 	rt.center = 1;
 	ggprint16(&rt, 16, 0x00ffffff, "%d", n*5);
+	if (n > 0)
+		game->score += 5;
 	//
 	Shape *s;	
 	//Missiles
@@ -622,6 +626,8 @@ void renderBonusA(Game *game, int rCount, int cCount, bool type)
 		rt.left = (WINDOW_WIDTH / 2) - 105;
 		rt.center = 1;
 		ggprint16(&rt, 16, 0x00ffffff, "%d", m*100);
+		if (m > 0)
+			game->score += 100;
 		for (int i = 0; i < m; i++) {
 			s = &game->BonusB[i];
 			s->width = 12;
