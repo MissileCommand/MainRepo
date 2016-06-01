@@ -96,7 +96,7 @@ int main(void)
 	// JBC 5/19/16
 	// added globally accesible defMissileSpeed so that we can 
 	// change it dynamically
-	game.defMissileSpeed = 80;
+	game.defMissileSpeed = 10;
 
 	initStruc(&game);
 	//Structures sh;
