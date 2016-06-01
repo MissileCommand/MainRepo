@@ -31,6 +31,7 @@ GLuint cityTexture;
 GLuint streetTexture;
 GLuint civilianTexture;
 GLuint dcityTexture;
+GLuint ufoTexture;
 
 void initStruc(Game *game)
 {
