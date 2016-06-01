@@ -71,6 +71,7 @@ Ppmimage *mainmenuImage=NULL;
 Ppmimage *emissileImage=NULL;
 Ppmimage *dmissileImage=NULL;
 Ppmimage *dcityImage=NULL;
+Ppmimage *ufoImage=NULL;
 GLuint starsTexture;
 
 int main(void)
@@ -99,6 +100,7 @@ int main(void)
 	//Changed call for function prototype 5-17-16 -DT
 	createEMissiles(&game, 0, 0);
 	initRadar(&game);
+	initUFO(&game);
 	//JR - Menu Object Shapes and Locations
 	drawMenu(&game);
 	drawSettings(&game);
@@ -214,6 +216,7 @@ void init_opengl(void)
 	system("convert ./images/dcity.png ./images/dcity.ppm");
 	system("convert ./images/emissile.png ./images/emissile.ppm");
 	system("convert ./images/dmissile.png ./images/dmissile.ppm");
+	system("convert ./images/ufo.png ./images/ufo.ppm");
 	//load images into a ppm structure
 	cityImage = ppm6GetImage("./images/city.ppm");
 	starsImage = ppm6GetImage("./images/stars.ppm");
@@ -225,6 +228,7 @@ void init_opengl(void)
 	dcityImage = ppm6GetImage("./images/dcity.ppm");
 	emissileImage = ppm6GetImage("./images/emissile.ppm");
 	dmissileImage = ppm6GetImage("./images/dmissile.ppm");
+	ufoImage = ppm6GetImage("./images/ufo.ppm");
 	//create opengl texture elements
 	//stars
 	starsTexture = makeTexture(starsTexture, starsImage);
@@ -243,6 +247,8 @@ void init_opengl(void)
 	emissileTexture = makeTransparentTexture(cityTexture, emissileImage);
 	//dmissile
 	dmissileTexture = makeTransparentTexture(cityTexture, dmissileImage);
+	//ufo
+	ufoTexture = makeTransparentTexture(cityTexture, ufoImage);
 	
 	//remove ppm's
 	remove("./images/city.ppm");
@@ -254,6 +260,7 @@ void init_opengl(void)
 	remove("./images/dcity.ppm");
 	remove("./images/emissile.ppm");
 	remove("./images/dmissile.ppm");
+	remove("./images/ufo.ppm");
 }
 
 
@@ -357,6 +364,11 @@ int check_keys(XEvent *e, Game *game)
 			game->radarOn ^= 1;
 		}
 
+		//JG: ufo
+		if (key == XK_b) {
+			game->ufoOn ^= 1;
+		}
+		
 		//You may check other keys here.
 	}
 	//JR: Check if exit button was clicked
@@ -378,6 +390,7 @@ void movement(Game *game)
 	//dMissilePhysics(game);
 	eExplosionPhysics(game);
 	civilianPhysics(game);
+	ufoPhysics(game);
 }
 
 void render_menu(Game *game)
@@ -421,6 +434,7 @@ void render(Game *game)
 	renderBackground(starsTexture);
 	//endLevel(game);
 	renderRadar(game);
+	renderUFO(game);
 	renderEMissiles(game);
 	renderEExplosions(game);
 	renderDefenseMissile(game);
