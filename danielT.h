@@ -13,6 +13,7 @@
 #define _DANIELT_H_
 using namespace std;
 
+extern GLuint emissileTexture;
 
 extern void eExplosionPhysics(Game *game);
 extern void eMissilePhysics(Game *game);

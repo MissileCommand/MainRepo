@@ -24,6 +24,7 @@ extern "C" {
 
 using namespace std;
 
+GLuint emissileTexture;
 
 //macros for vectors
 #define rnd() (((double)rand())/(double)RAND_MAX)
@@ -342,16 +343,21 @@ void renderEMissiles(Game *g)
 	    glEnd();
 	    glPopMatrix();
 
-	    //render Missiles
+		//render Missiles
+		glColor3f(1.0,1.0,1.0);
 	    glPushMatrix();
-	    glColor3f(e->color[0], e->color[1], e->color[2]);
+		glBindTexture(GL_TEXTURE_2D, emissileTexture);
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 	    glBegin(GL_QUADS);
-	    glVertex2i(e->pos.x-1, e->pos.y-6);
-	    glVertex2i(e->pos.x-3, e->pos.y+6);
-	    glVertex2i(e->pos.x+3, e->pos.y+6);
-	    glVertex2i(e->pos.x+1, e->pos.y-6);
-	    glEnd();
+	    glTexCoord2f(0.0f, 1.0f); glVertex2i(e->pos.x-8, e->pos.y-15);
+	    glTexCoord2f(0.0f, 0.0f); glVertex2i(e->pos.x-10, e->pos.y+15);
+	    glTexCoord2f(1.0f, 0.0f); glVertex2i(e->pos.x+10, e->pos.y+15);
+	    glTexCoord2f(1.0f, 1.0f); glVertex2i(e->pos.x+8, e->pos.y-15);
+		glEnd();
+		glDisable(GL_BLEND);
 	    glPopMatrix();
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
     }
     else {

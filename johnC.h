@@ -14,7 +14,7 @@
 #endif
 
 
-
+extern GLuint dmissileTexture;
 void fireDefenseMissile();
 // void changeTitle();
 

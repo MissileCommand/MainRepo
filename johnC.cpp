@@ -74,7 +74,7 @@ using namespace std;
 extern void dMissileRemove(Game *game, int dMissilenumber);
 extern void createEExplosion(Game *game, float x, float y);
 int tempOneTime = 0;
-
+GLuint dmissileTexture;
 //void changeTitle() 
 //{
 //    XStoreName(dpy, win, "335 Lab1 JBC Changed Title to prove a point");
@@ -115,23 +115,25 @@ void renderDefenseMissile(Game *game)
 
     DefenseMissile *dMissilePtr;
     float w, h;
-    
+    glColor3f(1.0, 1.0, 1.0);
+	glPushMatrix();
     for (int i=0; i<game->numberDefenseMissiles; i++) {
         Vec *c = &game->dMissile[i].shape.center;
-        w = 5;
-        h = 5;
-        glColor3f(game->dMissile[i].color[0],
-                game->dMissile[i].color[1], 
-                game->dMissile[i].color[2]);
-
+        w = 10;
+        h = 10;
+		glBindTexture(GL_TEXTURE_2D, dmissileTexture);
+		//For transparency
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
         glBegin(GL_QUADS);
-            glVertex2i(c->x-w, c->y-h);
-            glVertex2i(c->x-w, c->y+h);
-            glVertex2i(c->x+w, c->y+h);
-            glVertex2i(c->x+w, c->y-h);
-
-            glEnd();
-        glPopMatrix();
+            glTexCoord2f(0.0f, 1.0f); glVertex2i(c->x-w, c->y-h);
+            glTexCoord2f(0.0f, 0.0f); glVertex2i(c->x-w, c->y+h);
+            glTexCoord2f(1.0f, 0.0f); glVertex2i(c->x+w, c->y+h);
+            glTexCoord2f(1.0f, 1.0f); glVertex2i(c->x+w, c->y-h);
+		glEnd();
+		glDisable(GL_BLEND);
+		glPopMatrix();
+		glBindTexture(GL_TEXTURE_2D, 0);
     }
     
 
