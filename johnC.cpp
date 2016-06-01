@@ -45,6 +45,13 @@
 #include <X11/keysym.h>
 #include <GL/glx.h>
 
+
+
+extern "C" {
+#include "fonts.h"
+}
+
+
 // extra comment
 
 //#include "missileCommand.h"
@@ -77,13 +84,23 @@ void renderDefenseMissile(Game *game)
     if (game->level * 10 == mCount ) {
         
         game->defMissilesRemaining = game->level * 10 *1.5;
-        cout << "defMissiles left in IF: " << game->defMissilesRemaining << endl;
+        // cout << "defMissiles left in IF: " << game->defMissilesRemaining << endl;
     }
     if (game->level * 5 == mCount) {
-        cout << "mCount from JBC: " << mCount << endl;
+        // cout << "mCount from JBC: " << mCount << endl;
     }
-        cout << "defMissiles left: " << game->defMissilesRemaining << endl;
+        // cout << "defMissiles left: " << game->defMissilesRemaining << endl;
     
+
+     Rect r;
+    //glClear(GL_COLOR_BUFFER_BIT);
+    r.bot = WINDOW_HEIGHT-100;
+    r.left = 50.0;
+    r.center = 0;
+    ggprint8b(&r, 16, 0x00005599, "Defense Missiles: %i", 
+            game->defMissilesRemaining);
+
+
     DefenseMissile *dMissilePtr;
     float w, h;
     
@@ -151,6 +168,7 @@ void renderDefenseMissile(Game *game)
         }
 
     }
+    
 }
 
 
