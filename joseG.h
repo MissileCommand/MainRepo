@@ -16,6 +16,7 @@ extern GLuint cityTexture;
 extern GLuint streetTexture;
 extern GLuint civilianTexture;
 extern GLuint dcityTexture;
+extern GLuint ufoTexture;
 
 extern void initStruc(Game *game);
 extern void renderStruc(Game *game);
@@ -24,6 +25,9 @@ extern void renderBackground(GLuint starsTexture);
 extern void renderScores(Game *game);
 extern void makeCivilian(Game *game, int x, int y);
 extern void civilianPhysics(Game *game);
+extern void renderUFO(Game *game);
+extern void ufoPhysics(Game *game);
+extern void initUFO(Game *game);
 extern unsigned char *buildAlphaData(Ppmimage *img);
 extern GLuint makeTexture(GLuint texture, Ppmimage * image);
 extern GLuint makeTransparentTexture(GLuint texture, Ppmimage * image);
