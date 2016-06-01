@@ -45,6 +45,13 @@
 #include <X11/keysym.h>
 #include <GL/glx.h>
 
+
+
+extern "C" {
+#include "fonts.h"
+}
+
+
 // extra comment
 
 //#include "missileCommand.h"
@@ -63,7 +70,7 @@
 using namespace std;
 extern void dMissileRemove(Game *game, int dMissilenumber);
 extern void createEExplosion(Game *game, float x, float y);
-
+int tempOneTime = 0;
 
 //void changeTitle() 
 //{
@@ -72,6 +79,28 @@ extern void createEExplosion(Game *game, float x, float y);
 
 void renderDefenseMissile(Game *game)
 {
+    extern int mCount;
+    
+    if (game->level * 10 == mCount ) {
+        
+        game->defMissilesRemaining = game->level * 10 *1.5;
+        // cout << "defMissiles left in IF: " << game->defMissilesRemaining << endl;
+    }
+    if (game->level * 5 == mCount) {
+        // cout << "mCount from JBC: " << mCount << endl;
+    }
+        // cout << "defMissiles left: " << game->defMissilesRemaining << endl;
+    
+
+     Rect r;
+    //glClear(GL_COLOR_BUFFER_BIT);
+    r.bot = WINDOW_HEIGHT-100;
+    r.left = 50.0;
+    r.center = 0;
+    ggprint8b(&r, 16, 0x00005599, "Defense Missiles: %i", 
+            game->defMissilesRemaining);
+
+
     DefenseMissile *dMissilePtr;
     float w, h;
     
@@ -139,6 +168,7 @@ void renderDefenseMissile(Game *game)
         }
 
     }
+    
 }
 
 
@@ -152,6 +182,7 @@ void dMissileRemove(Game *game, int dMissilenumber)
     game->dMissile[dMissilenumber] = 
         game->dMissile[game->numberDefenseMissiles - 1];
     game->numberDefenseMissiles--;
+    game->defMissilesRemaining--;
 }
 
 void nukeEmAll (Game *game)
@@ -190,9 +221,10 @@ void nukeEmAll (Game *game)
 void makeDefenseMissile(Game *game, int x, int y)
 {
     
-
-    if (game->numberDefenseMissiles >= MAX_D_MISSILES)
+    if (game->numberDefenseMissiles >= MAX_D_MISSILES || 
+            game->defMissilesRemaining <1) {
         return;
+    }
         //std::cout << "makeDefenseMissile()" << x << " " << y << std::endl;
     
         DefenseMissile *dMissilePtr = 

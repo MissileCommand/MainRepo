@@ -150,19 +150,20 @@ void eMissilePhysics(Game *game)
 	//check for collision with cities 
 	for (k=0; k<CITYNUM; k++) {
 	    c = &sh->city[k];
-	    if (c[i].alive) {
-	    if (e->pos.y <= c->center.y+c->height && 
+	    //if (c.alive) {
+	    if (c->alive == 1 && e->pos.y <= c->center.y+c->height && 
 		    e->pos.x <= c->center.x+c->width && 
 		    e->pos.x >= c->center.x-c->width) {
 		destroyCity(game, k);
-		makeCivilian(game,c->width,c->height);
+		game->lvl.cCount--;
+		makeCivilian(game,c->center.x,c->center.y);
 		eMissileExplode(game, i);
 		a->playAudio(10);
 		chCount++;
 		game->score -= 10;
 		break;
 		    }
-	    }
+	    //}
 	}
 
 	if (k<CITYNUM)
@@ -171,7 +172,7 @@ void eMissilePhysics(Game *game)
 	//check for collision with floor
 	c = &sh->floor;
 	if (e->pos.y <= c->center.y+c->height) {
-		makeCivilian(game,c->width,c->height);
+		//makeCivilian(game,c->width,c->height);
 	    eMissileExplode(game, i);
 	    a->playAudio(0);
 	    continue;
@@ -185,7 +186,7 @@ void eMissilePhysics(Game *game)
 	    float yd = abs(e->pos.y-d->pos.y);
 	    float dist = sqrt(xd*xd+yd*yd);
 	    if (dist<=d->radius) {
-	    	makeCivilian(game,c->width,c->height);
+	    	//makeCivilian(game,10.0,c->height);
 		eMissileExplode(game,i);
 		a->playAudio(0);
 		game->score += 100;
@@ -226,6 +227,7 @@ void eMissileExplode(Game *game, int misnum)
     EMissile *e = &game->emarr[misnum];
     //create explosion graphic
     createEExplosion(game, e->pos.x, e->pos.y);
+    makeCivilian(game, 10.0, game->structures.floor.height);
     //delete missile
     game->emarr[misnum] = game->emarr[game->nmissiles-1];
     game->nmissiles--;
@@ -373,14 +375,20 @@ void renderEMissiles(Game *g)
 	    }
 	}
     }
+    int cCount = 0;
+    for (int c=0; c<CITYNUM; c++) {
+	if (g->structures.city[c].alive==1)
+	    cCount++;
+    }
     Rect r;
     //glClear(GL_COLOR_BUFFER_BIT);
     r.bot = WINDOW_HEIGHT-30;
     r.left = 50.0;
     r.center = 0;
     ggprint8b(&r, 16, 0x00005599, "LEVEL: %i", g->level);
-    ggprint8b(&r, 16, 0x00005599, "Missiles Remaining: %i", mCount);
+    //ggprint8b(&r, 16, 0x00005599, "Missiles Remaining: %i", mCount);
     ggprint8b(&r, 16, 0x00005599, "City Hit Count: %i", chCount);
+    ggprint8b(&r, 16, 0x00005599, "Remaining Cities: %i", cCount);
 }
 
 //function to be called in main render function to display enemy missiles
@@ -413,11 +421,11 @@ void renderEExplosions(Game *g)
 void createSMissile(Game *g)
 {
     SMissile *s = &g->smarr[g->nsmissiles];
-    s->pos.y = 300.0; //WINDOW_HEIGHT-1.0;
-    s->pos.x = 200.0; //(rand()%(WINDOW_WIDTH)-1.0);
+    s->pos.y = WINDOW_HEIGHT-1.0;
+    s->pos.x = (rand()%(WINDOW_WIDTH)-1.0);
     s->pos.z = 0.0;
-    s->vel.y = -1.0;//+(g->level*-0.5);
-    s->vel.x = s->vel.y*(s->pos.x-(rand()%WINDOW_WIDTH))/WINDOW_HEIGHT;
+    s->vel.y = -0.01;
+    s->vel.x = ((rand()%10)-5)*s->vel.y;
     s->vel.z = 0.0;
     s->color[0] = 0.1f;
     s->color[1] = 0.1f;
@@ -436,11 +444,12 @@ void sMissilePhysics(Game *g)
 
     for (int i=0; i<g->nsmissiles; i++) {
 
-	std::cout << s->pos.y << " " << s->pos.x << endl;
+	//std::cout << s->pos.y << " " << s->pos.x << endl;
 	s = &g->smarr[i];
 
 	s->pos.x += s->vel.x;
 	s->pos.y += s->vel.y;
+	s->vel.y -= 0.005;
 
 	//check for off screen
 	if (s->pos.y < 0.0 || s->pos.x <= 0.0 || s->pos.x >= WINDOW_WIDTH) {
@@ -489,12 +498,7 @@ void sMissilePhysics(Game *g)
 	    float xd = abs(s->pos.x-d->pos.x);
 	    float yd = abs(s->pos.y-d->pos.y);
 	    float dist = sqrt(xd*xd+yd*yd);
-	    if (dist<=d->radius+5.0) {
-		s->vel.y *= -1.0;
-		s->vel.x *= -1.0;
-		break;
-	    }
-	    else if (dist<=d->radius) {
+	    if (dist<=d->radius) {
 		createEExplosion(g, s->pos.x, s->pos.y);
 		g->smarr[i] = g->smarr[g->nsmissiles-1];
 		g->nsmissiles--;
@@ -502,11 +506,15 @@ void sMissilePhysics(Game *g)
 		g->score += 500;
 		break;
 	    }
+	    else if (dist<=d->radius+20.0) {
+		s->vel.y *= -0.75;
+		s->vel.x += ((rand()%10)-5)*0.1;
+		break;
+	    }
 	}
 	if (p<g->neexplosions)
 	    continue;
 
-	s->vel.y += 1.0;
     }
 }
 
@@ -516,14 +524,16 @@ void renderSMissile(Game *g)
     float twicePi = 2.0f * 3.14159265359;
     for (int i=0; i<g->nsmissiles; i++) {
         SMissile *s = &g->smarr[i];
-	//std::cout << "smis" << endl;
         glPushMatrix();
         glColor3f(s->color[0], s->color[1], s->color[2]);
-        glBegin(GL_QUADS);
-        glVertex2f(s->pos.x-3, s->pos.y-3);
-	glVertex2f(s->pos.x-3, s->pos.y+3);
-	glVertex2f(s->pos.x+3, s->pos.y+3);
-	glVertex2f(s->pos.x+3, s->pos.y-3);
+        glBegin(GL_TRIANGLE_FAN);
+        glVertex2f(s->pos.x, s->pos.y);
+	for (int i=0; i<=tris; i++) {
+		glVertex2f(
+			s->pos.x + (3.0 * cos(i * twicePi/tris)),
+			s->pos.y + (2.0 * sin(i * twicePi/tris))
+			);
+	}
         glEnd();
         glPopMatrix();
     }

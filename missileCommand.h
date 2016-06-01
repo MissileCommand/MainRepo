@@ -200,7 +200,6 @@ struct levelInfo {
 };
 
 struct Game {
-    //global variable for level 5-17-16 -DT
     int level;
     
     //global variable for score 5-25-16 -JG
@@ -224,6 +223,7 @@ struct Game {
     // array of Defense missile explosions
     DExplosion * defExplArray;
     int numDefExplosions;
+    int defMissilesRemaining;
     
     // JBC 05/08/16 JBC switched from DefenseMissile to dMissile (Defense Missile)
     DefenseMissile dMissile[MAX_D_MISSILES];
