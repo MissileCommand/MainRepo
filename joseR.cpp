@@ -212,11 +212,11 @@ void renderMenuObjects(Game *game)
 	//glBindTexture(GL_TEXTURE_2D, 0);
 	for (int i = 0; i < BUTTONS; i++) {
 		s = &game->mButton[i];
-		glColor3f(0.5, 0.75, 0.90);
+		glColor3ub(205,92,92);
 		//Button colors based on mouse position
 		if (game->mouseOnButton[i] == 1) {
 			//Button selected color
-			glColor3f(1.0, 0.0, 1.0);
+			glColor3ub(190,190,190);
 		}
 		glPushMatrix();
 		glTranslatef(s->center.x, s->center.y, 0);
