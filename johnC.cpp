@@ -88,10 +88,10 @@ void renderDefenseMissile(Game *game)
             game->mCount == 0) {
             game->defMissilesRemainingAfterLevel = 
             game->defMissilesRemaining;
-            cout << "nmissiles: " <<  game->nmissiles << 
-                    "  defMissilesRemainingAfterLevel: " <<  game->defMissilesRemainingAfterLevel << 
-                    "  mCount: " <<  game->mCount <<
-                    endl;
+//            cout << "nmissiles: " <<  game->nmissiles << 
+//                    "  defMissilesRemainingAfterLevel: " <<  game->defMissilesRemainingAfterLevel << 
+//                    "  mCount: " <<  game->mCount <<
+//                    endl;
          }
     if (5.0 + game->level*5.0 == game->mCount ) {
 
@@ -279,8 +279,8 @@ void makeDefenseMissile(Game *game, int x, int y)
         
         
         // test location of explosion vs mouse pick coords
-        cout << "X,Y Mouse coords:" << dMissilePtr->destinationX << 
-                "," << dMissilePtr->destinationY << endl;
+//        cout << "X,Y Mouse coords:" << dMissilePtr->destinationX << 
+//                "," << dMissilePtr->destinationY << endl;
         
         // set speed of missile
         // 0.5 is a good start, 0.25 seemed a bit to slow & 5.0 
