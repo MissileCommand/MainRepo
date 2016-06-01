@@ -287,8 +287,7 @@ void check_mouse(XEvent *e, Game *game)
                     game->defMissilesRemaining > 0) {
                         makeDefenseMissile(game, e->xbutton.x, y);
                         a->playAudio(20);
-                } else {
-                    game->defMissilesRemainingAfterLevel = 
+                    	game->defMissilesRemainingAfterLevel = 
                             game->defMissilesRemaining;
                 }
             }

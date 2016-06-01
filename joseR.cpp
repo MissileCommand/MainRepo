@@ -362,22 +362,25 @@ int lvlState(Game *game)
 	//printf("lvlState()\n");
 	if (gameState(game) != 5)
 		return -1;
-	int rMissiles = game->lvl.prevMCount;
+	int rMissiles = 0;
+	rMissiles = game->defMissilesRemainingAfterLevel - 1;
 	int rCities   = 0;
 	//TODO: Attach to correct struct variables
 	for (int i = 0; i < CITYNUM; i++) {
-		if (game->structures.city[i].alive==1) {
+		if (game->structures.city[i].alive == 1)
 			rCities++;
-			game->lvl.aCities = rCities;
-		}
 	}
 	//Check for Game Over
+	//rMissiles = 0;
+	//rCities = 0;
 	if (rCities == 0 && rMissiles == 0) {
 		//Set state to some unused value
 		game->gState = 99;
 		//renderGameOver(game);
 		return 2;
 	}
+	game->lvl.aCities = rCities;
+	game->lvl.prevMCount = rMissiles;
 	return 1;
 }
 
@@ -387,14 +390,15 @@ void resetLevelEnd(Game *game)
     game->lvl.cReset = true;
     game->lvl.explMax = false;
     game->lvl.gtime = 0.0;
-    game->lvl.rCount = 0.0;
-    game->lvl.cCount = 0.0;
+    game->lvl.rCount = 0;
+    game->lvl.cCount = 0;
     game->lvl.start = 0;
     game->lvl.end = 0;
     game->lvl.timer = 0.0;
     game->lvl.alpha = 1.0;
     game->lvl.mDone = 1;
     game->lvl.alertPlayed = 0;
+    game->lvl.aCities = 0;
 }
 
 void levelEnd(Game *game)
@@ -404,8 +408,10 @@ void levelEnd(Game *game)
 	time_t end   = game->lvl.end;
     double delay = game->lvl.delay;
 	float timer = game->lvl.timer;
-	int rCount = game->lvl.rCount, rMissiles = game->lvl.prevMCount;
-	int cCount = game->lvl.cCount, rCities = game->lvl.aCities;
+	int rCount = game->lvl.rCount;
+	int rMissiles = game->lvl.prevMCount;
+	int cCount = game->lvl.cCount;
+	int rCities = game->lvl.aCities;
     double diff = game->lvl.diff;
     double m_delay = game->lvl.m_delay;
     double c_delay = game->lvl.c_delay;
@@ -436,6 +442,10 @@ void levelEnd(Game *game)
 				renderBonusA(game, rCount, cCount, type);
 				timer = 0.0;
 			}
+		} else if (rCities == 0) {
+			game->gState = 99;
+			resetLevelEnd(game);
+			return;
 		} else if (cCount != rCities) {
 			game->lvl.mDone = 0;
 			type = 1;
@@ -462,10 +472,10 @@ void levelEnd(Game *game)
 	}
 	time(&end);
 	//Reset Game State once delay is reached
-	if (difftime(end, start) >= delay) {
+	if (difftime(end, start) >= delay+1.0) {
 		printf("Level: %d\n", game->level);
-		game->gState = 0;
 		resetLevelEnd(game);
+		game->gState = 0;
 	} else {
 		//Store calculated data
 		game->lvl.start = start;
@@ -610,7 +620,6 @@ void renderBonusA(Game *game, int rCount, int cCount, bool type)
 		Rect rt;
 		rt.bot = (WINDOW_HEIGHT / 2) + 50;
 		rt.left = (WINDOW_WIDTH / 2) - 105;
-		//std::cout << rt.bot << " " << rt.left << std::endl;
 		rt.center = 1;
 		ggprint16(&rt, 16, 0x00ffffff, "%d", m*100);
 		for (int i = 0; i < m; i++) {

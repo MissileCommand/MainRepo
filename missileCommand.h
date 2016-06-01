@@ -238,7 +238,7 @@ struct Game {
     Shape mButton[BUTTONS];
     Shape sButton[BUTTONS_S];
     Shape menuBG;
-    Shape BonusA[50];
+    Shape BonusA[200];
     Shape BonusB[5];
     Shape endExplosion;
     Audio sounds;
