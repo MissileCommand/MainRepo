@@ -60,7 +60,6 @@ const int MAX_EMISSILES = 10;
 //int mCount=0;
 int smCount=0;
 int chCount=0;
-int prevLevel=1;
 float msx=0;
 float msy=0;
 
@@ -212,11 +211,12 @@ void eMissilePhysics(Game *game)
 
 	//randomly generate new missile branch
 	//as long as more missiles are available
-	//only generate branches above middle of screen
+	//only generate branches above middle of screen and below top eighth
 	if ((rand()&99)==0 && 
 		game->nmissiles<10-game->level && 
 		game->mCount>10-game->level &&
-		e->pos.y>WINDOW_HEIGHT/2) {
+		e->pos.y>WINDOW_HEIGHT/2 &&
+		e->pos.y<((WINDOW_HEIGHT/8)*7)) {
 	    for (int q=0; q<(rand()%game->level); q++) {
 		createEMissiles(game, e->pos.x, e->pos.y);
 	    }
@@ -246,6 +246,8 @@ void eMissileExplode(Game *game, int misnum)
 
 void displayScore(Game *g) 
 {
+    if (g->level==1)
+	return;
     g->gState = 5;
     smCount = 1;
     if (g->level > 4)
@@ -265,9 +267,9 @@ void createEMissiles(Game *g, float x, float y)
 	g->mCount = 5+(g->level*5);
 	//after level has increased, return from function 
 	//level/score screen will then be displayed
-	if (prevLevel < g->level) {
+	if (g->prevLevel < g->level) {
 	    displayScore(g);
-	    prevLevel++;
+	    g->prevLevel++;
 	}
 	return;
     }
@@ -359,9 +361,9 @@ void renderEMissiles(Game *g)
 	    glColor3f(1.0,1.0,1.0);
 	    glPushMatrix();
 	    if (g->gfxMode)
-	    	glBindTexture(GL_TEXTURE_2D, emissileTexture);
+		glBindTexture(GL_TEXTURE_2D, emissileTexture);
 	    else
-	    	glBindTexture(GL_TEXTURE_2D, c_emissileTexture);
+		glBindTexture(GL_TEXTURE_2D, c_emissileTexture);
 	    glEnable(GL_BLEND);
 	    glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 	    glBegin(GL_QUADS);
@@ -734,10 +736,11 @@ void addHighScore(Game *g)
     int hscore = g->score;
     for (int i=0;i<5;i++) {
 	if (hscore >= g->highScores[i]) {
-	    for (int k=4;k>i+1;k--) {
+	    for (int k=4;k>i;k--) {
 		g->highScores[k] = g->highScores[k-1];
 	    }
 	    g->highScores[i] = hscore;
+	    return;
 	}
     }
 }

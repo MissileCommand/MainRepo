@@ -384,11 +384,13 @@ int lvlState(Game *game)
 
 void resetMainGame(Game *game)
 {
-	game->level = 0;
+	game->level = 1;
+	game->prevLevel = 1;
 	game->score = 0;
 	game->inGame = 0;
 	game->radarOn = 0;
 	game->ufoOn = 0;
+	game->mCount = 10;
 	for (int i = 0; i < CITYNUM; i++) {
 		game->structures.city[i].alive = 1;
 	}
