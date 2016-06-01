@@ -41,13 +41,13 @@
 //Divides WINDOW_WIDTH by the number below
 #define BUTTON_X 4.25
 #define CITYNUM 5
-#define TOTAL_SOUNDS 7
+#define TOTAL_SOUNDS 8
 //#define WINDOW_WIDTH  800
 //#define WINDOW_HEIGHT 600
 #define WINDOW_WIDTH  1024
 #define WINDOW_HEIGHT 768
 #define MAX_D_MISSILES 100
-#define MAX_PARTICLES 100
+#define MAX_PARTICLES 20
 #define GRAVITY 0.1
 
 //X Windows variables
@@ -172,26 +172,30 @@ class Audio
 struct levelInfo {    
     time_t start, end;
     clock_t gtime;
-    float timer;
-    int rCount, cCount, mDone, alertPlayed;
+    float timer, alpha;
+    int rCount, cCount, mDone, alertPlayed, prevMCount;
     double diff;
-    bool cReset;
+    bool cReset, explMax;
     //Time to stay in function by seconds
     double delay;
     //How fast missiles and cities are tallied
     double m_delay;
     double c_delay;
+    int aCities;
     levelInfo() {
         delay = 5.0;
         m_delay = 0.7;
         c_delay = 2.0;
         diff = 0;
-        cReset = true;
+        cReset = true, explMax = false;
         gtime = 0.0;
-        rCount = 0.0;
-        cCount = 0.0;
+        rCount = 0;
+        cCount = 0;
+        prevMCount = 0;
+        aCities = 0;
         start = 0, end = 0;
         timer = 0.0;
+        alpha = 1.0;
         mDone = 1;
         alertPlayed = 0;
     }
@@ -222,6 +226,7 @@ struct Game {
     DExplosion * defExplArray;
     int numDefExplosions;
     int defMissilesRemaining;
+    int defMissilesRemainingAfterLevel;
     
     // JBC 05/08/16 JBC switched from DefenseMissile to dMissile (Defense Missile)
     DefenseMissile dMissile[MAX_D_MISSILES];
@@ -233,9 +238,9 @@ struct Game {
     Shape mButton[BUTTONS];
     Shape sButton[BUTTONS_S];
     Shape menuBG;
-    Shape BonusA[10];
+    Shape BonusA[200];
     Shape BonusB[5];
-    Shape gameOver;
+    Shape endExplosion;
     Audio sounds;
     levelInfo lvl;
 

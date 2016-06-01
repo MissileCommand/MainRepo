@@ -57,7 +57,8 @@ void nukeEmAll (Game *game);
 // JR Prototypes
 void render_menu(Game *game);
 void render_settings(Game *game);
-void render_newgame(Game *game); 
+void render_newgame(Game *game);
+void render_gameover(Game *game);
 
 void render(Game *game);
 
@@ -65,6 +66,11 @@ Ppmimage *cityImage=NULL;
 Ppmimage *starsImage=NULL;
 Ppmimage *streetImage=NULL;
 Ppmimage *civilianImage=NULL;
+Ppmimage *gameoverImage=NULL;
+Ppmimage *mainmenuImage=NULL;
+Ppmimage *emissileImage=NULL;
+Ppmimage *dmissileImage=NULL;
+Ppmimage *dcityImage=NULL;
 GLuint starsTexture;
 
 int main(void)
@@ -121,8 +127,7 @@ int main(void)
 				levelEnd(&game);
 			}
 		} else {
-			printf("Game Over!\n");
-			//renderGameOver(&game);
+			render_gameover(&game);
 		}
 		glXSwapBuffers(dpy, win);
 	}
@@ -134,7 +139,7 @@ void set_title(void)
 {
 	//Set the window title bar.
 	XMapWindow(dpy, win);
-	XStoreName(dpy, win, "335 Lab1   LMB for dMissile");
+	XStoreName(dpy, win, "Missile Command / GTNW");
 }
 
 void cleanupXWindows(void)
@@ -190,7 +195,7 @@ void init_opengl(void)
 	glDisable(GL_FOG);
 	glDisable(GL_CULL_FACE);
 	//Set the screen background color
-	glClearColor(0.1, 0.1, 0.1, 1.0);
+	glClearColor(0.0, 0.0, 0.0, 1.0);
 	//Initialize Fonts
 	glEnable(GL_TEXTURE_2D);
 	initialize_fonts();
@@ -199,11 +204,27 @@ void init_opengl(void)
 	system("convert ./images/street.jpg ./images/street.ppm");
 	system("convert ./images/stars.png ./images/stars.ppm");
 	system("convert ./images/civilian.jpg ./images/civilian.ppm");
+	//system("convert ./images/c_city.png ./images/c_city.ppm");
+	//system("convert ./images/c_bomber.png ./images/c_bomber.ppm");
+	//system("convert ./images/c_satellite.png ./images/c_satellite.ppm");
+	//system("convert ./images/c_silo.png ./images/c_silo.ppm");
+	//system("convert ./images/c_sbomb.png ./images/c_sbomb.ppm");
+	system("convert ./images/gameover.png ./images/gameover.ppm");
+	system("convert ./images/mainmenu.png ./images/mainmenu.ppm");
+	system("convert ./images/dcity.png ./images/dcity.ppm");
+	system("convert ./images/emissile.png ./images/emissile.ppm");
+	system("convert ./images/dmissile.png ./images/dmissile.ppm");
 	//load images into a ppm structure
 	cityImage = ppm6GetImage("./images/city.ppm");
 	starsImage = ppm6GetImage("./images/stars.ppm");
 	streetImage = ppm6GetImage("./images/street.ppm");
 	civilianImage = ppm6GetImage("./images/civilian.ppm");
+	gameoverImage =ppm6GetImage("./images/gameover.ppm");
+	mainmenuImage = ppm6GetImage("./images/mainmenu.ppm");
+	//load classic images
+	dcityImage = ppm6GetImage("./images/dcity.ppm");
+	emissileImage = ppm6GetImage("./images/emissile.ppm");
+	dmissileImage = ppm6GetImage("./images/dmissile.ppm");
 	//create opengl texture elements
 	//stars
 	starsTexture = makeTexture(starsTexture, starsImage);
@@ -213,78 +234,96 @@ void init_opengl(void)
 	cityTexture = makeTransparentTexture(cityTexture, cityImage);
 	//civilian
 	civilianTexture = makeTransparentTexture(civilianTexture, civilianImage);
-
+	//Others
+	gameoverTexture = makeTransparentTexture(gameoverTexture, gameoverImage);
+	mainmenuTexture = makeTexture(mainmenuTexture, mainmenuImage);
+	//dcity
+	dcityTexture = makeTransparentTexture(cityTexture, dcityImage);
+	//emissile
+	emissileTexture = makeTransparentTexture(cityTexture, emissileImage);
+	//dmissile
+	dmissileTexture = makeTransparentTexture(cityTexture, dmissileImage);
+	
+	//remove ppm's
 	remove("./images/city.ppm");
 	remove("./images/stars.ppm");
 	remove("./images/street.ppm");
 	remove("./images/civilian.ppm");
+	remove("./images/gameover.ppm");
+	remove("./images/mainmenu.ppm");
+	remove("./images/dcity.ppm");
+	remove("./images/emissile.ppm");
+	remove("./images/dmissile.ppm");
 }
 
 
 void check_mouse(XEvent *e, Game *game)
 {
-	static int savex = 0;
-	static int savey = 0;
-	static int n = 0;
-	Audio *a;
-	a = &game->sounds;
+    static int savex = 0;
+    static int savey = 0;
+    static int n = 0;
+    Audio *a;
+    a = &game->sounds;
 
 
-	if (e->type == ButtonRelease) {
-		return;
-	}
-	if (e->type == ButtonPress && lvlState(game) < 0) {
-		//LEFT-CLICK
-		if (e->xbutton.button==1) {
-			//Left button was pressed
-			int y = WINDOW_HEIGHT - e->xbutton.y;
-			//Check game state when LEFT-clicking
-			if (gameState(game) == 1 || gameState(game) == 2) {
-				a->playAudio(30);
-				menuClick(game);
-				a->playAudio(32);
-			} else if (gameState(game) == 0) {
-				// JBC Added 5/30 to only make defense 
+    if (e->type == ButtonRelease) {
+            return;
+    }
+    if (e->type == ButtonPress && lvlState(game) < 0) {
+        //LEFT-CLICK
+        if (e->xbutton.button==1) {
+            //Left button was pressed
+            int y = WINDOW_HEIGHT - e->xbutton.y;
+            //Check game state when LEFT-clicking
+            if (gameState(game) == 1 || gameState(game) == 2) {
+                a->playAudio(30);
+                menuClick(game);
+                a->playAudio(32);
+            } else if (gameState(game) == 0) {
+                // JBC Added 5/30 to only make defense 
                 // missiles and play sound when enemy 
                 // missiles are present
-				if (game->nmissiles > 0) {
-					makeDefenseMissile(game, e->xbutton.x, y);
-					a->playAudio(20);
-				}
-			}
-			return;
-		}
-		//RIGHT-CLICK
-		if (e->xbutton.button==3) {
-			//Check game state when RIGHT-clicking
-			if (gameState(game) == 1) {
-				//Menu functions
-			} else if (gameState(game) == 0) {
-				//Game Functions
-				// fireDefenseMissile(game);
-				// JBC idea to add menu pop up for right-click
-				game->gState ^= 1;
-			}
-			return;
-		}
-	}
-	//Did the mouse move?
-	if (savex != e->xbutton.x || savey != e->xbutton.y) {
-		savex = e->xbutton.x;
-		savey = e->xbutton.y;
-		int y = WINDOW_HEIGHT - e->xbutton.y;
-		if (++n < 10)
-			return;
-		if (gameState(game) == 1 || gameState(game) == 2) {
-			//Menu Functions
-			mouseOver(savex, y, game);
-		} else if (gameState(game) == 0) {
-			//Game Functions
-			// JBC note 5/13
-			// moved the "particle" stuff out of here 
-			// makeParticle(game, e->xbutton.x, y);
-		}
-	}
+                if (game->nmissiles > 0 && 
+                    game->defMissilesRemaining > 0) {
+                        makeDefenseMissile(game, e->xbutton.x, y);
+                        a->playAudio(20);
+                    	game->defMissilesRemainingAfterLevel = 
+                            game->defMissilesRemaining;
+                }
+            }
+            return;
+        }
+        //RIGHT-CLICK
+        if (e->xbutton.button==3) {
+            //Check game state when RIGHT-clicking
+            if (gameState(game) == 1) {
+                //Menu functions
+            } else if (gameState(game) == 0) {
+                //Game Functions
+                // fireDefenseMissile(game);
+                // JBC idea to add menu pop up for right-click
+                game->gState ^= 1;
+            }
+            return;
+        }
+    }
+    //Did the mouse move?
+    if (savex != e->xbutton.x || savey != e->xbutton.y) {
+            savex = e->xbutton.x;
+            savey = e->xbutton.y;
+            int y = WINDOW_HEIGHT - e->xbutton.y;
+            if (++n < 10)
+                    return;
+            if (gameState(game) == 1 || gameState(game) == 2) {
+                    //Menu Functions
+                    mouseOver(savex, y, game);
+            } else if (gameState(game) == 0) {
+                    //Game Functions
+                    // JBC note 5/13
+                    // moved the "particle" stuff out of here 
+                    // makeParticle(game, e->xbutton.x, y);
+            }
+    }
 }
 
 int check_keys(XEvent *e, Game *game)
@@ -343,14 +382,14 @@ void movement(Game *game)
 
 void render_menu(Game *game)
 {
-	renderBackground(starsTexture);
+	renderBackground(mainmenuTexture);
 	renderMenuObjects(game);
 	renderMenuText(game);
 }
 
 void render_settings(Game *game)
 {
-	renderBackground(starsTexture);
+	renderBackground(mainmenuTexture);
 	renderSettings(game);
 	renderSettingsText(game);
 }
@@ -360,7 +399,12 @@ void render_newgame(Game *game)
 	renderBackground(starsTexture);
 	renderStruc(game);
 	renderNewLevelMsg(game);
+}
 
+void render_gameover(Game *game)
+{
+	//renderBackground(gameoverTexture);
+	gameOver(game);
 }
 
 void render(Game *game)

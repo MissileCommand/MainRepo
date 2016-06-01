@@ -16,6 +16,7 @@ extern "C" {
 GLuint cityTexture;
 GLuint streetTexture;
 GLuint civilianTexture;
+GLuint dcityTexture;
 
 void initStruc(Game *game)
 {
@@ -85,6 +86,26 @@ void renderStruc(Game *game)
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 		//glColor4ub(255,255,255,255);
+		glBegin(GL_QUADS);
+			glTexCoord2f(0.0f, 1.0f); glVertex2i(-w2,-h2);
+			glTexCoord2f(0.0f, 0.0f); glVertex2i(-w2, h2);
+			glTexCoord2f(1.0f, 0.0f); glVertex2i( w2, h2);
+			glTexCoord2f(1.0f, 1.0f); glVertex2i( w2,-h2);
+		glEnd();
+		glDisable(GL_BLEND);
+		glPopMatrix();
+		glBindTexture(GL_TEXTURE_2D, 0);
+		}
+		else {
+		glColor3f(1.0, 1.0, 1.0);
+		glPushMatrix();
+		glTranslatef(c->center.x, c->center.y, 0);
+		w2 = c->width;
+		h2 = c->height + 10;
+		glBindTexture(GL_TEXTURE_2D, dcityTexture);
+		//For transparency
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
 		glBegin(GL_QUADS);
 			glTexCoord2f(0.0f, 1.0f); glVertex2i(-w2,-h2);
 			glTexCoord2f(0.0f, 0.0f); glVertex2i(-w2, h2);
