@@ -16,10 +16,11 @@ JBC ToDo's:
 DT ToDo's: 
 - [ ] Help the rest of us since he codes too damn fast :-)
 - [x] City count after destruction (maybe via JG's code)
-- [ ] Missile spawn from UFOs
+- [x] Missile spawn from UFOs
 - [x] Smart Missile
 - [x] Possible texture on missiles (Garcia did it)
 - [x] make count componets global in game struct
+- [x] make array to track top five high scores while program running
 
 --------------------------------------------
 JR ToDo's: 

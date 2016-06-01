@@ -120,11 +120,24 @@ void eMissilePhysics(Game *game)
     EMissile *e;
     Shape *c;
     EExplosion *d;
+    UFO *u;
     Audio *a;
     a = &game->sounds;
 
-    //if (game->nmissiles <=0)
-    //	return;
+    //spawn missiles from UFO
+    u = &game->ufo;
+    if ((rand()&19)==0 && game->mCount>5 && game->nmissiles<7
+	    && u->pos.x > 0.0 && u->pos.x < WINDOW_WIDTH
+	    && game->nmissiles>3) {
+	for (int p=0; p<(rand()&3); p++) {
+	    createEMissiles(game, u->pos.x+p, u->pos.y+p);
+	}
+    }
+    if (game->nmissiles < 10) {
+	if ((rand()%(80/game->level))==0) {
+	    createEMissiles(game, 0, 0);
+	}
+    }
     for (int i=0; i<game->nmissiles; i++) {
 	e = &game->emarr[i];
 
@@ -144,7 +157,7 @@ void eMissilePhysics(Game *game)
 	}
 
 	int k;
-
+	int aliveCount=0;
 	//check for collision with cities 
 	for (k=0; k<CITYNUM; k++) {
 	    c = &sh->city[k];
@@ -160,6 +173,13 @@ void eMissilePhysics(Game *game)
 		game->score -= 10;
 		break;
 	    }
+	    else if (c->alive == 1) {
+		aliveCount++;
+	    }
+	}
+
+	if (aliveCount==0) {
+	    game->mCount = 0;
 	}
 
 	if (k<CITYNUM)
@@ -204,7 +224,7 @@ void eMissilePhysics(Game *game)
     }
     //puts in a random delay between missile creation
     if (game->nmissiles < 10) {
-	if ((rand()&((80/game->level)-1))==0) {
+	if ((rand()%(100/game->level))==0) {
 	    createEMissiles(game, 0, 0);
 	}
     }
@@ -243,13 +263,12 @@ void createEMissiles(Game *g, float x, float y)
 	    return;
 	g->level++;
 	g->mCount = 5+(g->level*5);
-	//after level has increased return from function 
+	//after level has increased, return from function 
 	//level/score screen will then be displayed
-	return;
-    }
-    if (prevLevel< g->level) {
-	displayScore(g);
-	prevLevel++;
+	if (prevLevel < g->level) {
+	    displayScore(g);
+	    prevLevel++;
+	}
 	return;
     }
 
@@ -381,14 +400,19 @@ void renderEMissiles(Game *g)
 	if (g->structures.city[c].alive==1)
 	    cCount++;
     }
+    if (cCount==0) {
+	g->mCount=0;
+    }
     //print out game info
     Rect r;
     r.bot = WINDOW_HEIGHT-30;
     r.left = 50.0;
     r.center = 0;
     ggprint8b(&r, 16, 0x00005599, "LEVEL: %i", g->level);
-    ggprint8b(&r, 16, 0x00005599, "City Hit Count: %i", chCount);
-    ggprint8b(&r, 16, 0x00005599, "Remaining Cities: %i", cCount);
+    ggprint8b(&r, 16, 0x00005599, "High Score 1: %i", g->highScores[0]);
+    ggprint8b(&r, 16, 0x00005599, "High Score 2: %i", g->highScores[1]);
+    //ggprint8b(&r, 16, 0x00005599, "City Hit Count: %i", chCount);
+    //ggprint8b(&r, 16, 0x00005599, "Remaining Cities: %i", cCount);
 }
 
 //function to display explosions
@@ -453,7 +477,8 @@ void sMissilePhysics(Game *g)
     a = &g->sounds;
 
     //create more smissiles if available
-    if (g->nsmissiles==0 && (rand()&59)==0) {
+    if (g->nsmissiles==0 && (rand()&99)==0
+	    && g->mCount>=5 && g->nmissiles >=10) {
 	createSMissile(g);
     }
     else if (smCount<=0 && g->nsmissiles==0)
@@ -526,8 +551,6 @@ void sMissilePhysics(Game *g)
 	    continue;
 	}
 
-
-
 	int p;
 	//check for explosion collision
 	for (p=0; p<g->neexplosions; p++) {
@@ -554,7 +577,6 @@ void sMissilePhysics(Game *g)
 	}
 	if (p<g->neexplosions)
 	    continue;
-
     }
 }
 
@@ -676,8 +698,10 @@ void initRadar(Game *g)
     r->tri[0].x = r->pos.x;
     r->tri[0].y = r->pos.y;
     r->tri[0].z = r->pos.z;
-    r->tri[1].x = r->pos.x + (r->radius * cos(r->radius2 * twicePi/tris));
-    r->tri[1].y = r->pos.y + (r->radius * sin(r->radius2 * twicePi/tris));
+    r->tri[1].x = r->pos.x + (r->radius * 
+	    cos(r->radius2 * twicePi/tris));
+    r->tri[1].y = r->pos.y + (r->radius * 
+	    sin(r->radius2 * twicePi/tris));
     r->tri[1].z = r->pos.z;
     r->tri[2].x = r->pos.x + (r->radius * 
 	    cos((r->radius2 * twicePi/tris)+twicePi/tris));
@@ -688,6 +712,31 @@ void initRadar(Game *g)
     r->color[1] = 0.973;
     r->color[2] = 0.016;
     r->color[3] = 0.3;
+}
+
+//initializes high scores to defaults 
+void initHighScores(Game *g)
+{
+    int basescore = 7500;
+    for (int i=0;i<5;i++) {
+	g->highScores[i] = basescore;
+	basescore -= 500;
+    }
+
+}
+
+//keeps track of highest five scores while game is running
+void addHighScore(Game *g)
+{
+    int hscore = g->score;
+    for (int i=0;i<5;i++) {
+	if (hscore >= g->highScores[i]) {
+	    for (int k=4;k>i+1;k--) {
+		g->highScores[k] = g->highScores[k-1];
+	    }
+	    g->highScores[i] = hscore;
+	}
+    }
 }
 
 
