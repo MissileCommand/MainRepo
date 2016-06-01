@@ -405,7 +405,6 @@ void levelEnd(Game *game)
     double delay = game->lvl.delay;
 	float timer = game->lvl.timer;
 	int rCount = game->lvl.rCount, rMissiles = game->lvl.prevMCount;
-	printf("%d\n", rMissiles);
 	int cCount = game->lvl.cCount, rCities = game->lvl.aCities;
     double diff = game->lvl.diff;
     double m_delay = game->lvl.m_delay;
