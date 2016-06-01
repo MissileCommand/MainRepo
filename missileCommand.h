@@ -226,6 +226,7 @@ struct Game {
     DExplosion * defExplArray;
     int numDefExplosions;
     int defMissilesRemaining;
+    int defMissilesRemainingAfterLevel;
     
     // JBC 05/08/16 JBC switched from DefenseMissile to dMissile (Defense Missile)
     DefenseMissile dMissile[MAX_D_MISSILES];

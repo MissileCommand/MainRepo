@@ -197,6 +197,7 @@ void dMissileRemove(Game *game, int dMissilenumber)
         game->dMissile[game->numberDefenseMissiles - 1];
     game->numberDefenseMissiles--;
     game->defMissilesRemaining--;
+    
 }
 
 void nukeEmAll (Game *game)
@@ -212,16 +213,12 @@ void nukeEmAll (Game *game)
             createEExplosion(game,  
                 enemyMissile->pos.x + enemyMissile->vel.x, 
                 enemyMissile->pos.y + enemyMissile->vel.y);
-                // down to left... vel.y = -0.5 & vel.x -=-0.46
-                // down to right. vel.y = -0.5 & vel.x = +0.3
             
         } else { 
             // dowmn and to the left enemy missile
             createEExplosion(game,  
                 enemyMissile->pos.x - fabs(enemyMissile->vel.x), 
                 enemyMissile->pos.y + enemyMissile->vel.y);
-                // down to left... vel.y = -0.5 & vel.x -=-0.46
-                // down to right. vel.y = -0.5 & vel.x = +0.3
             
         }
     }

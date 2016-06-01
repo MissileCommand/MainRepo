@@ -139,7 +139,7 @@ void set_title(void)
 {
 	//Set the window title bar.
 	XMapWindow(dpy, win);
-	XStoreName(dpy, win, "335 Lab1   LMB for dMissile");
+	XStoreName(dpy, win, "Missile Command / GTNW");
 }
 
 void cleanupXWindows(void)
@@ -287,6 +287,9 @@ void check_mouse(XEvent *e, Game *game)
                     game->defMissilesRemaining > 0) {
                         makeDefenseMissile(game, e->xbutton.x, y);
                         a->playAudio(20);
+                } else {
+                    game->defMissilesRemainingAfterLevel = 
+                            game->defMissilesRemaining;
                 }
             }
             return;
