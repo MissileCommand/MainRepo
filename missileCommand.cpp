@@ -66,14 +66,11 @@ Ppmimage *cityImage=NULL;
 Ppmimage *starsImage=NULL;
 Ppmimage *streetImage=NULL;
 Ppmimage *civilianImage=NULL;
-<<<<<<< HEAD
 Ppmimage *gameoverImage=NULL;
 Ppmimage *mainmenuImage=NULL;
-=======
 Ppmimage *emissileImage=NULL;
 Ppmimage *dmissileImage=NULL;
 Ppmimage *dcityImage=NULL;
->>>>>>> refs/remotes/origin/master
 GLuint starsTexture;
 
 int main(void)
