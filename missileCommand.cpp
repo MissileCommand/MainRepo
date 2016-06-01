@@ -101,6 +101,7 @@ int main(void)
 	createEMissiles(&game, 0, 0);
 	initRadar(&game);
 	initUFO(&game);
+	initHighScores(&game);
 	//JR - Menu Object Shapes and Locations
 	drawMenu(&game);
 	drawSettings(&game);
@@ -129,6 +130,7 @@ int main(void)
 				levelEnd(&game);
 			}
 		} else {
+		    	addHighScore(&game);
 			render_gameover(&game);
 		}
 		glXSwapBuffers(dpy, win);
@@ -290,8 +292,9 @@ void check_mouse(XEvent *e, Game *game)
                 // JBC Added 5/30 to only make defense 
                 // missiles and play sound when enemy 
                 // missiles are present
-                if (game->nmissiles > 0 && 
-                    game->defMissilesRemaining > 0) {
+                if ((game->nmissiles > 0 ||
+		       game->nsmissiles > 0) &&
+			game->defMissilesRemaining > 0) {
                         makeDefenseMissile(game, e->xbutton.x, y);
                         a->playAudio(20);
                     	game->defMissilesRemainingAfterLevel = 
@@ -367,6 +370,7 @@ int check_keys(XEvent *e, Game *game)
 		//JG: ufo
 		if (key == XK_b) {
 			game->ufoOn ^= 1;
+			initUFO(game);
 		}
 		
 		//You may check other keys here.
