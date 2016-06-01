@@ -363,7 +363,7 @@ int lvlState(Game *game)
 	if (gameState(game) != 5)
 		return -1;
 	int rMissiles = 0;
-	rMissiles = game->defMissilesRemainingAfterLevel - 1;
+	rMissiles = game->defMissilesRemainingAfterLevel;
 	int rCities   = 0;
 	//TODO: Attach to correct struct variables
 	for (int i = 0; i < CITYNUM; i++) {
@@ -432,7 +432,6 @@ void levelEnd(Game *game)
 	//Calculate Score
 	if (rCount != rMissiles || cCount != rCities || game->lvl.alertPlayed == 0) {
 		timer += 0.1;
-		printf("%d | %d\n", rCount, rMissiles);
 		if (rCount != rMissiles) {
 			if (timer > m_delay) {
 				if (rMissiles > 14)
