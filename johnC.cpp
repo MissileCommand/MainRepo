@@ -44,6 +44,9 @@
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <GL/glx.h>
+#include <AL/al.h>
+#include <AL/alc.h>
+#include <AL/alut.h>
 
 
 
@@ -99,6 +102,15 @@ void renderDefenseMissile(Game *game)
     r.center = 0;
     ggprint8b(&r, 16, 0x00005599, "Defense Missiles: %i", 
             game->defMissilesRemaining);
+    ggprint8b(&r, 16, 0x00005599, "");
+    ggprint8b(&r, 16, 0x00005599, "Keys Menu:");
+    ggprint8b(&r, 16, 0x00005599, "-------------");
+    ggprint8b(&r, 16, 0x00005599, "'n' = Nuke'em");
+    ggprint8b(&r, 16, 0x00005599, "'m' = Menu");
+    ggprint8b(&r, 16, 0x00005599, "'r' = Radar");
+    ggprint8b(&r, 16, 0x00005599, "'z' = Quit");
+    ggprint8b(&r, 16, 0x00005599, "'[esc]' = Quit");
+    
 
 
     DefenseMissile *dMissilePtr;
@@ -220,13 +232,16 @@ void nukeEmAll (Game *game)
 // seems OK now... :-)
 void makeDefenseMissile(Game *game, int x, int y)
 {
+    Audio *a;
+    if (game->nmissiles > 0 &&  game->defMissilesRemaining > 0) {
+        a->playAudio(20);
+    } 
+
     
     if (game->numberDefenseMissiles >= MAX_D_MISSILES || 
             game->defMissilesRemaining <1) {
         return;
     }
-        //std::cout << "makeDefenseMissile()" << x << " " << y << std::endl;
-    
         DefenseMissile *dMissilePtr = 
                 &game->dMissile[game->numberDefenseMissiles];
         dMissilePtr->shape.width = 10;
@@ -254,8 +269,6 @@ void makeDefenseMissile(Game *game, int x, int y)
         // test location of explosion vs mouse pick coords
         cout << "X,Y Mouse coords:" << dMissilePtr->destinationX << 
                 "," << dMissilePtr->destinationY << endl;
-        
-        
         
         // set speed of missile
         // 0.5 is a good start, 0.25 seemed a bit to slow & 5.0 

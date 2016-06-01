@@ -223,68 +223,69 @@ void init_opengl(void)
 
 void check_mouse(XEvent *e, Game *game)
 {
-	static int savex = 0;
-	static int savey = 0;
-	static int n = 0;
-	Audio *a;
-	a = &game->sounds;
+    static int savex = 0;
+    static int savey = 0;
+    static int n = 0;
+    Audio *a;
+    a = &game->sounds;
 
 
-	if (e->type == ButtonRelease) {
-		return;
-	}
-	if (e->type == ButtonPress && lvlState(game) < 0) {
-		//LEFT-CLICK
-		if (e->xbutton.button==1) {
-			//Left button was pressed
-			int y = WINDOW_HEIGHT - e->xbutton.y;
-			//Check game state when LEFT-clicking
-			if (gameState(game) == 1 || gameState(game) == 2) {
-				a->playAudio(30);
-				menuClick(game);
-				a->playAudio(32);
-			} else if (gameState(game) == 0) {
-				// JBC Added 5/30 to only make defense 
+    if (e->type == ButtonRelease) {
+            return;
+    }
+    if (e->type == ButtonPress && lvlState(game) < 0) {
+        //LEFT-CLICK
+        if (e->xbutton.button==1) {
+            //Left button was pressed
+            int y = WINDOW_HEIGHT - e->xbutton.y;
+            //Check game state when LEFT-clicking
+            if (gameState(game) == 1 || gameState(game) == 2) {
+                a->playAudio(30);
+                menuClick(game);
+                a->playAudio(32);
+            } else if (gameState(game) == 0) {
+                // JBC Added 5/30 to only make defense 
                 // missiles and play sound when enemy 
                 // missiles are present
-				if (game->nmissiles > 0) {
-					makeDefenseMissile(game, e->xbutton.x, y);
-					a->playAudio(20);
-				}
-			}
-			return;
-		}
-		//RIGHT-CLICK
-		if (e->xbutton.button==3) {
-			//Check game state when RIGHT-clicking
-			if (gameState(game) == 1) {
-				//Menu functions
-			} else if (gameState(game) == 0) {
-				//Game Functions
-				// fireDefenseMissile(game);
-				// JBC idea to add menu pop up for right-click
-				game->gState ^= 1;
-			}
-			return;
-		}
-	}
-	//Did the mouse move?
-	if (savex != e->xbutton.x || savey != e->xbutton.y) {
-		savex = e->xbutton.x;
-		savey = e->xbutton.y;
-		int y = WINDOW_HEIGHT - e->xbutton.y;
-		if (++n < 10)
-			return;
-		if (gameState(game) == 1 || gameState(game) == 2) {
-			//Menu Functions
-			mouseOver(savex, y, game);
-		} else if (gameState(game) == 0) {
-			//Game Functions
-			// JBC note 5/13
-			// moved the "particle" stuff out of here 
-			// makeParticle(game, e->xbutton.x, y);
-		}
-	}
+                if (game->nmissiles > 0 && 
+                    game->defMissilesRemaining > 0) {
+                        makeDefenseMissile(game, e->xbutton.x, y);
+                        a->playAudio(20);
+                }
+            }
+            return;
+        }
+        //RIGHT-CLICK
+        if (e->xbutton.button==3) {
+            //Check game state when RIGHT-clicking
+            if (gameState(game) == 1) {
+                //Menu functions
+            } else if (gameState(game) == 0) {
+                //Game Functions
+                // fireDefenseMissile(game);
+                // JBC idea to add menu pop up for right-click
+                game->gState ^= 1;
+            }
+            return;
+        }
+    }
+    //Did the mouse move?
+    if (savex != e->xbutton.x || savey != e->xbutton.y) {
+            savex = e->xbutton.x;
+            savey = e->xbutton.y;
+            int y = WINDOW_HEIGHT - e->xbutton.y;
+            if (++n < 10)
+                    return;
+            if (gameState(game) == 1 || gameState(game) == 2) {
+                    //Menu Functions
+                    mouseOver(savex, y, game);
+            } else if (gameState(game) == 0) {
+                    //Game Functions
+                    // JBC note 5/13
+                    // moved the "particle" stuff out of here 
+                    // makeParticle(game, e->xbutton.x, y);
+            }
+    }
 }
 
 int check_keys(XEvent *e, Game *game)
