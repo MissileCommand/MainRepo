@@ -387,6 +387,7 @@ void movement(Game *game)
 {    
 	radarPhysics(game);
 	eMissilePhysics(game);
+	sMissilePhysics(game);
 	//dMissilePhysics(game);
 	eExplosionPhysics(game);
 	civilianPhysics(game);

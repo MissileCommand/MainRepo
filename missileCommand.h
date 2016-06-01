@@ -218,6 +218,7 @@ struct Game {
     //DT
     EMissile *emarr;                                  
     int nmissiles;
+    int mCount;
     EExplosion *eearr;
     int neexplosions;
     SMissile *smarr;
@@ -266,6 +267,7 @@ struct Game {
         eearr = new EExplosion[1000];
         numberDefenseMissiles = 0;
         nmissiles = 0;
+	mCount = 0;
         neexplosions = 0;
         nsmissiles = 0;
         radarOn = 0;
