@@ -83,7 +83,16 @@ GLuint dmissileTexture;
 void renderDefenseMissile(Game *game)
 {
     extern int mCount;
-    
+         if (game->nmissiles == 0 && 
+        game->defMissilesRemaining > 0 &&
+            mCount == 0) {
+            game->defMissilesRemainingAfterLevel = 
+            game->defMissilesRemaining;
+            cout << "nmissiles: " <<  game->nmissiles << 
+                    "  defMissilesRemainingAfterLevel: " <<  game->defMissilesRemainingAfterLevel << 
+                    "  mCount: " <<  mCount <<
+                    endl;
+         }
     if (game->level * 10 == mCount ) {
 
         game->defMissilesRemaining = game->level * 10 *1.5;
