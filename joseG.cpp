@@ -3,7 +3,7 @@
 //Purpose: This program is my source code for rendering shapes
 //that are supposed to represent the floor and cities
 //Written: 4/28/16
-//Modified: 5/6/16
+//Modified: 6/1/16
 
 #include "joseG.h"
 #include "danielT.h"
@@ -129,7 +129,7 @@ void ufoPhysics(Game *game)
 	}
 	//Gravity
 	if (addgrav)
-		u->vel.y -= 0.50;
+		u->vel.y -= 0.05;
 }
 
 void destroyCity(Game *game, int citynum)
