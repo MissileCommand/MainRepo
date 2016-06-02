@@ -218,7 +218,7 @@ void renderMenuObjects(Game *game)
 		//Button colors based on mouse position
 		if (game->mouseOnButton[i] == 1) {
 			//Button selected color
-			glColor3ub(190,190,190);
+			glColor3ub(120,120,120);
 		}
 		glPushMatrix();
 		glTranslatef(s->center.x, s->center.y, 0);
@@ -308,7 +308,7 @@ void renderSettings(Game *game)
 	s = &game->menuBG;
 	float w, h;
 	//glBindTexture(GL_TEXTURE_2D, 0);
-	glColor3ub(128,128,128);
+	glColor3ub(35,35,35);
 	glPushMatrix();
 	glTranslatef(s->center.x, s->center.y, 0);
 	w = s->width;
@@ -317,7 +317,8 @@ void renderSettings(Game *game)
 	if (game->howto == 1) {
 		glBindTexture(GL_TEXTURE_2D, howtoplayTexture);
 		w = s->width + 145;
-		h = s->height + 160;
+		h = s->height + 160;		
+		glColor3ub(255,255,255);
 	}
 	glBegin(GL_QUADS);
 		glTexCoord2f(0.0f, 1.0f); glVertex2i(-w,-h);
@@ -338,7 +339,7 @@ void renderSettings(Game *game)
 		glColor3ub(205,92,92);
 		if (game->mouseOnButton[i] == 1) {
 			//Button selected color
-			glColor3ub(190,190,190);
+			glColor3ub(120,120,120);
 		}
 		glPushMatrix();
 		glTranslatef(s->center.x, s->center.y, 0);
@@ -591,7 +592,13 @@ void renderGameOverExpl(Game *game, double n)
 		alpha -= 0.0045;
 		game->lvl.alpha = alpha;
 	}
-	glColor4f(1.0, 1.0, 1.0, alpha);
+	//if (!game->expColor) {
+	glColor4f(1.0, 0.35, 0.0, alpha);
+	game->expColor = true;
+	//} else {
+	//	glColor4f(1.0, 0.35, 0.0, alpha);
+	//	game->expColor = false;
+	//}
 	c = &game->endExplosion;
 	c->radius = 0;
 	c->radius += n;
@@ -621,10 +628,13 @@ void renderBonusA(Game *game, int rCount, int cCount, bool type)
 	int m = cCount;
 	//printf("%d | %d\n", n, m);
 	Rect rt;
-	rt.bot = (WINDOW_HEIGHT / 2) + 100;
-	rt.left = (WINDOW_WIDTH / 2) - 100;
 	//std::cout << rt.bot << " " << rt.left << std::endl;
 	rt.center = 1;
+	rt.bot = (WINDOW_HEIGHT / 2) + 200;
+	rt.left = (WINDOW_WIDTH / 2);
+	ggprint16(&rt, 16, 0x00ffffff, "BONUS   POINTS");
+	rt.bot = (WINDOW_HEIGHT / 2) + 100;
+	rt.left = (WINDOW_WIDTH / 2) - 100;
 	ggprint16(&rt, 16, 0x00ffffff, "%d", n*5);
 	if (n > 0)
 		game->score += 5;
@@ -727,8 +737,10 @@ void renderNewLevelMsg(Game *game)
 	if (game->lvl.alertPlayed == 0) {
 		a->playAudio(39);
 		time(&start);
-	}
-	ggprint16(&rt, 16, 0x00ffffff, "%d X POINTS", game->level);
+	}	
+	ggprint16(&rt, 16, 0x00ffffff, "%d  X  POINTS", game->level);
+	rt.bot = (WINDOW_HEIGHT / 2) + 100;
+	ggprint16(&rt, 16, 0x00ffffff, "LEVEL   %d", game->level);
 	rt.bot = (WINDOW_HEIGHT / 2) - 100;
 	ggprint16(&rt, 16, 0x00ffffff, "DEFEND               CITIES");
 	//
@@ -871,7 +883,6 @@ void lastCityMode(int x, int y, Game *game)
 	//Last Surviving City Moves on X-Axis based on mouse
 	int idx;
 	idx = isLastCity(game);
-	printf("%d\n", idx);
 	if (idx < 0) {
 		printf("There are still others...\n");
 		game->lcm ^= 1;

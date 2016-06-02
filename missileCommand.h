@@ -243,7 +243,7 @@ struct Game {
     int buttonSpacer[BUTTONS];
     int mouseOnButton[T_BUTTONS];
     int menuExit, gState, inGame, vVolume, gStart, howto, lcm;
-    bool gfxMode;
+    bool gfxMode, expColor;
     Shape mButton[BUTTONS];
     Shape sButton[BUTTONS_S];
     Shape menuBG;
@@ -284,6 +284,7 @@ struct Game {
         inGame = 0;
         vVolume = 100;
         gfxMode = 1;
+        expColor = 0;
         for (int i=0;i<BUTTONS;i++) {
             mouseOnButton[i] = 0;
         }
