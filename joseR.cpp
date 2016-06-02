@@ -45,6 +45,7 @@ extern "C" {
 using namespace std;
 
 extern void init_opengl();
+extern void initStruc(Game *game);
 extern GLuint starsTexture;
 extern GLuint cityTexture;
 extern void renderBackground(GLuint starsTexture);
@@ -54,6 +55,7 @@ extern void renderScores(Game *game);
 
 GLuint gameoverTexture;
 GLuint mainmenuTexture;
+GLuint howtoplayTexture;
 
 Audio::Audio()
 {
@@ -248,6 +250,9 @@ void renderMenuText(Game *game)
 	ggprint16(&rt, 16, 0x00ffffff, "Settings");
 	j++;
 	rt.bot = WINDOW_HEIGHT - game->buttonSpacer[j] - 10;
+	ggprint16(&rt, 16, 0x00ffffff, "How To Play");
+	j++;
+	rt.bot = WINDOW_HEIGHT - game->buttonSpacer[j] - 10;
 	if (game->inGame == 0) {
 		ggprint16(&rt, 16, 0x00ffffff, "Play");
 	} else {
@@ -271,17 +276,26 @@ void drawSettings(Game *game)
 	s->width = 125;
 	s->height = 25;
 	s->center.x = WINDOW_WIDTH / 2;
-	s->center.y = WINDOW_HEIGHT - 350;
+	s->center.y = WINDOW_HEIGHT - 685;
 	//Plus and Minus
-	for (int i = 1; i < BUTTONS_S; i++) {
-		s = &game->sButton[i];
-		s->width = 25;
-		s->height = 25;
-		if (i == 1)
-			s->center.x = WINDOW_WIDTH / 2 + 100;
-		if (i == 2)
-			s->center.x = WINDOW_WIDTH / 2 - 100;
-		s->center.y = WINDOW_HEIGHT - 250;
+	if (game->howto == 1) {
+		for (int i = 1; i < BUTTONS_S; i++) {
+			s = &game->sButton[i];
+			s->width = 25;
+			s->height = 25;
+			s->center.x = -50;
+		}
+	} else {
+		for (int i = 1; i < BUTTONS_S; i++) {
+			s = &game->sButton[i];
+			s->width = 25;
+			s->height = 25;
+			if (i == 1)
+				s->center.x = WINDOW_WIDTH / 2 + 100;
+			if (i == 2)
+				s->center.x = WINDOW_WIDTH / 2 - 100;
+			s->center.y = WINDOW_HEIGHT - 250;
+		}
 	}
 }
 
@@ -299,16 +313,26 @@ void renderSettings(Game *game)
 	glTranslatef(s->center.x, s->center.y, 0);
 	w = s->width;
 	h = s->height;
+	//Attach texture
+	if (game->howto == 1) {
+		glBindTexture(GL_TEXTURE_2D, howtoplayTexture);
+		w = s->width + 145;
+		h = s->height + 160;
+	}
 	glBegin(GL_QUADS);
-		glVertex2i(-w,-h);
-		glVertex2i(-w, h);
-		glVertex2i( w, h);
-		glVertex2i( w,-h);
+		glTexCoord2f(0.0f, 1.0f); glVertex2i(-w,-h);
+		glTexCoord2f(0.0f, 0.0f); glVertex2i(-w, h);
+		glTexCoord2f(1.0f, 0.0f); glVertex2i( w, h);
+		glTexCoord2f(1.0f, 1.0f); glVertex2i( w,-h);
 	glEnd();
 	glPopMatrix();
-	//glFlush();
-	//Render Settings Buttons
-	for (int i = 0; i < BUTTONS_S; i++) {
+	glBindTexture(GL_TEXTURE_2D, 0);
+//glFlush();
+	//Render Settings Buttons	
+	int numSButtons = BUTTONS_S;
+	if (game->howto == 1)
+		numSButtons = 1;
+	for (int i = 0; i < numSButtons; i++) {
 		s = &game->sButton[i];
 		float w, h;
 		glColor3ub(205,92,92);
@@ -335,22 +359,24 @@ void renderSettingsText(Game *game)
 {
 	Rect rt;
 	int j = 0;
-	rt.bot = WINDOW_HEIGHT - 250 - (j * 100) + 25;
-	rt.left = WINDOW_WIDTH / 2;
-	//std::cout << rt.bot << " " << rt.left << std::endl;
-	rt.center = 1;
-	ggprint16(&rt, 16, 0x00ffffff, "Volume");
-	rt.bot = WINDOW_HEIGHT - 250 - (j * 100) - 10;
-	rt.left = WINDOW_WIDTH / 2 - 100;
-	ggprint16(&rt, 16, 0x00ffffff, " - ");
-	rt.bot = WINDOW_HEIGHT - 250 - (j * 100) - 10;
-	rt.left = WINDOW_WIDTH / 2 + 100;
-	ggprint16(&rt, 16, 0x00ffffff, " + ");
-	rt.bot = WINDOW_HEIGHT - 250 - (j * 100) - 10;
-	rt.left = WINDOW_WIDTH / 2;
-	ggprint16(&rt, 16, 0x00ffffff, "%d", game->vVolume);
+	if (game->howto == 0) {
+		rt.bot = WINDOW_HEIGHT - 250 - (j * 100) + 25;
+		rt.left = WINDOW_WIDTH / 2;
+		//std::cout << rt.bot << " " << rt.left << std::endl;
+		rt.center = 1;
+		ggprint16(&rt, 16, 0x00ffffff, "Volume");
+		rt.bot = WINDOW_HEIGHT - 250 - (j * 100) - 10;
+		rt.left = WINDOW_WIDTH / 2 - 100;
+		ggprint16(&rt, 16, 0x00ffffff, " - ");
+		rt.bot = WINDOW_HEIGHT - 250 - (j * 100) - 10;
+		rt.left = WINDOW_WIDTH / 2 + 100;
+		ggprint16(&rt, 16, 0x00ffffff, " + ");
+		rt.bot = WINDOW_HEIGHT - 250 - (j * 100) - 10;
+		rt.left = WINDOW_WIDTH / 2;
+		ggprint16(&rt, 16, 0x00ffffff, "%d", game->vVolume);
+	}
 	j++;
-	rt.bot = WINDOW_HEIGHT - 250 - (j * 100) - 10;
+	rt.bot = WINDOW_HEIGHT - 250 - (j * 100) - 345;
 	rt.left = WINDOW_WIDTH / 2;
 	ggprint16(&rt, 16, 0x00ffffff, "Back");
 }
@@ -391,9 +417,10 @@ void resetMainGame(Game *game)
 	game->radarOn = 0;
 	game->ufoOn = 0;
 	game->mCount = 10;
-	for (int i = 0; i < CITYNUM; i++) {
-		game->structures.city[i].alive = 1;
-	}
+	//for (int i = 0; i < CITYNUM; i++) {
+	//	game->structures.city[i].alive = 1;
+	//}
+	initStruc(game);
 }
 
 void resetLevelEnd(Game *game)
@@ -604,6 +631,9 @@ void renderBonusA(Game *game, int rCount, int cCount, bool type)
 	//
 	Shape *s;	
 	//Missiles
+	if (n >= 20) {
+		n = 20;
+	}
 	for (int i = 0; i < n; i++) {
 		s = &game->BonusA[i];
 		s->width = 8;
@@ -650,7 +680,7 @@ void renderBonusA(Game *game, int rCount, int cCount, bool type)
 			s = &game->BonusB[i];
 			s->width = 24;
 			s->height = 12;
-			s->center.x = (WINDOW_WIDTH / 2) - 50 + i*60;
+			s->center.x = (WINDOW_WIDTH / 2) - 30 + i*60;
 			s->center.y = (WINDOW_HEIGHT / 2) + 60;
 		}
 		for (int i = 0; i < m; i++) {
@@ -748,12 +778,17 @@ void mouseOver(int savex, int savey, Game *game)
 void menuClick(Game *game)
 {
 	if (gameState(game) == 1) {
-		//Play Button (2)
-		if (game->mouseOnButton[2] == 1 && game->inGame == 0) {
+		//Play Button (3)
+		if (game->mouseOnButton[3] == 1 && game->inGame == 0) {
 			game->gState = 3;
 			game->inGame = 1;
-		} else if (game->mouseOnButton[2] == 1 && game->inGame == 1) {
+		} else if (game->mouseOnButton[3] == 1 && game->inGame == 1) {
 			game->gState = 0;
+		}
+		//How To Play/Instructions (2)
+		if (game->mouseOnButton[2] == 1) {
+			game->gState = 2;
+			game->howto = 1;
 		}
 		//Settings Button (1)
 		if (game->mouseOnButton[1] == 1) {
@@ -786,6 +821,7 @@ void menuClick(Game *game)
 		//Back
 		if (game->mouseOnButton[0] == 1) {
 			game->gState = 1;
+			game->howto = 0;
 		}
 	}
 }
@@ -810,5 +846,42 @@ void classicMode(Game *game)
 {
 	//Toggle Between Project and Classic Images
 	game->gfxMode ^= 1;
+	//Unload Audio
 	//Reload Audio
+}
+
+int isLastCity(Game *game)
+{
+	int counter = 0;
+	int x;
+	for (int i = 0; i < CITYNUM; i++) {
+		if (game->structures.city[i].alive == 1) {
+			counter++;
+			if (counter > 1)
+				return -1;
+			else
+				x = i;
+		}
+	}
+	return x;
+}
+
+void lastCityMode(int x, int y, Game *game)
+{
+	//Last Surviving City Moves on X-Axis based on mouse
+	int idx;
+	idx = isLastCity(game);
+	printf("%d\n", idx);
+	if (idx < 0) {
+		printf("There are still others...\n");
+		game->lcm ^= 1;
+		return;
+	} else {
+		Shape *c;
+		c = &game->structures.city[idx];
+		if (c->alive == 0)
+			game->lcm ^= 1;
+		c->center.x = x;
+		//c->center.y = y;
+	}
 }

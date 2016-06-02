@@ -34,7 +34,7 @@
 
 //MACROS
 //Number of buttons to show on menu
-#define BUTTONS 3
+#define BUTTONS 4
 #define BUTTONS_S 3
 #define T_BUTTONS BUTTONS + BUTTONS_S
 //X Position of all buttons
@@ -242,7 +242,7 @@ struct Game {
     //JR:
     int buttonSpacer[BUTTONS];
     int mouseOnButton[T_BUTTONS];
-    int menuExit, gState, inGame, vVolume, gStart;
+    int menuExit, gState, inGame, vVolume, gStart, howto, lcm;
     bool gfxMode;
     Shape mButton[BUTTONS];
     Shape sButton[BUTTONS_S];
@@ -278,6 +278,8 @@ struct Game {
 		ufoOn = 0;
         menuExit = 0;
         gState = 1;
+        howto = 0;
+        lcm = 0;
         gStart = 1;
         inGame = 0;
         vVolume = 100;

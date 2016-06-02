@@ -91,6 +91,7 @@ void renderDefenseMissile(Game *game)
     ggprint8b(&r, 16, 0x00005599, "'M' = Menu");
     ggprint8b(&r, 16, 0x00005599, "'R' = Radar");
     ggprint8b(&r, 16, 0x00005599, "'B' = UFO");
+    ggprint8b(&r, 16, 0x00005599, "'L' = Last City Standing");   
     ggprint8b(&r, 16, 0x00005599, "'C' = Toggle GFX");
     ggprint8b(&r, 16, 0x00005599, "'Z' = Quit");
     ggprint8b(&r, 16, 0x00005599, "'[esc]' = Quit");
