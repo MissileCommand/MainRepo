@@ -82,6 +82,14 @@ void renderDefenseMissile(Game *game)
     r.bot = WINDOW_HEIGHT-100;
     r.left = 50.0;
     r.center = 0;
+    
+    // JBC Note 06-01-2016 somehow game->defMissilesRemaining is getting past 0 
+    // (-2, etc) fixed by brute force... 
+    // not sure if its exactly correct, but the player wont know...
+    if ( game->defMissilesRemaining < 0 ) {
+        game->defMissilesRemaining = 0;
+    }
+    
     ggprint8b(&r, 16, 0x00005599, "Defense Missiles: %i", 
             game->defMissilesRemaining);
     ggprint8b(&r, 16, 0x00005599, "");
@@ -173,6 +181,8 @@ void renderDefenseMissile(Game *game)
 }
 
 
+/// JBC Note somehow game->defMissilesRemaining is getting past 0 (-2, etc)
+// need to find a fix...
 void dMissileRemove(Game *game, int dMissilenumber)
 {
     DefenseMissile *dMissilePtr = &game->dMissile[dMissilenumber];
