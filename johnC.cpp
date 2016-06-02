@@ -5,12 +5,40 @@
  * Purpose: Functions for firing Dmissiles (defense missiles) up to 
  *          destroy/Stop Emissiles (Enemy Missiles)
  *          
+  *          (April 2016)
+ *          So far I just change the title bar text with mouse left and 
+ *          right buttons to prove I am accessing my functions from 
+ *          main file "missileCommand.cpp" and visa-versa
+ * 
+ *          (05/07/2016)
+ *          Added "fireDefenseMissile" (used to be "movement" 
+ *          inside "missileCommand.cpp")
+ *          
+ *          removed the extra empty lines+ from within the functions
+ *          (5/5/16)
+ * 
+ *          5/13-14
+ *          Added missile firing to mouse coords from 0,0 ONLY!
+ *          Still need to make it fire from other locations
+ * 
+ *          5/14-15/16
+ *          added code to make defense missiles lime green and bigger
+ *          also made them stop at mouse click location
+ * 
+ *          5/25/16
+ *          Changed explosion coords to mouse location instead of missile 
+ *          location to be more accurate. (SEE TODO #1)
  * 
  *          5/26-27/16
  *          - [x] Make missiles stop at mouse coords 
  *          - [x] Nuke 'em  
  *          - [x] Missiles start higher 
-
+ * 
+ *          06/01/16 started work on fixing bug 
+ *          Def missile remaining shows up as negative numbers
+ *          somehow game->defMissilesRemaining is getting past 0 
+ *          (-2, etc) fixed by brute force... not sure if its
+ *          exactly correct, but the player might not notice
  * 
  */
 #include <iostream>
@@ -25,16 +53,10 @@
 #include <AL/alc.h>
 #include <AL/alut.h>
 
-
-
 extern "C" {
 #include "fonts.h"
 }
 
-
-// extra comment
-
-//#include "missileCommand.h"
 #ifndef MISSILECOMMAND_H
 #define MISSILECOMMAND_H
 #include "missileCommand.h"
@@ -56,26 +78,32 @@ GLuint c_dmissileTexture;
 
 void renderDefenseMissile(Game *game)
 {
-         if (game->nmissiles == 0 && 
-        game->defMissilesRemaining > 0 &&
-            game->mCount == 0) {
-            game->defMissilesRemainingAfterLevel = 
-            game->defMissilesRemaining;
-//            cout << "nmissiles: " <<  game->nmissiles << 
-//                    "  defMissilesRemainingAfterLevel: " <<  game->defMissilesRemainingAfterLevel << 
-//                    "  mCount: " <<  game->mCount <<
-//                    endl;
+            
+    // Find end of level to save "defMissilesRemainingAfterLevel" for JG
+    if (game->nmissiles == 0 && 
+    game->defMissilesRemaining > 0 &&
+        game->mCount == 0) {
+        game->defMissilesRemainingAfterLevel = 
+        game->defMissilesRemaining;
+        // cout << "nmissiles: " <<  game->nmissiles << 
+          //  "  defMissilesRemainingAfterLevel: " <<  
+          // game->defMissilesRemainingAfterLevel << 
+          //  "  mCount: " <<  game->mCount <<
+          //  endl;
          }
     if (5.0 + game->level*5.0 == game->mCount ) {
 
         game->defMissilesRemaining = game->level * 10 *1.5;
-        // cout << "defMissiles left in IF: " << game->defMissilesRemaining << endl;
+        // cout << "defMissiles left in IF: " << 
+         // game->defMissilesRemaining << endl;
     }
+    
+    // testing lines (or unit testing... )
     if (game->level * 5 == game->mCount) {
         // cout << "mCount from JBC: " << mCount << endl;
     }
-        // cout << "defMissiles left: " << game->defMissilesRemaining << endl;
-    
+        // cout << "defMissiles left: " << 
+        // game->defMissilesRemaining << endl;
 
      Rect r;
     //glClear(GL_COLOR_BUFFER_BIT);
@@ -83,7 +111,7 @@ void renderDefenseMissile(Game *game)
     r.left = 50.0;
     r.center = 0;
     
-    // JBC Note 06-01-2016 somehow game->defMissilesRemaining is getting past 0 
+    // JBC Note 06-01-2016 somehow game->defMissilesRemaining is goes past 0 
     // (-2, etc) fixed by brute force... 
     // not sure if its exactly correct, but the player wont know...
     if ( game->defMissilesRemaining < 0 ) {
@@ -113,30 +141,29 @@ void renderDefenseMissile(Game *game)
         Vec *c = &game->dMissile[i].shape.center;
         w = 10;
         h = 10;
-        if (game->gfxMode)
+        if (game->gfxMode) {
             glBindTexture(GL_TEXTURE_2D, dmissileTexture);
-        else
+        } else {
             glBindTexture(GL_TEXTURE_2D, c_dmissileTexture);
-		//For transparency
-		glEnable(GL_BLEND);
-		glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
+        
+        }
+        //For transparency
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA,GL_ONE_MINUS_SRC_ALPHA);
         glBegin(GL_QUADS);
-            glTexCoord2f(0.0f, 1.0f); glVertex2i(c->x-w, c->y-h);
-            glTexCoord2f(0.0f, 0.0f); glVertex2i(c->x-w, c->y+h);
-            glTexCoord2f(1.0f, 0.0f); glVertex2i(c->x+w, c->y+h);
-            glTexCoord2f(1.0f, 1.0f); glVertex2i(c->x+w, c->y-h);
-		glEnd();
-		glDisable(GL_BLEND);
-		glPopMatrix();
-		glBindTexture(GL_TEXTURE_2D, 0);
+        glTexCoord2f(0.0f, 1.0f); glVertex2i(c->x-w, c->y-h);
+        glTexCoord2f(0.0f, 0.0f); glVertex2i(c->x-w, c->y+h);
+        glTexCoord2f(1.0f, 0.0f); glVertex2i(c->x+w, c->y+h);
+        glTexCoord2f(1.0f, 1.0f); glVertex2i(c->x+w, c->y-h);
+        glEnd();
+        glDisable(GL_BLEND);
+        glPopMatrix();
+        glBindTexture(GL_TEXTURE_2D, 0);
     }
     
 
     if (game->numberDefenseMissiles <= 0)
         return;
-
-    
-    
     
     for (int i=0; i<game->numberDefenseMissiles; i++) {
         dMissilePtr = &game->dMissile[i];
@@ -145,7 +172,8 @@ void renderDefenseMissile(Game *game)
         if (dMissilePtr->destinationY >= dMissilePtr->shape.center.y ) {
 
 //            // test location of Missile vs mouse pick coords
-//            cout << "X,Y Missile coords just before the next move (velocity):" << 
+//            cout << "X,Y Missile coords just before the next move 
+                // (velocity):" << 
 //                    dMissilePtr->shape.center.x << 
 //                "," << dMissilePtr->shape.center.y << endl; 
 
@@ -163,7 +191,6 @@ void renderDefenseMissile(Game *game)
                 // Added "+ 1" otherwise the missile never explodes 
                         
             }
-            
             
         } else {
             
