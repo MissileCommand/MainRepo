@@ -23,6 +23,8 @@ extern void renderNewLevelMsg(Game *game);
 extern void menuClick(Game *game);
 extern int gameState(Game *game);
 extern void classicMode(Game *game);
+extern int isLastCity(Game *game);
+extern void lastCityMode(int x, int y, Game *game);
 
 //DT
 extern void addHighScore(Game *game);
@@ -33,6 +35,7 @@ extern GLuint dmissileTexture;
 extern GLuint c_dmissileTexture;
 extern GLuint cityTexture;
 extern GLuint c_cityTexture;
+extern GLuint howtoplayTexture;
 
 //Textures
 extern GLuint gameoverTexture;
