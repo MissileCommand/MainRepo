@@ -438,6 +438,7 @@ void render_menu(Game *game)
     renderBackground(mainmenuTexture);
     renderMenuObjects(game);
     renderMenuText(game);
+    game_credits(game);
 }
 
 void render_settings(Game *game)

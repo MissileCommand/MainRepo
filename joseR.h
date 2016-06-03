@@ -25,6 +25,7 @@ extern int gameState(Game *game);
 extern void classicMode(Game *game);
 extern int isLastCity(Game *game);
 extern void lastCityMode(int x, int y, Game *game);
+extern void game_credits(Game *game);
 
 //DT
 extern void addHighScore(Game *game);
