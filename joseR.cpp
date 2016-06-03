@@ -896,3 +896,14 @@ void lastCityMode(int x, int y, Game *game)
 		//c->center.y = y;
 	}
 }
+
+void game_credits(Game *game)
+{
+	Rect rt;
+	rt.bot = 20;
+	rt.left = WINDOW_WIDTH / 2;
+	rt.center = 1;
+	ggprint8b(&rt, 16, 0x00ffff00, 
+		"Created by: Daniel T, John C, Jose G, "
+		"and Jose R - CS335 [Software Engineering] Spring 2016");
+}
